@@ -1,6 +1,6 @@
 .vs/
-bin/
-bin-int/
+/bin/
+/bin-int/
 NigoziEngine/NigoziEngine.vcxproj
 NigoziEngine/NigoziEngine.vcxproj.filters
 NigoziEngine/NigoziEngine.vcxproj.user
