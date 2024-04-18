@@ -1,0 +1,10 @@
+.vs/
+bin/
+bin-int/
+NigoziEngine/NigoziEngine.vcxproj
+NigoziEngine/NigoziEngine.vcxproj.filters
+NigoziEngine/NigoziEngine.vcxproj.user
+Sandbox/Sandbox.vcxproj
+Sandbox/Sandbox.vcxproj.filters
+Sandbox/Sandbox.vcxproj.users
+NigoziEngine.sln
