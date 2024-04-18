@@ -15,17 +15,17 @@ namespace Nigozi
 
 		template<typename T, typename... Args>
 		void AddComponent(Args&&... args) {
-			m_componentStack.emplace_back(T(std::move<Args>(args)...));
+			m_componentStack.emplace_back(new T(std::move<Args>(args)...));
 		}
 		template<typename T>
 		void AddComponent() {
-			m_componentStack.emplace_back(T());
+			m_componentStack.emplace_back(new T());
 		}
 
 		template<typename T>
 		T* GetComponent() {
-			for (Component& component : m_componentStack) {
-				if (component.GetType() == typeid(T)) {
+			for (Component* component : m_componentStack) {
+				if (component->GetType() == typeid(T)) {
 					return static_cast<T*>(component);
 				}
 			}
@@ -39,7 +39,7 @@ namespace Nigozi
 		std::string Tag = "";
 		std::string Name = "";
 	private:
-		std::vector<Component> m_componentStack;
+		std::vector<Component*> m_componentStack;
 	};
 }
 

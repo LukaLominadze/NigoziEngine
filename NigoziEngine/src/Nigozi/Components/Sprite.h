@@ -9,8 +9,8 @@ namespace Nigozi
 	struct NG_API SpriteData {
 		SDL_Texture* p_texture = nullptr;
 
-		SDL_Rect dstrect = { };
-		SDL_Rect srcrect = { };
+		SDL_Rect dstrect = { 0, 0, 0, 0 };
+		SDL_Rect srcrect = { 0, 0, 0, 0 };
 
 		std::string spritePath = "";
 	};
@@ -27,7 +27,7 @@ namespace Nigozi
 
 		virtual void SetTargetIndex() override;
 
-		const virtual std::type_info& GetType() const override {
+		virtual const std::type_info& GetType() const override {
 			return typeid(*this);
 		}
 

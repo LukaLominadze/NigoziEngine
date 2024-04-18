@@ -42,7 +42,8 @@ namespace Nigozi
 		m_sprites.emplace_back(dynamic_cast<Sprite*>(component));
 
 		Sprite* p_sprite = m_sprites[m_vectorInstertIndex];
-		p_sprite->SetTexture(p_renderer->CreateTexture(p_sprite->data.spritePath));
+		p_renderer->CreateTexture(p_sprite->data);
+
 		p_sprite = nullptr;
 
 		m_vectorInstertIndex++;

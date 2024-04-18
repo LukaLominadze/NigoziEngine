@@ -37,12 +37,16 @@ namespace Nigozi
 		SDL_RenderPresent(p_renderer);
 	}
 
-	SDL_Texture* Renderer::CreateTexture(std::string spritePath)
+	void Renderer::CreateTexture(SpriteData& spriteData)
 	{
-		SDL_Surface* p_surface = IMG_Load(spritePath.c_str());
-		SDL_Texture* p_texture = SDL_CreateTextureFromSurface(p_renderer, p_surface);
-		SDL_FreeSurface(p_surface);
+		SDL_Surface* p_surface = IMG_Load(spriteData.spritePath.c_str());
+		spriteData.p_texture = SDL_CreateTextureFromSurface(p_renderer, p_surface);
 
-		return p_texture;
+		if (spriteData.srcrect.x == 0) {
+			spriteData.srcrect.w = p_surface->w;
+			spriteData.srcrect.h = p_surface->h;
+		}
+
+		SDL_FreeSurface(p_surface);
 	}
 }

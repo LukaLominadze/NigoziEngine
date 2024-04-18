@@ -18,7 +18,7 @@ namespace Nigozi
 		void DrawTexture(Sprite* p_sprite);
 		void Present();
 
-		SDL_Texture* CreateTexture(std::string spritePath);
+		void CreateTexture(SpriteData& spriteData);
 
 		inline SDL_Renderer* GetRenderer() const { return p_renderer; }
 	private:

@@ -28,7 +28,8 @@ if platform.system() == 'Windows':
                     print('Success! -> ' + ng_guid)
                     insert_count += 1
                 if '<ClCompile Include="src\\ngpch.cpp"' in line:
-                    lines.insert(i + 1, "\t\t\t<PrecompiledHeader Condition=\"'$(Configuration)|$(Platform)'=='Debug|x64'\">Create</PrecompiledHeader>\n")
+                    lines.insert(i + 1, "\t\t\t<PrecompiledHeader Condition=\"'$(Configuration)|$(Platform)'=='Debug|x64'\">Create</PrecompiledHeader>\n" +
+                                        "\t\t\t<PrecompiledHeader Condition=\"'$(Configuration)|$(Platform)'=='Release|x64'\">Create</PrecompiledHeader>\n")
                     insert_count += 1
                 if insert_count == 2:
                     break

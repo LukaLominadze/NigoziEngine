@@ -6,6 +6,7 @@ class Sandbox : public Application {
 public:
 	Sandbox() : Application("MyGame", 1366, 160) {
 		m_object.AddComponent<Sprite>("Player.png");
+		m_object.GetComponent<Sprite>()->data.dstrect = { 0, 0, 1366, 160 };
 	}
 	
 	void OnStart() override {
