@@ -1,5 +1,6 @@
 # Nigozi Engine
 ![image](https://github.com/LukaLominadze/NigoziEngine/assets/142942110/a63aec34-2335-42a5-90e3-f77dd0552cff)
+
 Nigozi Engine is a game engine framework designed to make 2D devolopment easier in C++. The engine is in the beginning stages of devlopment, many features and systems are yet to come!
 
 ***
@@ -18,7 +19,10 @@ The engine primarly only supports Windows and the build scripts will only run on
 After cloning the repository, simply run the 'Setup-windows.bat' file.
 
 You can type in the preffered build option, if a Visual Studio solution is needed, type the prefix 'vs' and the year.
-`vs2022'
+```cmd
+vs2022'
+```
+![image](https://github.com/LukaLominadze/PongSDL/assets/142942110/5c6a2334-fbde-451f-bcfa-c0c9bfac9eb8)
 
 Press enter and the project will be built.
 
