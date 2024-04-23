@@ -4,9 +4,12 @@ using namespace Nigozi;
 
 class Sandbox : public Application {
 public:
-	Sandbox() : Application("MyGame", 1366, 160) {
+	Sandbox() : Application("MyGame", 600, 600) {
 		m_object.AddComponent<Sprite>("Player.png");
-		m_object.GetComponent<Sprite>()->data.dstrect = { 0, 0, 1366, 160 };
+		Sprite* p_sprite = m_object.GetComponent<Sprite>();
+		p_sprite->data.srcrect = { 0, 0, 16, 16 };
+		p_sprite->data.dstrect = { 150, 150, 300, 300 };
+		p_sprite = nullptr;
 	}
 	
 	void OnStart() override {
@@ -20,15 +23,10 @@ public:
 	}
 
 	void OnRender() override {
-		SDL_Rect m_rect = { 100, 100, 50, 50 };
-		NG_Renderer->DrawRect(m_rect, 20, 60, 23, 255);	
-
 		SDL_Delay(1000 / 60);
 	}
 	
-	~Sandbox() {
-
-	}
+	~Sandbox() = default;
 private:
 	GameObject m_object = GameObject();
 };
