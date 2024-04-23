@@ -2,14 +2,13 @@
 
 #include "ngpch.h"
 
-#include "Nigozi/Layers/Layer.h"
+#include "Nigozi/Layers/GameLayer.h"
 #include "Nigozi/Core/Renderer.h"
-#include "Nigozi/Components/Component.h"
 #include "Nigozi/Components/Sprite.h"
 
 namespace Nigozi
 {
-	class RenderLayer : public Layer
+	class RenderLayer : public GameLayer<Sprite>
 	{
 	public:
 		RenderLayer(Renderer* renderer);
@@ -20,8 +19,8 @@ namespace Nigozi
 		virtual void OnUpdate() override;
 		virtual void OnDetach() override;
 
-		virtual void PushToVector(Component* component) override;
-		virtual void PopFromVector(Component* component) override;
+		virtual void PushToVector(Sprite* obj) override;
+		virtual void PopFromVector(Sprite* obj) override;
 
 		std::vector<Sprite*> GetSprites() const { return m_sprites; }
 

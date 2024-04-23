@@ -8,7 +8,7 @@ namespace Nigozi
 	Sprite::Sprite()
 	{
 		SetTargetIndex();
-		SendComponent();
+		SEND_COMPONENT(Sprite, this);
 	}
 
 	Sprite::Sprite(const char*&& spritePath)
@@ -16,7 +16,7 @@ namespace Nigozi
 		data.spritePath = spritePath;
 
 		SetTargetIndex();
-		SendComponent();
+		SEND_COMPONENT(Sprite, this);
 
 		spritePath = nullptr;
 	}

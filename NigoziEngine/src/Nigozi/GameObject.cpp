@@ -25,7 +25,7 @@ namespace Nigozi
 
 	void GameObject::SendObject()
 	{
-		LayerStack::Get().GetLayer(ObjectLayer::GetInsertIndex())->PushToVector(this);
+		static_cast<GameLayer<GameObject>*>(LayerStack::Get().GetLayer(ObjectLayer::GetInsertIndex()))->PushToVector(this);
 
 		LOG("Object Sent!");
 	}

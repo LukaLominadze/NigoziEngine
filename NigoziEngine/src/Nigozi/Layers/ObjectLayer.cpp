@@ -30,24 +30,17 @@ namespace Nigozi
 	{
 	}
 
-	void ObjectLayer::PushToVector(GameObject* component)
+	void ObjectLayer::PushToVector(GameObject* obj)
 	{
-		m_objectStack.emplace_back(component);
+		m_objectStack.emplace_back(obj);
 		m_vectorInstertIndex++;
 
 		LOG("Object added!");
-
-#ifdef _DEBUG
-		for (GameObject* obj : m_objectStack) {
-			std::cout << obj->Tag << ", ";
-		}
-		std::cout << std::endl;
-#endif
 	}
 
-	void ObjectLayer::PopFromVector(GameObject* component)
+	void ObjectLayer::PopFromVector(GameObject* obj)
 	{
-		auto i = std::find(m_objectStack.begin(), m_objectStack.begin() + m_vectorInstertIndex, component);
+		auto i = std::find(m_objectStack.begin(), m_objectStack.begin() + m_vectorInstertIndex, obj);
 		if (i != m_objectStack.begin() + m_vectorInstertIndex) {
 			m_objectStack.erase(i);
 			m_vectorInstertIndex--;

@@ -3,12 +3,12 @@
 #include "ngpch.h"
 
 #include "Nigozi/Core/Core.h"
-#include "Nigozi/Layers/Layer.h"
+#include "Nigozi/Layers/GameLayer.h"
 #include "Nigozi/GameObject.h"
 
 namespace Nigozi
 {
-	class ObjectLayer : public Layer
+	class ObjectLayer : public GameLayer<GameObject>
 	{
 	public:
 		ObjectLayer() = default;
@@ -20,8 +20,8 @@ namespace Nigozi
 		virtual void OnUpdate() override;
 		virtual void OnDetach() override;
 		
-		void PushToVector(GameObject* component);
-		void PopFromVector(GameObject* component);
+		virtual void PushToVector(GameObject* obj) override;
+		virtual void PopFromVector(GameObject* obj) override;
 
 		BUILD_GET_INDEX_FUNC
 	private:

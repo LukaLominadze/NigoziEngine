@@ -37,9 +37,9 @@ namespace Nigozi
 	{
 	}
 
-	void RenderLayer::PushToVector(Component* component)
+	void RenderLayer::PushToVector(Sprite* obj)
 	{
-		m_sprites.emplace_back(dynamic_cast<Sprite*>(component));
+		m_sprites.emplace_back(obj);
 
 		Sprite* p_sprite = m_sprites[m_vectorInstertIndex];
 		p_renderer->CreateTexture(p_sprite->data);
@@ -51,9 +51,9 @@ namespace Nigozi
 		LOG("Component added!");
 	}
 
-	void RenderLayer::PopFromVector(Component* component)
+	void RenderLayer::PopFromVector(Sprite* obj)
 	{
-		auto i = std::find(m_sprites.begin(), m_sprites.begin() + m_vectorInstertIndex, component);
+		auto i = std::find(m_sprites.begin(), m_sprites.begin() + m_vectorInstertIndex, obj);
 		if (i != m_sprites.begin() + m_vectorInstertIndex) {
 			m_sprites.erase(i);
 			m_vectorInstertIndex--;

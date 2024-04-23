@@ -13,12 +13,12 @@ namespace Nigozi
 			return typeid(*this);
 		}
 	protected:
-		void SendComponent();
-	protected:
 		uint32_t m_targetLayerIndex = 0;
 	};
 
 #define IMPL_TARGET_INDEX_FUNC(this_class, target_class) void this_class::SetTargetIndex() { \
 																m_targetLayerIndex = target_class::GetInsertIndex(); \
 														 }
+
+#define SEND_COMPONENT(type, component) static_cast<GameLayer<type>*>(LayerStack::Get().GetLayer(m_targetLayerIndex))->PushToVector(component);
 }
