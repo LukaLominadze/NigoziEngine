@@ -10,13 +10,13 @@ Visual Studio 2020 (and above) is recommended, but you are free to try other app
 
 <ins>**1. Downloading the repository:**</ins>
 
-Start cloning the repository with 'git clone --recursive https://github.com/LukaLominadze/NigoziEngine'
+Start cloning the repository with ```git clone --recursive https://github.com/LukaLominadze/NigoziEngine```
 
 <ins>**2. Building the project:**</ins>
 
 The engine primarly only supports Windows and the build scripts will only run on this platform.
 
-After cloning the repository, simply run the 'Setup-windows.bat' file.
+After cloning the repository, simply run the ```Setup-windows.bat``` file.
 
 You can type in the preffered build option, if a Visual Studio solution is needed, type the prefix 'vs' and the year.
 ```cmd
