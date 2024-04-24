@@ -2,24 +2,25 @@
 
 #include "ngpch.h"
 
+#include "Nigozi/Layers/LayerStack.h"
+#include "Nigozi/Layers/GameLayer.h"
 #include "Nigozi/Core/Core.h"
 #include "Nigozi/Components/Component.h"
+
 namespace Nigozi
 {
+#define GET_LAYER(type, layer_index) static_cast<GameLayer<type>*>(LayerStack::Get().GetLayer(layer_index))
+
 	class NG_API GameObject
 	{
 	public:
 		GameObject();
-		GameObject(int positionX, int positionY);
-		~GameObject();
+		~GameObject() = default;
 
 		template<typename T, typename... Args>
 		void AddComponent(Args&&... args) {
-			m_componentStack.emplace_back(new T(std::move<Args>(args)...));
-		}
-		template<typename T>
-		void AddComponent() {
-			m_componentStack.emplace_back(new T());
+			m_componentStack.push_back(GET_LAYER(T, T::GetLayerIndex())->CreatePushAndReturn(std::move<Args>(args)...));
+			LOG("Recieved Component Pointer!!");
 		}
 
 		template<typename T>
@@ -33,11 +34,6 @@ namespace Nigozi
 		}
 	protected:
 		void SendObject();
-	public:
-		int PositionX = 0;
-		int PositionY = 0;
-		std::string Tag = "";
-		std::string Name = "";
 	private:
 		std::vector<Component*> m_componentStack;
 	};

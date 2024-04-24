@@ -5,18 +5,9 @@
 
 namespace Nigozi
 {
-	Sprite::Sprite()
-	{
-		SetTargetIndex();
-		SEND_COMPONENT(Sprite, this);
-	}
-
 	Sprite::Sprite(const char*&& spritePath)
 	{
 		data.spritePath = spritePath;
-
-		SetTargetIndex();
-		SEND_COMPONENT(Sprite, this);
 
 		spritePath = nullptr;
 	}
@@ -36,5 +27,5 @@ namespace Nigozi
 		data.p_texture = texture;
 	}
 
-	IMPL_TARGET_INDEX_FUNC(Sprite, RenderLayer)
+	IMPL_C_GET_INDEX_FUNC(Sprite, RenderLayer)
 }

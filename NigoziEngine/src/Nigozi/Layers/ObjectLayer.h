@@ -1,14 +1,14 @@
 #pragma once
 
 #include "ngpch.h"
-
 #include "Nigozi/Core/Core.h"
+
 #include "Nigozi/Layers/GameLayer.h"
 #include "Nigozi/GameObject.h"
 
 namespace Nigozi
 {
-	class ObjectLayer : public GameLayer<GameObject>
+	class NG_API ObjectLayer : public GameLayer<GameObject>
 	{
 	public:
 		ObjectLayer() = default;
@@ -18,10 +18,11 @@ namespace Nigozi
 
 		virtual void OnAttach() override;
 		virtual void OnUpdate() override;
+		virtual void OnRender() override;
 		virtual void OnDetach() override;
 		
-		virtual void PushToVector(GameObject* obj) override;
-		virtual void PopFromVector(GameObject* obj) override;
+		void PushToVector(GameObject* obj);
+		void PopFromVector(GameObject* obj);
 
 		BUILD_GET_INDEX_FUNC
 	private:

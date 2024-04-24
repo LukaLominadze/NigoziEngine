@@ -42,7 +42,7 @@ namespace Nigozi
 		SDL_Surface* p_surface = IMG_Load(spriteData.spritePath.c_str());
 		spriteData.p_texture = SDL_CreateTextureFromSurface(p_renderer, p_surface);
 
-		if (spriteData.srcrect.x == 0) {
+		if (spriteData.srcrect.w == 0) {
 			spriteData.srcrect.w = p_surface->w;
 			spriteData.srcrect.h = p_surface->h;
 		}

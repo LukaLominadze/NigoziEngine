@@ -18,14 +18,14 @@ namespace Nigozi
 	class NG_API Sprite : public Component
 	{
 	public:
-		Sprite();
+		Sprite() = default;
 		Sprite(const char*&& spritePath);
 		~Sprite();
 
 		void SetSprite(const char* spritePath);
 		void SetTexture(SDL_Texture* texture);
 
-		virtual void SetTargetIndex() override;
+		BUILD_C_GET_INDEX_FUNC
 
 		virtual const std::type_info& GetType() const override {
 			return typeid(*this);

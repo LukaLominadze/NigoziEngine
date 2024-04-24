@@ -1,6 +1,7 @@
 #pragma once
 
 #include "ngpch.h"
+#include "Nigozi/Core/Core.h"
 
 #include "Nigozi/Layers/GameLayer.h"
 #include "Nigozi/Core/Renderer.h"
@@ -8,28 +9,21 @@
 
 namespace Nigozi
 {
-	class RenderLayer : public GameLayer<Sprite>
+	class NG_API RenderLayer : public GameLayer<Sprite>
 	{
 	public:
 		RenderLayer(Renderer* renderer);
-		~RenderLayer();
+		~RenderLayer() = default;
 
 		virtual void SetIndex(uint32_t layerIndex) override;
+
 		virtual void OnAttach() override;
 		virtual void OnUpdate() override;
+		virtual void OnRender() override;
 		virtual void OnDetach() override;
-
-		virtual void PushToVector(Sprite* obj) override;
-		virtual void PopFromVector(Sprite* obj) override;
-
-		std::vector<Sprite*> GetSprites() const { return m_sprites; }
 
 		BUILD_GET_INDEX_FUNC
 	private:
 		Renderer* p_renderer;
-
-		std::vector<Sprite*> m_sprites;
-
-		uint32_t m_vectorInstertIndex = 0;
 	};
 }

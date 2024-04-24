@@ -24,10 +24,13 @@ namespace Nigozi {
 		Application(const char* title, int width, int height);
 		~Application();
 
+		void PushLayer(Layer* layer);
+		void PopLayer(Layer* layer);
+
 		void Run();
-		virtual void OnStart();
-		virtual void OnUpdate();
-		virtual void OnRender();
+		void OnStart();
+		void OnUpdate();
+		void OnRender();
 
 		void OnWindowEvent();
 

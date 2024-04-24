@@ -39,6 +39,16 @@ namespace Nigozi
 		delete p_window;
 	}
 
+	void Application::PushLayer(Layer* layer)
+	{
+		p_layerStack->PushLayer(layer);
+	}
+
+	void Application::PopLayer(Layer* layer)
+	{
+		p_layerStack->PopLayer(layer);
+	}
+
 	void Application::Run()
 	{
 		OnStart();
@@ -49,16 +59,7 @@ namespace Nigozi
 			OnWindowEvent();
 
 			OnUpdate();
-			for (Layer* layer : *p_layerStack) {
-				layer->OnUpdate();
-			}
-
-			NG_Renderer->Clear();
 			OnRender();
-			for (Sprite* sprite : p_renderLayer->GetSprites()) {
-				NG_Renderer->DrawTexture(sprite);
-			}
-			NG_Renderer->Present();
 		}
 	}
 
@@ -69,10 +70,21 @@ namespace Nigozi
 
 	void Application::OnUpdate()
 	{
+		for (Layer* layer : *p_layerStack) {
+			layer->OnUpdate();
+		}
 	}
 
 	void Application::OnRender()
 	{
+		NG_Renderer->Clear();
+
+		for (Layer* layer : *p_layerStack) {
+			layer->OnRender();
+		}
+		NG_Renderer->Present();
+
+		SDL_Delay(1000 / 60);
 	}
 
 	void Application::OnWindowEvent()

@@ -9,7 +9,7 @@
 
 namespace Nigozi
 {
-	class LayerStack {
+	class NG_API LayerStack {
 	public:
 		LayerStack();
 		~LayerStack();

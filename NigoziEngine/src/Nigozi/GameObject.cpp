@@ -5,27 +5,14 @@
 
 namespace Nigozi 
 {
-	GameObject::GameObject():
-		PositionX(0), PositionY(0)
+	GameObject::GameObject()
 	{	
 		SendObject();
 	}
 
-	GameObject::GameObject(int positionX, int positionY)
-	{
-		PositionX = positionX;
-		PositionY = positionY;
-
-		SendObject();
-	}
-
-	GameObject::~GameObject()
-	{
-	}
-
 	void GameObject::SendObject()
 	{
-		static_cast<GameLayer<GameObject>*>(LayerStack::Get().GetLayer(ObjectLayer::GetInsertIndex()))->PushToVector(this);
+		static_cast<ObjectLayer*>(LayerStack::Get().GetLayer(ObjectLayer::GetInsertIndex()))->PushToVector(this);
 
 		LOG("Object Sent!");
 	}

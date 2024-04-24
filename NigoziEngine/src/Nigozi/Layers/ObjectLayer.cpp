@@ -4,6 +4,7 @@
 namespace Nigozi
 {
 	std::function<uint32_t()> ObjectLayer::GetInsertIndex;
+	SET_INDEX(ObjectLayer)
 
 	ObjectLayer::~ObjectLayer()
 	{
@@ -12,17 +13,15 @@ namespace Nigozi
 		}
 	}
 
-	void ObjectLayer::SetIndex(uint32_t layerIndex)
-	{
-		m_layerIndex = layerIndex;
-		SetGetIndexFunc([&]() { return m_layerIndex; });
-	}
-
 	void ObjectLayer::OnAttach()
 	{
 	}
 
 	void ObjectLayer::OnUpdate()
+	{
+	}
+
+	void ObjectLayer::OnRender()
 	{
 	}
 

@@ -2,33 +2,30 @@
 
 using namespace Nigozi;
 
-class Sandbox : public Application {
+class SandboxLayer : public Layer {
 public:
-	Sandbox() : Application("MyGame", 600, 600) {
+	SandboxLayer() {
 		m_object.AddComponent<Sprite>("Player.png");
 		Sprite* p_sprite = m_object.GetComponent<Sprite>();
 		p_sprite->data.srcrect = { 0, 0, 16, 16 };
 		p_sprite->data.dstrect = { 150, 150, 300, 300 };
 		p_sprite = nullptr;
 	}
-	
-	void OnStart() override {
-		
-	}
+	~SandboxLayer() = default;
+private:
+	GameObject m_object = GameObject();
+};
 
-	void OnUpdate() override {
-		EventHandler::Get().GetKey(EventType::KeyPressed, SDL_SCANCODE_LEFT);
-		EventHandler::Get().GetKey(EventType::KeyReleased, SDL_SCANCODE_SPACE);
-		EventHandler::Get().GetKey(EventType::KeyDown, SDL_SCANCODE_A);
-	}
-
-	void OnRender() override {
-		SDL_Delay(1000 / 60);
+class Sandbox : public Application {
+public:
+	Sandbox() : Application("MyGame", 600, 600) {
+		p_sandboxLayer = new SandboxLayer();
+		PushLayer(p_sandboxLayer);
 	}
 	
 	~Sandbox() = default;
 private:
-	GameObject m_object = GameObject();
+	SandboxLayer* p_sandboxLayer = nullptr;
 };
 
 Application* Nigozi::CreateApplication() {
