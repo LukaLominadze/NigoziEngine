@@ -20,7 +20,7 @@ After cloning the repository, simply run the ```Setup-windows.bat``` file.
 
 You can type in the preffered build option, if a Visual Studio solution is needed, type the prefix 'vs' and the year.
 ```cmd
-vs2022'
+vs2022
 ```
 ![image](https://github.com/LukaLominadze/PongSDL/assets/142942110/5c6a2334-fbde-451f-bcfa-c0c9bfac9eb8)
 
