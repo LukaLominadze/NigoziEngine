@@ -6,10 +6,3 @@ namespace Nigozi {
 
 	extern Application* CreateApplication();
 }
-
-int main(int argc, char** argv) {
-	auto app = Nigozi::CreateApplication();
-	app->Run();
-	delete app;
-	return 0;
-}

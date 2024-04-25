@@ -1,5 +1,6 @@
 #include "ngpch.h"
 #include "Window.h"
+#include "Nigozi/Core/Camera.h"
 
 namespace Nigozi
 {
@@ -10,6 +11,8 @@ namespace Nigozi
 
 		p_window = SDL_CreateWindow(title, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, width, height, NULL);
 		ASSERT(p_window, "Creating Window...");
+
+		Camera::UnitSize = height / Camera::OrthographicSize;
 
 		m_running = true;
 	}

@@ -19,7 +19,7 @@ namespace Nigozi
 
 		template<typename T, typename... Args>
 		void AddComponent(Args&&... args) {
-			m_componentStack.push_back(GET_LAYER(T, T::GetLayerIndex())->CreatePushAndReturn(std::move<Args>(args)...));
+			m_componentStack.push_back(GET_LAYER(T, T::GetLayerIndex())->CreatePushAndReturn(std::forward<Args>(args)...));
 			LOG("Recieved Component Pointer!!");
 		}
 

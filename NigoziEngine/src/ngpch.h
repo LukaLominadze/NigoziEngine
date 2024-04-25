@@ -14,4 +14,5 @@
 #include <SDL2/SDL_image.h>
 
 #include "Nigozi/Core/Log.h"
+#include "Nigozi/Core/Vector2.h"
 
