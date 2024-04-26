@@ -3,6 +3,7 @@
 #include "ngpch.h"
 
 #include "Nigozi/Components/Component.h"
+#include "Nigozi/Components/Transform.h"
 
 namespace Nigozi
 {

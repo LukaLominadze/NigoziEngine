@@ -11,7 +11,6 @@ namespace Nigozi
 		p_eventHandler = new EventHandler();
 
 		p_objectLayer = new ObjectLayer();
-		p_transformLayer = new TransformLayer();
 		p_renderLayer = new RenderLayer(NG_Renderer);
 
 		p_layerStack = new LayerStack();
@@ -21,7 +20,6 @@ namespace Nigozi
 		ASSERT(p_eventHandler, "Creating Events...");
 
 		p_layerStack->PushLayer(p_objectLayer);
-		p_layerStack->PushLayer(p_transformLayer);
 		p_layerStack->PushLayer(p_renderLayer);
 
 		#ifdef _DEBUG

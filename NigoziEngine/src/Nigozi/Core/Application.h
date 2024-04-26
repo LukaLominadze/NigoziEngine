@@ -13,7 +13,6 @@
 #include "Nigozi/Layers/LayerStack.h"
 #include "Nigozi/Layers/ObjectLayer.h"
 #include "Nigozi/Layers/RenderLayer.h"
-#include "Nigozi/Layers/TransformLayer.h"
 
 #include "Nigozi/Components/Sprite.h"
 
@@ -41,7 +40,6 @@ namespace Nigozi {
 
 		LayerStack* p_layerStack;
 		ObjectLayer* p_objectLayer;
-		TransformLayer* p_transformLayer;
 		RenderLayer* p_renderLayer;
 
 		EventHandler* p_eventHandler;

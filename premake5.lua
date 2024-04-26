@@ -12,9 +12,11 @@ outputdir = "%{cfg.buildcfg}-%{cfg.system}-%{cfg.architecture}"
 
 project "NigoziEngine"
 	location "NigoziEngine"
-	kind "SharedLib"
+	kind "StaticLib"
+	staticruntime "on"
 
 	language "C++"
+	cppdialect "C++20"
 
 	targetdir ("bin/" ..outputdir.. "/%{prj.name}")
 	objdir ("bin-int/" ..outputdir.. "/%{prj.name}")
@@ -49,35 +51,31 @@ project "NigoziEngine"
 	}
 
 	filter "system:windows"
-		cppdialect "C++20"
-		staticruntime "On"
 		systemversion "latest"
 
 		buildoptions { "/Yc\"ngpch.h\"" }
-
-		postbuildcommands {
-			"{COPYFILE} %[%{wks.location}bin/" ..outputdir.. "/%{prj.name}/NigoziEngine.dll] %[%{wks.location}/bin/" ..outputdir.. "/Sandbox/]"
-		}
 
 	filter "configurations:Debug"
 		
 		defines { "_DEBUG" }
 		
 		architecture "x64"
-		symbols "On"
+		symbols "on"
 
 	filter "configurations:Release"
 		
 		defines { "NDEBUG" }
 
 		architecture "x64"
-		optimize "On"
+		optimize "on"
 
 project "Sandbox"
 	location "Sandbox"
 	kind "ConsoleApp"
+	staticruntime "on"
 
 	language "C++"
+	cppdialect "C++20"
 
 	targetdir ("bin/" ..outputdir.. "/%{prj.name}")
 	objdir ("bin-int/" ..outputdir.. "/%{prj.name}")
@@ -110,7 +108,7 @@ project "Sandbox"
 
 	filter "system:windows"
 		cppdialect "C++20"
-		staticruntime "On"
+		staticruntime "on"
 		systemversion "latest"
 
 		postbuildcommands {
@@ -123,11 +121,11 @@ project "Sandbox"
 		defines { "_DEBUG" }
 		
 		architecture "x64"
-		symbols "On"
+		symbols "on"
 
 	filter "configurations:Release"
 		
 		defines { "NDEBUG" }
 
 		architecture "x64"
-		optimize "On"
+		optimize "on"

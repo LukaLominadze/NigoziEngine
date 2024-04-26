@@ -6,6 +6,7 @@
 #include "Nigozi/Layers/GameLayer.h"
 #include "Nigozi/Core/Core.h"
 #include "Nigozi/Components/Component.h"
+#include "Nigozi/Components/Transform.h"
 
 namespace Nigozi
 {
@@ -21,6 +22,7 @@ namespace Nigozi
 		void AddComponent(Args&&... args) {
 			m_componentStack.push_back(GET_LAYER(T, T::GetLayerIndex())->CreatePushAndReturn(std::forward<Args>(args)...));
 			LOG("Recieved Component Pointer!!");
+			m_componentStack[m_componentStack.size() - 1]->SetTransform(&m_Transform);
 		}
 
 		template<typename T>
@@ -32,6 +34,8 @@ namespace Nigozi
 			}
 			return nullptr;
 		}
+
+		Transform m_Transform;
 	protected:
 		void SendObject();
 	private:

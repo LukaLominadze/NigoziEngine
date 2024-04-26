@@ -12,7 +12,8 @@ namespace Nigozi
 		p_window = SDL_CreateWindow(title, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, width, height, NULL);
 		ASSERT(p_window, "Creating Window...");
 
-		Camera::UnitSize = height / Camera::OrthographicSize;
+		Camera::WindowHeight = height;
+		Camera::SetOrthograpicSize(5);
 
 		m_running = true;
 	}

@@ -7,8 +7,18 @@ namespace Nigozi
 {
 	namespace Camera {
 		inline Vector2<int> Position(0, 0);
-		inline uint32_t OrthographicSize = 5;
-		inline uint32_t UnitSize;
+		inline unsigned int WindowHeight;
+		inline float OrthographicSize = 5;
+		inline float UnitSize;
+
+		inline void SetOrthograpicSize(float newSize) {
+			OrthographicSize = newSize;
+			UnitSize = (float)WindowHeight / OrthographicSize;
+		}
+		inline void IncrOrthograpicSize(float size) {
+			OrthographicSize += size;
+			UnitSize = (float)WindowHeight / OrthographicSize; 
+		}
 	}
 }
 
