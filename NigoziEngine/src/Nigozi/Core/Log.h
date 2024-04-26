@@ -20,7 +20,7 @@
 			} \
 			SetConsoleTextAttribute(hConsole, FOREGROUND_RED | FOREGROUND_GREEN | FOREGROUND_BLUE);
 	#define LOG(message) \
-				std::cout << message << std::endl;
+			std::cout << message << std::endl;
 #else
 	#define ASSERT(condition, message)
 	#define LOG(message)

@@ -6,7 +6,7 @@
 namespace Nigozi
 {
 	namespace Camera {
-		inline Vector2<int> Position(0, 0);
+		inline Vector2<float> Position(0, 0);
 		inline unsigned int WindowHeight;
 		inline float OrthographicSize = 5;
 		inline float UnitSize;
