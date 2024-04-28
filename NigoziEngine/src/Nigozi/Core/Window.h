@@ -1,7 +1,6 @@
 #pragma once
 
 #include "Nigozi/Core/Log.h"
-#include "Nigozi/Events/Event.h"
 #include <ngpch.h>
 
 namespace Nigozi {

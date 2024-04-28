@@ -9,6 +9,7 @@ namespace Nigozi
 		NG_Renderer = new Renderer(p_window->GetWindow());
 
 		p_eventHandler = new EventHandler();
+		p_input = new Input(p_eventHandler);
 
 		p_objectLayer = new ObjectLayer();
 		p_renderLayer = new RenderLayer(NG_Renderer);
@@ -32,6 +33,7 @@ namespace Nigozi
 	Application::~Application()
 	{
 		delete &p_eventHandler->Get();
+		delete &p_input->Get();
 
 		delete &p_layerStack->Get();
 
@@ -89,7 +91,7 @@ namespace Nigozi
 
 	void Application::OnWindowEvent()
 	{
-		if (p_eventHandler->GetWindowEvent(EventType::WindowClose)) {
+		if (p_eventHandler->GetWindowEvent(SDL_QUIT)) {
 			p_window->WindowClose();
 		}
 	}

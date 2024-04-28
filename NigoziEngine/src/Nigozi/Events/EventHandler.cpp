@@ -25,38 +25,40 @@ namespace Nigozi
         }
     }
 
-    bool EventHandler::GetWindowEvent(EventType type)
+    bool EventHandler::GetWindowEvent(SDL_EventType type)
     {
-        if (m_event.type == (SDL_EventType)type) {
+        if (m_event.type == type) {
             return true;
         }
         return false;
     }
 
-    bool EventHandler::GetKey(EventType type, SDL_Scancode keycode)
+    bool EventHandler::KeyPressed(SDL_Scancode keycode)
     {
-        switch (type) {
-        case EventType::KeyDown:
-            if (keystate[keycode]) {
-                LOG("KeyDown! " << keycode);
-                return true;
-            }
-            break;
-        case EventType::KeyPressed:
-            if (m_event.type != SDL_KEYDOWN) return false;
-            if (m_event.key.keysym.scancode == keycode && m_lastkey != keycode) {
-                LOG("KeyEvent! " << (SDL_EventType)type << " " << keycode);
-                m_lastkey = keycode;
-                return true;
-            }
-            break;
-        case EventType::KeyReleased:
-            if (m_event.type != SDL_KEYUP) return false;
-            if (m_event.key.keysym.scancode == keycode) {
-                LOG("KeyEvent! " << (SDL_EventType)type << " " << keycode);
-                return true;
-            }
-            break;
+        if (m_event.type != SDL_KEYDOWN) return false;
+        if (m_event.key.keysym.scancode == keycode && m_lastkey != keycode) {
+            LOG("KeyPressed! " << keycode);
+            m_lastkey = keycode;
+            return true;
+        }
+        return false;
+    }
+
+    bool EventHandler::KeyDown(SDL_Scancode keycode)
+    {
+        if (keystate[keycode]) {
+            LOG("KeyDown! " << keycode);
+            return true;
+        }
+        return false;
+    }
+
+    bool EventHandler::KeyReleased(SDL_Scancode keycode)
+    {
+        if (m_event.type != SDL_KEYUP) return false;
+        if (m_event.key.keysym.scancode == keycode) {
+            LOG("KeyRekeased! " << keycode);
+            return true;
         }
         return false;
     }

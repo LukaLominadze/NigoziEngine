@@ -6,8 +6,8 @@
 #include "Nigozi/Core/Window.h"
 #include "Nigozi/Core/Renderer.h"
 
-#include "Nigozi/Events/Event.h"
 #include "Nigozi/Events/EventHandler.h"
+#include "Nigozi/Events/Input.h"
 
 #include "Nigozi/Layers/Layer.h"
 #include "Nigozi/Layers/LayerStack.h"
@@ -43,6 +43,7 @@ namespace Nigozi {
 		RenderLayer* p_renderLayer;
 
 		EventHandler* p_eventHandler;
+		Input* p_input;
 	};
 }
 

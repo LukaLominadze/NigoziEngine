@@ -7,8 +7,8 @@
 #include "Nigozi/Core/Application.h"
 #include "Nigozi/Core/EntryPoint.h"
 
-#include "Nigozi/Events/Event.h"
 #include "Nigozi/Events/EventHandler.h"
+#include "Nigozi/Events/Input.h"
 
 #include "Nigozi/Layers/Layer.h"
 

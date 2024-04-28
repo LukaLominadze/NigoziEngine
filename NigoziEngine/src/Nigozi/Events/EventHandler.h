@@ -3,7 +3,6 @@
 #include "ngpch.h"
 
 #include "Nigozi/Core/Core.h"
-#include "Nigozi/Events/Event.h"
 
 namespace Nigozi
 {
@@ -15,8 +14,11 @@ namespace Nigozi
 
 		void PollEvents();
 
-		bool GetWindowEvent(EventType type);
-		bool GetKey(EventType type, SDL_Scancode keycode);
+		bool GetWindowEvent(SDL_EventType type);
+
+		bool KeyPressed(SDL_Scancode keycode);
+		bool KeyDown(SDL_Scancode keycode);
+		bool KeyReleased(SDL_Scancode keycode);
 
 		inline static EventHandler& Get() { return *s_Instance; }
 	private:
