@@ -9,8 +9,8 @@ namespace Nigozi
 {
 	class NG_API Component {
 	public:
-		virtual const std::type_info& GetType() const {
-			return typeid(*this);
+		static const char* GetType() {
+			return "Component";
 		}
 
 		inline void SetTransform(Transform* transform) { p_transform = transform; }

@@ -15,7 +15,7 @@ namespace Nigozi
 
 		void Clear();
 		void DrawRect(const SDL_Rect& rect, Uint8 r, Uint8 g, Uint8 b, Uint8 a);
-		void DrawTexture(Sprite* p_sprite);
+		void DrawTexture(Sprite& sprite);
 		void Present();
 
 		void CreateTexture(SpriteData& spriteData);

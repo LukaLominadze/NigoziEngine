@@ -6,8 +6,9 @@
 
 namespace Nigozi 
 {
-	class Input {
+	class NG_API Input {
 	public:
+		Input() = default;
 		Input(EventHandler* eventHandler);
 		~Input();
 

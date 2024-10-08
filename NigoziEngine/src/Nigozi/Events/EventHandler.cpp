@@ -3,19 +3,6 @@
 
 namespace Nigozi
 {
-    EventHandler* EventHandler::s_Instance = nullptr;
-
-    EventHandler::EventHandler()
-    {
-        if (!s_Instance) {
-            s_Instance = this;
-        }
-    }
-
-    EventHandler::~EventHandler()
-    {
-    }
-
     void EventHandler::PollEvents()
     {
         SDL_PollEvent(&m_event);

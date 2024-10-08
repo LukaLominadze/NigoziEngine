@@ -5,7 +5,7 @@
 
 namespace Nigozi {
 
-	class Window
+	class NG_API Window
 	{
 	public:
 		Window(const char* title, int width, int height);

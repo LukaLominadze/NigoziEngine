@@ -28,8 +28,8 @@ namespace Nigozi
 
 		BUILD_C_GET_INDEX_FUNC
 
-		virtual const std::type_info& GetType() const override {
-			return typeid(*this);
+		static const char* GetType() {
+			return "Sprite";
 		}
 
 		SpriteData data;

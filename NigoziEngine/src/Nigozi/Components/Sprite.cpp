@@ -25,6 +25,7 @@ namespace Nigozi
 	void Sprite::SetTexture(SDL_Texture* texture)
 	{
 		data.p_texture = texture;
+		SDL_QueryTexture(texture, nullptr, nullptr, &data.dstrect.w, &data.dstrect.h);
 	}
 
 	IMPL_C_GET_INDEX_FUNC(Sprite, RenderLayer)

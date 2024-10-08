@@ -3,7 +3,7 @@
 
 namespace Nigozi
 {
-	LayerStack* LayerStack::s_Instance = nullptr;
+	NG_API LayerStack* LayerStack::s_Instance = nullptr;
 
 	LayerStack::LayerStack()
 	{

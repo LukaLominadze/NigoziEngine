@@ -18,7 +18,7 @@ project "NigoziEngine"
 	language "C++"
 	cppdialect "C++20"
 
-	targetdir ("bin/" ..outputdir.. "/%{prj.name}")
+	targetdir ("bin/" ..outputdir.. "/%{prj.name}")	
 	objdir ("bin-int/" ..outputdir.. "/%{prj.name}")
 
 	defines { "NG_PLATFORM_WINDOWS", "NG_BUILD_DLL" }
@@ -94,7 +94,7 @@ project "Sandbox"
 
 	includedirs { "%{prj.name}/src/",
 				  "%{wks.location}/vendor/SDL2-2.30.0/include",
-				  "%{wks.location}/NigoziEngine/src"}
+				  "%{wks.location}/NigoziEngine/src" }
 	libdirs { "%{wks.location}/vendor/SDL2-2.30.0/lib/x64/" }
 
 	links { "SDL2.lib",
@@ -108,7 +108,6 @@ project "Sandbox"
 
 	filter "system:windows"
 		cppdialect "C++20"
-		staticruntime "on"
 		systemversion "latest"
 
 		postbuildcommands {

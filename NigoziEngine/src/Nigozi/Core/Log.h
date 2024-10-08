@@ -9,13 +9,15 @@
 
 	// Check if a task is succesfully completed
 	#define ASSERT(condition, message) \
+			SetConsoleTextAttribute(hConsole, FOREGROUND_RED | FOREGROUND_GREEN); \
+			std::cerr << message; \
 			if ((condition)){ \
 				SetConsoleTextAttribute(hConsole, FOREGROUND_GREEN); \
-				std::cerr << message " -> Success!" << std::endl; \
+				std::cerr << " -> Success!" << std::endl; \
 			} \
 			else { \
 				SetConsoleTextAttribute(hConsole, FOREGROUND_RED); \
-				std::cerr << message << " -> Failed!" << std::endl; \
+				std::cerr << " -> Failed!" << std::endl; \
 				__debugbreak(); \
 			} \
 			SetConsoleTextAttribute(hConsole, FOREGROUND_RED | FOREGROUND_GREEN | FOREGROUND_BLUE);

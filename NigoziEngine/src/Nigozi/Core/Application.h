@@ -12,6 +12,7 @@
 #include "Nigozi/Layers/Layer.h"
 #include "Nigozi/Layers/LayerStack.h"
 #include "Nigozi/Layers/ObjectLayer.h"
+#include "Nigozi/Layers/CollisionLayer.h"
 #include "Nigozi/Layers/RenderLayer.h"
 
 #include "Nigozi/Components/Sprite.h"
@@ -39,10 +40,8 @@ namespace Nigozi {
 		Window* p_window;
 
 		LayerStack* p_layerStack;
-		ObjectLayer* p_objectLayer;
-		RenderLayer* p_renderLayer;
 
-		EventHandler* p_eventHandler;
+		EventHandler m_eventHandler;
 		Input* p_input;
 	};
 }

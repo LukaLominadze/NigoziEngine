@@ -4,8 +4,12 @@
 
 namespace Nigozi
 {
-	struct Transform
+	class NG_API Transform
 	{
+	public:
+		Transform() = default;
+		~Transform() = default;
+
 		Vector2<float> GetAbsolutePosition() const { return (Position + Camera::Position) * Camera::UnitSize; }
 		Vector2<float> GetAbsoluteScale() const { return Scale * Camera::UnitSize; }
 

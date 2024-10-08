@@ -5,6 +5,8 @@ namespace Nigozi
 {
 	Renderer::Renderer(SDL_Window* p_window)
 	{
+		IMG_Init(IMG_INIT_PNG);
+
 		p_renderer = SDL_CreateRenderer(p_window, 0, SDL_RENDERER_PRESENTVSYNC);
 		ASSERT(p_renderer, "Creating Renderer...");
 	}
@@ -27,9 +29,9 @@ namespace Nigozi
 		SDL_RenderFillRect(p_renderer, &rect);
 	}
 
-	void Renderer::DrawTexture(Sprite* p_sprite)
+	void Renderer::DrawTexture(Sprite& sprite)
 	{
-		SDL_RenderCopy(p_renderer, p_sprite->data.p_texture, &p_sprite->data.srcrect, &p_sprite->data.dstrect);
+		SDL_RenderCopy(p_renderer, sprite.data.p_texture, &sprite.data.srcrect, &sprite.data.dstrect);
 	}
 
 	void Renderer::Present()
@@ -42,9 +44,18 @@ namespace Nigozi
 		SDL_Surface* p_surface = IMG_Load(spriteData.spritePath.c_str());
 		spriteData.p_texture = SDL_CreateTextureFromSurface(p_renderer, p_surface);
 
+		int textureWidth, textureHeight;
+		SDL_QueryTexture(spriteData.p_texture, nullptr, nullptr, &textureWidth, &textureHeight);
+		LOG(textureWidth << ", " << textureHeight);
+
 		if (spriteData.srcrect.w == 0) {
 			spriteData.srcrect.w = p_surface->w;
 			spriteData.srcrect.h = p_surface->h;
+		}
+		LOG("-> " << spriteData.dstrect.w);
+		if (spriteData.dstrect.w == 0) {
+			spriteData.dstrect.w = textureWidth;
+			spriteData.dstrect.h = textureHeight;
 		}
 
 		SDL_FreeSurface(p_surface);

@@ -8,20 +8,17 @@ namespace Nigozi
 		p_window = new Window(title, width, height);
 		NG_Renderer = new Renderer(p_window->GetWindow());
 
-		p_eventHandler = new EventHandler();
-		p_input = new Input(p_eventHandler);
-
-		p_objectLayer = new ObjectLayer();
-		p_renderLayer = new RenderLayer(NG_Renderer);
+		m_eventHandler = EventHandler();
+		p_input = new Input(&m_eventHandler);
 
 		p_layerStack = new LayerStack();
 
 		ASSERT(p_window, "Creating Window...");
 		ASSERT(NG_Renderer, "Creating Renderer...");
-		ASSERT(p_eventHandler, "Creating Events...");
 
-		p_layerStack->PushLayer(p_objectLayer);
-		p_layerStack->PushLayer(p_renderLayer);
+		PushLayer(new ObjectLayer());
+		PushLayer(new CollisionLayer());
+		PushLayer(new RenderLayer(NG_Renderer));
 
 		#ifdef _DEBUG
 		for (Layer* layer : *p_layerStack) {
@@ -32,9 +29,6 @@ namespace Nigozi
 
 	Application::~Application()
 	{
-		delete &p_eventHandler->Get();
-		delete &p_input->Get();
-
 		delete &p_layerStack->Get();
 
 		delete NG_Renderer;
@@ -57,7 +51,7 @@ namespace Nigozi
 
 		while (p_window->Running()) {
 
-			p_eventHandler->PollEvents();
+			m_eventHandler.PollEvents();
 			OnWindowEvent();
 
 			OnUpdate();
@@ -91,7 +85,7 @@ namespace Nigozi
 
 	void Application::OnWindowEvent()
 	{
-		if (p_eventHandler->GetWindowEvent(SDL_QUIT)) {
+		if (m_eventHandler.GetWindowEvent(SDL_QUIT)) {
 			p_window->WindowClose();
 		}
 	}

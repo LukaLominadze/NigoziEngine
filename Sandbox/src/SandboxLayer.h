@@ -10,6 +10,8 @@ public:
 
 	virtual void OnAttach() override;
 	virtual void OnUpdate() override;
+	virtual void OnRender() override;
 private:
-	GameObject m_object = GameObject();
+	GameObject m_object1 = GameObject();
+	GameObject m_object2 = GameObject();
 };

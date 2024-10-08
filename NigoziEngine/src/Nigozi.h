@@ -3,6 +3,8 @@
 #include "ngpch.h"
 
 #include "Nigozi/Core/Core.h"
+
+#include "Nigozi/Benchmarking/Timer.h"
 				 
 #include "Nigozi/Core/Application.h"
 #include "Nigozi/Core/EntryPoint.h"
