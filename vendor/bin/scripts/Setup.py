@@ -6,8 +6,12 @@ import re
 current_dir = os.path.dirname(os.path.abspath(__file__))
 solution_dir = os.path.join(current_dir, '../../../')
 
+batch_file = os.path.join(current_dir, 'premake5.bat')
+
 if platform.system() == 'Windows':
     try:
+        subprocess.call([batch_file], cwd=current_dir)
+        
         vcxproj_nigozi = os.path.join(solution_dir, 'NigoziEngine/NigoziEngine.vcxproj')
         vcxproj_sandbox = os.path.join(solution_dir, 'Sandbox/Sandbox.vcxproj')
 
@@ -31,7 +35,7 @@ if platform.system() == 'Windows':
             lines1 = f1.readlines()
 
             for j, line in enumerate(lines1):
-                if '<Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />' in line:
+                if '<Import Project="$(VCTargetsPath)\\Microsoft.Cpp.targets" />' in line:
                     lines1.insert(j, """
 <ItemGroup>
     <ProjectReference Include="..\\NigoziEngine\\NigoziEngine.vcxproj">
@@ -60,7 +64,7 @@ if platform.system() == 'Windows':
                     break
         with open(vcxproj_nigozi, "r") as f2:
             for j, line in enumerate(lines2):
-                if '<ClCompile Include="src\\Benchmarking\Timer.cpp" />' in line:
+                if '<ClCompile Include="src\\Benchmarking\\Timer.cpp" />' in line:
                     del lines2[j]
                     lines2.insert(j, '\t\t<ClCompile Include="src\\utils\Timer.cpp">\n' +
                                   "\t\t\t<PrecompiledHeader Condition=\"'$(Configuration)|$(Platform)'=='Debug|x64'\">NotUsing</PrecompiledHeader>\n" +
