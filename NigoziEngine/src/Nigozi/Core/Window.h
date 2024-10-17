@@ -1,29 +1,49 @@
 #pragma once
 
-#include "Nigozi/Core/Log.h"
-#include <ngpch.h>
+#include "events/Event.h"
+#include "events/KeyEvent.h"
+#include "glcore/DebugNMacros.h"
 
-namespace Nigozi {
+#include <functional>
 
-	class NG_API Window
+namespace Nigozi
+{
+	struct WindowData {
+		uint32_t Width, Height;
+		bool Fullscreen = false;
+
+		std::function<void(Event&)> EventCallback;
+
+		GLFWwindow* NativeWindow;
+	};
+
+	namespace Global 
 	{
+		inline WindowData windowData;
+	}
+
+	class Window {
 	public:
-		Window(const char* title, int width, int height);
+		Window() = default;
+		Window(const char* title, uint32_t width, uint32_t height, bool fullscreen);
 		~Window();
 
-		void OnWindowResize();
-		void WindowClose();
+		inline void SetEventCallback(const std::function<void(Event&)>& function) {
+			Global::windowData.EventCallback = function;
+		}
 
-		bool Running();
+		void SetVSync(bool value);
 
-		inline SDL_Window* GetWindow() const { return p_window; }
+		void OnEvent(Event& e);
+		void OnUpdate();
 
+		void Delete();
 	private:
-		SDL_Window* p_window;
+		bool OnFullscreenToggle(KeyPressedEvent& e);
+	private:
+		GLFWwindow* p_window;
+		GLFWmonitor* p_monitor;
 
-		SDL_Event m_event;
-
-		bool m_running;
+		bool m_isFullscreen = false;
 	};
 }
-

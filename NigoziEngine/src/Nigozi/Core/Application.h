@@ -1,48 +1,37 @@
 #pragma once
 
-#include "ngpch.h"
+#include "glcore/Renderer.h"
+#include "glcore/Shader.h"
+#include "core/Window.h"
+#include "layers/Layer.h"
+#include "layers/ImGuiLayer.h"
+#include "Input.h"
+#include "Benchmarking/Timer.h"
 
-#include "Core.h"
-#include "Nigozi/Core/Window.h"
-#include "Nigozi/Core/Renderer.h"
-
-#include "Nigozi/Events/EventHandler.h"
-#include "Nigozi/Events/Input.h"
-
-#include "Nigozi/Layers/Layer.h"
-#include "Nigozi/Layers/LayerStack.h"
-#include "Nigozi/Layers/ObjectLayer.h"
-#include "Nigozi/Layers/CollisionLayer.h"
-#include "Nigozi/Layers/RenderLayer.h"
-
-#include "Nigozi/Components/Sprite.h"
-
-namespace Nigozi {
-
-	class NG_API Application
-	{
+namespace Nigozi 
+{
+	class Application {
 	public:
-		Application(const char* title, int width, int height);
+		Application(const char* title, uint32_t width, uint32_t height, bool vsync, bool fullscreen);
 		~Application();
 
-		void PushLayer(Layer* layer);
-		void PopLayer(Layer* layer);
-
 		void Run();
-		void OnStart();
-		void OnUpdate();
+
+		void PushLayer(Layer* layer);
+	private:
+		void OnEvent(Event& event);
+		void OnUpdate(float timestep);
 		void OnRender();
-
-		void OnWindowEvent();
-
-		Renderer* NG_Renderer;
+		void OnImGuiRender();
 	private:
 		Window* p_window;
+		Renderer m_renderer;
+		Input* p_input = nullptr;
 
-		LayerStack* p_layerStack;
+		std::vector<Layer*> m_layerStack;
 
-		EventHandler m_eventHandler;
-		Input* p_input;
+		ImGuiLayer m_imGuiLayer;
+
+		bool m_running;
 	};
 }
-

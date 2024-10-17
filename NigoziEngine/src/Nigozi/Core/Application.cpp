@@ -1,92 +1,99 @@
 #include "ngpch.h"
+
 #include "Application.h"
 
 namespace Nigozi
 {
-	Application::Application(const char* title, int width, int height)
-	{
-		p_window = new Window(title, width, height);
-		NG_Renderer = new Renderer(p_window->GetWindow());
+    Application::Application(const char* title, uint32_t width, uint32_t height, bool vsync, bool fullscreen = false)
+        :m_running(false)
+    {
+        p_window = new Window(title, width, height, fullscreen);
+        p_window->SetEventCallback(std::bind(&Application::OnEvent, this, std::placeholders::_1));
+        p_window->SetVSync(vsync);
 
-		m_eventHandler = EventHandler();
-		p_input = new Input(&m_eventHandler);
+        p_input = new Input();
 
-		p_layerStack = new LayerStack();
+        m_renderer = Renderer();
 
-		ASSERT(p_window, "Creating Window...");
-		ASSERT(NG_Renderer, "Creating Renderer...");
+        PushLayer(&m_imGuiLayer);
+    }
 
-		PushLayer(new ObjectLayer());
-		PushLayer(new CollisionLayer());
-		PushLayer(new RenderLayer(NG_Renderer));
+    Application::~Application()
+    {
+        for (int i = 0; i < m_layerStack.size(); i++) {
+            m_layerStack[i]->OnDetach();
+        }
 
-		#ifdef _DEBUG
-		for (Layer* layer : *p_layerStack) {
-			ASSERT(layer, "Initializing Layers...");
-		}
-		#endif
-	}
+        delete p_input;
+        p_window->Delete();
 
-	Application::~Application()
-	{
-		delete &p_layerStack->Get();
+        glfwTerminate();
+    }
 
-		delete NG_Renderer;
-		delete p_window;
-	}
+    void Application::Run()
+    {
+        Test::Timer timer = Test::Timer();
+        float timestep = 0.0f;
 
-	void Application::PushLayer(Layer* layer)
-	{
-		p_layerStack->PushLayer(layer);
-	}
+        m_running = true;
 
-	void Application::PopLayer(Layer* layer)
-	{
-		p_layerStack->PopLayer(layer);
-	}
+        while (m_running)
+        {
+            timer.StartTimerAndReturnSeconds();
 
-	void Application::Run()
-	{
-		OnStart();
+            OnUpdate(timestep);
 
-		while (p_window->Running()) {
+            GLCall(glClearColor(0.0f, 0.0f, 0.0f, 1.0f));
+            GLCall(glClear(GL_COLOR_BUFFER_BIT));
+            m_renderer.Clear();
+        
+            OnRender();
 
-			m_eventHandler.PollEvents();
-			OnWindowEvent();
+            m_imGuiLayer.Begin();
+            OnImGuiRender();
+            m_imGuiLayer.End();
 
-			OnUpdate();
-			OnRender();
-		}
-	}
+            p_window->OnUpdate();
 
-	void Application::OnStart()
-	{
-		std::cout << "Welcome to NIGOZI engine!" << std::endl;
-	}
+            timestep = timer.EndTimerAndReturnSeconds();
+        }
+    }
 
-	void Application::OnUpdate()
-	{
-		for (Layer* layer : *p_layerStack) {
-			layer->OnUpdate();
-		}
-	}
+    void Application::PushLayer(Layer* layer)
+    {
+        m_layerStack.push_back(layer);
+        layer->OnAttach();
+    }
 
-	void Application::OnRender()
-	{
-		NG_Renderer->Clear();
+    void Application::OnEvent(Event& event)
+    {
+        if (event.GetEventType() == EventType::WindowClose)
+            m_running = false;
+        p_window->OnEvent(event);
+        for (int i = m_layerStack.size() - 1; i >= 0; i--) {
+            m_layerStack[i]->OnEvent(event);
+        }
+    }
 
-		for (Layer* layer : *p_layerStack) {
-			layer->OnRender();
-		}
-		NG_Renderer->Present();
+    void Application::OnUpdate(float timestep)
+    {
+        p_input->OnUpdate();
+        for (Layer* layer : m_layerStack) {
+            layer->OnUpdate(timestep);
+        }
+    }
 
-		SDL_Delay(1000 / 60);
-	}
+    void Application::OnRender()
+    {
+        for (Layer* layer : m_layerStack) {
+            layer->OnRender(m_renderer);
+        }
+    }
 
-	void Application::OnWindowEvent()
-	{
-		if (m_eventHandler.GetWindowEvent(SDL_QUIT)) {
-			p_window->WindowClose();
-		}
-	}
+    void Application::OnImGuiRender()
+    {
+        for (Layer* layer : m_layerStack) {
+            layer->OnImGuiRender();
+        }
+    }
 }

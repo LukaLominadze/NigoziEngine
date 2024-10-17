@@ -10,10 +10,11 @@
 
 #include <typeinfo>
 
-#include <SDL2/SDL.h>
-#include <SDL2/SDL_image.h>
+#include "imgui.h"
+#include "imgui_impl_glfw.h"
+#include "imgui_impl_opengl3.h"
 
-#include "Nigozi/Core/Core.h"
-#include "Nigozi/Core/Log.h"
-#include "Nigozi/Core/Vector2.h"
+#include "glm.hpp"
+#include "gtc/matrix_transform.hpp"
 
+#include "stb_image.h"

@@ -1,0 +1,9 @@
+[submodule "dependencies/glfw"]
+	path = dependencies/glfw
+	url = https://github.com/LukaLominadze/glfw
+[submodule "dependencies/imgui"]
+	path = dependencies/imgui
+	url = https://github.com/LukaLominadze/imgui
+[submodule "dependencies/stb"]
+	path = dependencies/stb
+	url = https://github.com/LukaLominadze/stb
