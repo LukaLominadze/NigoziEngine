@@ -46,7 +46,8 @@ project "NigoziEngine"
 
 	configurations {
 		"Debug",
-		"Release"
+		"Release",
+		"Distribution"
 	}
 
 	filter "system:windows"
@@ -65,3 +66,10 @@ project "NigoziEngine"
 
 		architecture "x64"
 		optimize "on"
+		
+	filter "configurations:Distribution"
+		
+	defines { "DISTRIBUTION" }
+
+	architecture "x64"
+	optimize "on"

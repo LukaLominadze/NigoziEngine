@@ -8,8 +8,10 @@ namespace Global
 	static SandboxLayer sandboxLayer = SandboxLayer();
 }
 
-Nigozi::Application* CreateApplication() {
-	Nigozi::Application* app = new Nigozi::Application("Test", 960, 540, true, false);
-	app->PushLayer(&Global::sandboxLayer);
-	return app;
+Nigozi::ApplicationProps CreateApplicationProps() {
+	return { "Test App", 960, 540, true, false };
+}
+
+void OnApplicationInitialized(Nigozi::Application& app) {
+	app.PushLayer(&Global::sandboxLayer);
 }

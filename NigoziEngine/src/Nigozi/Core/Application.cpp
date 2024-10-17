@@ -4,26 +4,22 @@
 
 namespace Nigozi
 {
-    Application::Application(const char* title, uint32_t width, uint32_t height, bool vsync, bool fullscreen = false)
+    Application::Application(const ApplicationProps& props)
         :m_running(false)
     {
-        p_window = new Window(title, width, height, fullscreen);
+        p_window = new Window(props.Title, props.Width, props.Height, props.Fullscreen);
         p_window->SetEventCallback(std::bind(&Application::OnEvent, this, std::placeholders::_1));
-        p_window->SetVSync(vsync);
+        p_window->SetVSync(props.VSync);
 
         p_input = new Input();
 
         m_renderer = Renderer();
 
-        PushLayer(&m_imGuiLayer);
+        PushOverlay(&m_imGuiLayer);
     }
 
     Application::~Application()
     {
-        for (int i = 0; i < m_layerStack.size(); i++) {
-            m_layerStack[i]->OnDetach();
-        }
-
         delete p_input;
         p_window->Delete();
 
@@ -42,16 +38,8 @@ namespace Nigozi
             timer.StartTimerAndReturnSeconds();
 
             OnUpdate(timestep);
-
-            GLCall(glClearColor(0.0f, 0.0f, 0.0f, 1.0f));
-            GLCall(glClear(GL_COLOR_BUFFER_BIT));
-            m_renderer.Clear();
-        
             OnRender();
-
-            m_imGuiLayer.Begin();
             OnImGuiRender();
-            m_imGuiLayer.End();
 
             p_window->OnUpdate();
 
@@ -61,8 +49,12 @@ namespace Nigozi
 
     void Application::PushLayer(Layer* layer)
     {
-        m_layerStack.push_back(layer);
-        layer->OnAttach();
+        m_layerStack.PushLayer(layer);
+    }
+
+    void Application::PushOverlay(Layer* layer)
+    {
+        m_layerStack.PushOverlay(layer);
     }
 
     void Application::OnEvent(Event& event)
@@ -70,8 +62,12 @@ namespace Nigozi
         if (event.GetEventType() == EventType::WindowClose)
             m_running = false;
         p_window->OnEvent(event);
-        for (int i = m_layerStack.size() - 1; i >= 0; i--) {
-            m_layerStack[i]->OnEvent(event);
+
+        for (auto it = m_layerStack.end(); it != m_layerStack.begin(); )
+        {
+            (*--it)->OnEvent(event);
+            if (event.Handled)
+                break;
         }
     }
 
@@ -85,6 +81,8 @@ namespace Nigozi
 
     void Application::OnRender()
     {
+        m_renderer.SetClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+        m_renderer.Clear();
         for (Layer* layer : m_layerStack) {
             layer->OnRender(m_renderer);
         }
@@ -92,8 +90,10 @@ namespace Nigozi
 
     void Application::OnImGuiRender()
     {
+        m_imGuiLayer.Begin();
         for (Layer* layer : m_layerStack) {
             layer->OnImGuiRender();
         }
+        m_imGuiLayer.End();
     }
 }

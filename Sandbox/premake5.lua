@@ -42,7 +42,8 @@ project "Sandbox"
 
 	configurations {
 		"Debug",
-		"Release"
+		"Release",
+		"Distribution"
 	}
 
 	filter "system:windows"
@@ -60,5 +61,14 @@ project "Sandbox"
 		
 		defines { "NDEBUG", "_CONSOLE" }
 
+		architecture "x64"
+		optimize "on"
+
+	filter "configurations:Distribution"
+		
+		kind "WindowedApp"
+
+		defines { "DISTRIBUTION" }
+	
 		architecture "x64"
 		optimize "on"

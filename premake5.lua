@@ -1,7 +1,8 @@
 workspace "NigoziEngine"
 	configurations {
 		"Debug",
-		"Release"
+		"Release",
+		"Distribution"
 	}
 
 	flags

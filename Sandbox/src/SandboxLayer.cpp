@@ -12,7 +12,9 @@ void SandboxLayer::OnEvent(Nigozi::Event& event)
 
 void SandboxLayer::OnUpdate(float timestep)
 {
-
+	if (Nigozi::Input::IsKeyPressed(GLFW_KEY_SPACE)) {
+		LOG("pressing!");
+	}
 }
 
 void SandboxLayer::OnImGuiRender()
