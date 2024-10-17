@@ -52,8 +52,6 @@ project "NigoziEngine"
 	filter "system:windows"
 		systemversion "latest"
 
-		buildoptions { "/Yc\"ngpch.h\"" }
-
 	filter "configurations:Debug"
 		
 		defines { "_DEBUG" }
