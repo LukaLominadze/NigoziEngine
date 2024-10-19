@@ -1,7 +1,6 @@
 #include "ngpch.h"
 
 #include "IndexBuffer.h"
-#include "DebugNMacros.h"
 
 namespace Nigozi
 {

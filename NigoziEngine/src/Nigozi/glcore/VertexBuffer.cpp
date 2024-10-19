@@ -1,7 +1,6 @@
 #include "ngpch.h"
 
 #include "VertexBuffer.h"
-#include "DebugNMacros.h"
 
 namespace Nigozi
 {

@@ -5,7 +5,6 @@
 #include "events/ApplicationEvent.h"
 #include "events/KeyEvent.h"
 #include "events/MouseEvent.h"
-#include "glcore/DebugNMacros.h"
 
 namespace Nigozi
 {
@@ -21,7 +20,7 @@ namespace Nigozi
         p_window = glfwCreateWindow(width, height, title, NULL, NULL);
         if (!p_window)
         {
-            ERROR_LOG("Failed to create Window! Terminating program...");
+            ASSERT(p_window, "Initializing Window...");
             glfwTerminate();
         }
 
@@ -33,22 +32,22 @@ namespace Nigozi
             const GLFWvidmode* mode = glfwGetVideoMode(p_monitor);
             Global::windowData.Width = mode->width;
             Global::windowData.Height = mode->height;
-            glfwSetWindowMonitor(p_window, p_monitor, 0, 0, mode->width, mode->height, mode->refreshRate);
+            glfwSetWindowMonitor(p_window, p_monitor, 0, 0, mode->width, mode->height, GLFW_DONT_CARE);
             glViewport(0, 0, mode->width, mode->height);
         }
 
         glfwMakeContextCurrent(p_window);
 
         if (glewInit() != GLEW_OK) {
-            ERROR_LOG("Couldn't initialize GLEW");
+            ASSERT(false, "Initializing GLEW...");
         }
 
-        LOG("OpenGL Info: ")
-            LOG("  Vendor: {0} " << glGetString(GL_VENDOR))
-            LOG("  Renderer: {0} " << glGetString(GL_RENDERER))
-            LOG("  Version: {0} " << glGetString(GL_VERSION))
+        LOG("OpenGL Info: ");
+        LOG("  Vendor: {0} " << glGetString(GL_VENDOR));
+        LOG("  Renderer: {0} " << glGetString(GL_RENDERER));
+        LOG("  Version: {0} " << glGetString(GL_VERSION));
 
-            GLCall(glEnable(GL_BLEND));
+        GLCall(glEnable(GL_BLEND));
         GLCall(glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA));
 
         glfwSetWindowUserPointer(p_window, &Global::windowData);

@@ -2,8 +2,6 @@
 
 #include "ngpch.h"
 
-#include "DebugNMacros.h"
-
 namespace Nigozi
 {
 	struct VertexBufferLayoutElement {

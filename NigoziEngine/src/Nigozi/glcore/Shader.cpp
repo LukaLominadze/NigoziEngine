@@ -1,7 +1,6 @@
 #include "ngpch.h"
 
 #include "Shader.h"
-#include "DebugNMacros.h"
 
 #include <iostream>
 #include <fstream>
@@ -14,6 +13,9 @@ namespace Nigozi
     {
         m_filePath = filePath;
         ShaderProgramSource shaderSource = ParseShader();
+        LOG("Creating shader at " + filePath);
+        LOG(shaderSource.VertexShader);
+        LOG(shaderSource.FragmentShader);
         m_shader = CreateShader(shaderSource.VertexShader, shaderSource.FragmentShader);
         GLCall(glUseProgram(m_shader));
     }

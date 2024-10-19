@@ -1,7 +1,6 @@
 #include "ngpch.h"
 
 #include "Renderer.h"
-#include "DebugNMacros.h"
 
 namespace Nigozi
 {
