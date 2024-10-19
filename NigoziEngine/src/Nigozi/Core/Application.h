@@ -35,7 +35,7 @@ namespace Nigozi
 	private:
 		Window* p_window;
 		Renderer m_renderer;
-		Input* p_input = nullptr;
+		Input m_input;
 
 		LayerStack m_layerStack;
 

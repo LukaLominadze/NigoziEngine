@@ -10,4 +10,8 @@ public:
 	void OnImGuiRender() override;
 private:
 	bool OnMouseButtonPressed(Nigozi::MouseButtonPressedEvent& event);
+
+	std::string m_keystate;
+	std::pair<int, int> m_mouseDelta;
+	std::pair<int, int> m_mousePosition;
 };

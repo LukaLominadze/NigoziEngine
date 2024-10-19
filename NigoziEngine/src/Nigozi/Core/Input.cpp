@@ -12,6 +12,11 @@ namespace Nigozi
         if (!s_instance) {
             s_instance = this;
         }
+        // add all keycodes in keystates
+        for (int i = 32; i < 349; i++) 
+        {
+            m_keystates[i] = GLFW_RELEASE;
+        }
     }
 
     Input::~Input()
@@ -19,10 +24,41 @@ namespace Nigozi
         s_instance = nullptr;
     }
 
+    bool Input::IsKeyJustPressed(int keycode)
+    {
+        int state = glfwGetKey(Global::windowData.NativeWindow, keycode);
+        if (state == GLFW_PRESS) {
+            if (s_instance->m_keystates[keycode] == GLFW_RELEASE) {
+                s_instance->m_keystates[keycode] = GLFW_PRESS;
+                return true;
+            }
+        }
+        return false;
+    }
+
     bool Input::IsKeyPressed(int keycode)
     {
         int state = glfwGetKey(Global::windowData.NativeWindow, keycode);
-        return state == GLFW_PRESS || state == GLFW_REPEAT;
+        if (state == GLFW_PRESS || state == GLFW_REPEAT) {
+            if (s_instance->m_keystates[keycode] == GLFW_PRESS || s_instance->m_keystates[keycode] == GLFW_REPEAT)
+            {
+                s_instance->m_keystates[keycode] = GLFW_REPEAT;
+                return true;
+            }
+        }
+        return false;
+    }
+
+    bool Input::IsKeyReleased(int keycode)
+    {
+        int state = glfwGetKey(Global::windowData.NativeWindow, keycode);
+        if (state == GLFW_RELEASE) {
+            if (!s_instance->m_keystates[keycode] == state) {
+                s_instance->m_keystates[keycode] = GLFW_RELEASE;
+                return true;
+            }
+        }
+        return false;
     }
 
     bool Input::IsMouseButtonPressed(int button)
@@ -40,14 +76,12 @@ namespace Nigozi
 
     float Input::GetMouseX()
     {
-        std::pair<float, float> position = GetMousePosition();
-        return position.first;
+        return GetMousePosition().first;
     }
 
     float Input::GetMouseY()
     {
-        std::pair<float, float> position = GetMousePosition();
-        return position.second;
+        return GetMousePosition().second;
     }
 
     void Input::OnUpdate()

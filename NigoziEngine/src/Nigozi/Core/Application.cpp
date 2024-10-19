@@ -5,13 +5,11 @@
 namespace Nigozi
 {
     Application::Application(const ApplicationProps& props)
-        :m_running(false)
+        :m_running(false), m_input(Input())
     {
         p_window = new Window(props.Title, props.Width, props.Height, props.Fullscreen);
         p_window->SetEventCallback(std::bind(&Application::OnEvent, this, std::placeholders::_1));
         p_window->SetVSync(props.VSync);
-
-        p_input = new Input();
 
         m_renderer = Renderer();
 
@@ -20,7 +18,7 @@ namespace Nigozi
 
     Application::~Application()
     {
-        delete p_input;
+        //delete p_input;
         p_window->Delete();
 
         glfwTerminate();
@@ -73,7 +71,7 @@ namespace Nigozi
 
     void Application::OnUpdate(float timestep)
     {
-        p_input->OnUpdate();
+        m_input.OnUpdate();
         for (Layer* layer : m_layerStack) {
             layer->OnUpdate(timestep);
         }
