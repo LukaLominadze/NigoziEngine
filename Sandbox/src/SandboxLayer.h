@@ -1,17 +1,22 @@
 #pragma once
+
 #include <Nigozi.h>
 
-using namespace Nigozi;
-
-class SandboxLayer : public Layer {
+class SandboxLayer : public Nigozi::Layer {
 public:
-	SandboxLayer() = default;
-	~SandboxLayer() = default;
-
-	virtual void OnAttach() override;
-	virtual void OnUpdate() override;
-	virtual void OnRender() override;
+	void OnAttach() override;
+	void OnEvent(Nigozi::Event& event) override;
+	void OnUpdate(float timestep) override;
+	void OnRender() override;
+	void OnImGuiRender() override;
 private:
-	GameObject m_object1 = GameObject();
-	GameObject m_object2 = GameObject();
+	bool OnMouseButtonPressed(Nigozi::MouseButtonPressedEvent& event);
+
+	std::shared_ptr<Nigozi::Texture> m_luigiTexture;
+
+	std::string m_keystate;
+	std::pair<int, int> m_mouseDelta;
+	std::pair<int, int> m_mousePosition;
+
+	glm::vec3 m_luigiPosition;
 };

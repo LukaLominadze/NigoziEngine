@@ -2,19 +2,22 @@
 
 #include "ngpch.h"
 
-#include "Nigozi/Core/Core.h"
-
 #include "Nigozi/Benchmarking/Timer.h"
-				 
-#include "Nigozi/Core/Application.h"
-#include "Nigozi/Core/EntryPoint.h"
 
-#include "Nigozi/Events/EventHandler.h"
-#include "Nigozi/Events/Input.h"
+#include "Nigozi/core/Application.h"
+#include "Nigozi/core/Input.h"
 
-#include "Nigozi/Layers/Layer.h"
+#include "Nigozi/glcore/Renderer2D.h"
+#include "Nigozi/glcore/Shader.h"
+#include "Nigozi/glcore/Texture.h"
+#include "Nigozi/glcore/OrthographicCamera.h"
+#include "Nigozi/glcore/OrthographicCameraController.h"
+#include "Nigozi/glcore/PerspectiveCamera.h"
+#include "Nigozi/glcore/PerspectiveCameraController.h"
 
-#include "Nigozi/Components/Component.h"
-#include "Nigozi/Components/Sprite.h"
+#include "Nigozi/events/Event.h"
+#include "Nigozi/events/ApplicationEvent.h"
+#include "Nigozi/events/KeyEvent.h"
+#include "Nigozi/events/MouseEvent.h"
 
-#include "Nigozi/GameObject.h"
+#include "Nigozi/layers/Layer.h"

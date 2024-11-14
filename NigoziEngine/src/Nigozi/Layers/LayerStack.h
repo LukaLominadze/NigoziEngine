@@ -2,32 +2,25 @@
 
 #include "ngpch.h"
 
-#include "Nigozi/Core/Core.h"
-
-#include "Nigozi/Components/Component.h"
-#include "Nigozi/Layers/Layer.h"
+#include "Layer.h"
 
 namespace Nigozi
 {
-	class NG_API LayerStack {
+	class LayerStack
+	{
 	public:
 		LayerStack();
 		~LayerStack();
 
 		void PushLayer(Layer* layer);
-		void PopLayer(Layer* layer);
+		void PushOverlay(Layer* layer);
 
-		std::vector<Layer*>::iterator begin() { return m_layerStack.begin(); }
-		std::vector<Layer*>::iterator end() { return m_layerStack.end(); }
-
-		inline Layer* GetLayer(uint32_t layerIndex) { return m_layerStack[layerIndex]; }
-
-		inline static LayerStack& Get() { return *s_Instance; }
+		inline std::vector<Layer*>::iterator begin() { return m_layerStack.begin(); }
+		inline std::vector<Layer*>::iterator end() { return m_layerStack.end(); }
 	private:
 		std::vector<Layer*> m_layerStack;
 
-		static LayerStack* s_Instance;
-
-		uint32_t m_layerInsertIndex = 0;
+		uint32_t m_layerInsertIndex;
 	};
 }
+

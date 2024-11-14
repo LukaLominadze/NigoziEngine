@@ -3,43 +3,28 @@
 
 namespace Nigozi
 {
-	NG_API LayerStack* LayerStack::s_Instance = nullptr;
-
 	LayerStack::LayerStack()
+		:m_layerInsertIndex(0)
 	{
-		if (!s_Instance) {
-			s_Instance = this;
-		}
 	}
 
 	LayerStack::~LayerStack()
 	{
 		for (Layer* layer : m_layerStack) {
-			delete layer;
+			layer->OnDetach();
 		}
 	}
 
 	void LayerStack::PushLayer(Layer* layer)
 	{
-		m_layerStack.emplace(m_layerStack.begin() + m_layerInsertIndex, layer);
-		layer->SetIndex(m_layerInsertIndex);
+		m_layerStack.insert(m_layerStack.begin() + m_layerInsertIndex, layer);
 		layer->OnAttach();
 		m_layerInsertIndex++;
 	}
 
-	void LayerStack::PopLayer(Layer* layer)
+	void LayerStack::PushOverlay(Layer* layer)
 	{
-		auto it = std::find(m_layerStack.begin(), m_layerStack.begin() + m_layerInsertIndex, layer);
-		if (it != m_layerStack.begin() + m_layerInsertIndex) {
-			layer->OnDetach();
-			m_layerStack.erase(it);
-			m_layerInsertIndex--;
-
-			int index = std::distance(m_layerStack.begin(), it);
-
-			for (int i = index; i < m_layerStack.size(); ++i) {
-				m_layerStack[i]->SetIndex(i);
-			}
-		}
+		m_layerStack.push_back(layer);
+		layer->OnAttach();
 	}
 }

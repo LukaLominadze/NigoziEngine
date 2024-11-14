@@ -1,29 +1,28 @@
 #pragma once
-#include "ngpch.h"
-#include <windows.h>
 
+#include <GL/glew.h>
+#include <GLFW/glfw3.h>
 
-#ifdef _DEBUG
+#include <iostream>
 
-	inline HANDLE hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
+#ifndef DISTRIBUTION
+#define LOG(x) std::cout << x << std::endl
+#define ERROR_LOG(x) LOG(x);
+#define ASSERT(x, message) if ((x)) LOG(message << " Success! " << __FILE__ << "; " << __LINE__ << "; " << #x); \
+								else LOG(message << " Failed! " << __FILE__ << "; " << __LINE__ << "; " << #x);
+#define ASSERT_ERROR(x) if (!(x)) LOG("Failed! " << __FILE__ << "; " << __LINE__ << "; " << #x);
+#define GLCall(x) x; ASSERT_ERROR(GLLogCall(#x, __FILE__, __LINE__));
 
-	// Check if a task is succesfully completed
-	#define ASSERT(condition, message) \
-			SetConsoleTextAttribute(hConsole, FOREGROUND_RED | FOREGROUND_GREEN); \
-			std::cerr << message; \
-			if ((condition)){ \
-				SetConsoleTextAttribute(hConsole, FOREGROUND_GREEN); \
-				std::cerr << " -> Success!" << std::endl; \
-			} \
-			else { \
-				SetConsoleTextAttribute(hConsole, FOREGROUND_RED); \
-				std::cerr << " -> Failed!" << std::endl; \
-				__debugbreak(); \
-			} \
-			SetConsoleTextAttribute(hConsole, FOREGROUND_RED | FOREGROUND_GREEN | FOREGROUND_BLUE);
-	#define LOG(message) \
-			std::cout << message << std::endl;
+inline bool GLLogCall(const char* function, const char* file, int line) {
+    while (GLenum error = glGetError()) {
+        std::cout << "{OpenGL Error} (" << error << "): " << function << " " << file << std::endl;
+        return false;
+    }
+    return true;
+}
 #else
-	#define ASSERT(condition, message)
-	#define LOG(message)
+#define LOG(x)
+#define ERROR_LOG(x)
+#define ASSERT(x, message)
+#define GLCall(x) x;
 #endif
