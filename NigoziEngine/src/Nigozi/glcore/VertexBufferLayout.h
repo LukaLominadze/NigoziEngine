@@ -50,7 +50,7 @@ namespace Nigozi
 		inline unsigned int GetStride() const { return m_stride; }
 	private:
 		std::vector<VertexBufferLayoutElement> m_elements;
-		unsigned int m_stride;
+		unsigned int m_stride = 0;
 
 	};
 }

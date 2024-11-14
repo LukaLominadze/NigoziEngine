@@ -47,8 +47,8 @@ namespace Nigozi
         LOG("  Renderer: {0} " << glGetString(GL_RENDERER));
         LOG("  Version: {0} " << glGetString(GL_VERSION));
 
-        GLCall(glEnable(GL_BLEND));
-        GLCall(glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA));
+        /*GLCall(glEnable(GL_BLEND));
+        GLCall(glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA));*/
 
         glfwSetWindowUserPointer(p_window, &Global::windowData);
 

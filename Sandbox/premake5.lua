@@ -46,6 +46,10 @@ project "Sandbox"
 		"Distribution"
 	}
 
+	postbuildcommands {
+		"{COPYDIR} %{wks.location}/NigoziEngine/src/Nigozi/res %{prj.location}/src/Nigozi/res"
+	}
+
 	filter "system:windows"
 		cppdialect "C++20"
 		systemversion "latest"

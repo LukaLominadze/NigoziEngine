@@ -45,6 +45,7 @@ namespace Nigozi
                 s_instance->m_keystates[keycode] = GLFW_REPEAT;
                 return true;
             }
+            return true;
         }
         return false;
     }

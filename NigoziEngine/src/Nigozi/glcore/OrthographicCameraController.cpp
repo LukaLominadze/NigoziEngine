@@ -25,31 +25,54 @@ namespace Nigozi
 	{
 		glm::vec3 cameraPosition = m_camera.GetPosition();
 		float cameraRotation = m_camera.GetRotation();
+
+		float cosRotation = cos(glm::radians(cameraRotation));
+		float sinRotation = sin(glm::radians(cameraRotation));
+
+		if (sinRotation == 0) {
+			// disregard rotation
+			cosRotation = 1;
+			sinRotation = 1;
+		}
+
 		if (Input::IsKeyPressed(GLFW_KEY_A))
 		{
-			cameraPosition.x -= cos(glm::radians(cameraRotation)) * m_cameraTranslationSpeed * timestep;
-			cameraPosition.y -= sin(glm::radians(cameraRotation)) * m_cameraTranslationSpeed * timestep;
+			cameraPosition.x -= cosRotation * m_cameraTranslationSpeed * timestep;
 		}
 		else if (Input::IsKeyPressed(GLFW_KEY_D))
 		{
-			cameraPosition.x += cos(glm::radians(cameraRotation)) * m_cameraTranslationSpeed * timestep;
-			cameraPosition.y += sin(glm::radians(cameraRotation)) * m_cameraTranslationSpeed * timestep;
+			cameraPosition.x += cosRotation * m_cameraTranslationSpeed * timestep;
 		}
 
 		if (Input::IsKeyPressed(GLFW_KEY_W))
 		{
-			cameraPosition.x += -sin(glm::radians(cameraRotation)) * m_cameraTranslationSpeed * timestep;
-			cameraPosition.y += cos(glm::radians(cameraRotation)) * m_cameraTranslationSpeed * timestep;
+			cameraPosition.y += m_cameraTranslationSpeed * timestep;
 		}
 		else if (Input::IsKeyPressed(GLFW_KEY_S))
 		{
-			cameraPosition.x -= -sin(glm::radians(cameraRotation)) * m_cameraTranslationSpeed * timestep;
-			cameraPosition.y -= cos(glm::radians(cameraRotation)) * m_cameraTranslationSpeed * timestep;
+			cameraPosition.y -= m_cameraTranslationSpeed * timestep;
+		}
+
+		if (Input::IsKeyPressed(GLFW_KEY_Q)) {
+			cameraRotation += m_cameraRotationSpeed * timestep;
+			m_camera.SetRotation(cameraRotation);
+		}
+		if (Input::IsKeyPressed(GLFW_KEY_E)) {
+			cameraRotation -= m_cameraRotationSpeed * timestep;
+			m_camera.SetRotation(cameraRotation);
+		}
+		if (Input::IsKeyJustPressed(GLFW_KEY_R)) {
+			m_camera.SetRotation(0);
 		}
 
 		m_camera.SetPosition(cameraPosition);
 
-		m_cameraTranslationSpeed = m_zoom;
+		m_cameraTranslationSpeed = 3 * m_zoom;
+	}
+
+	void OrthographicCameraController::OnRender()
+	{
+		m_camera.SetMVPMatrix();
 	}
 
 	bool OrthographicCameraController::OnMouseScrolled(MouseScrolledEvent& e)

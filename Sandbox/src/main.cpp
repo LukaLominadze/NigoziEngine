@@ -5,6 +5,7 @@
 
 namespace Global 
 {
+	static Nigozi::OrthographicCameraController cameraLayer = Nigozi::OrthographicCameraController(16 / 9.0f);
 	static SandboxLayer sandboxLayer = SandboxLayer();
 }
 
@@ -13,5 +14,6 @@ Nigozi::ApplicationProps CreateApplicationProps() {
 }
 
 void OnApplicationInitialized(Nigozi::Application& app) {
+	app.PushLayer(&Global::cameraLayer);
 	app.PushLayer(&Global::sandboxLayer);
 }

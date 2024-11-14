@@ -1,6 +1,5 @@
 #pragma once
 
-#include "glcore/Renderer.h"
 #include "glcore/Shader.h"
 #include "core/Window.h"
 #include "layers/Layer.h"
@@ -34,7 +33,6 @@ namespace Nigozi
 		void OnImGuiRender();
 	private:
 		Window* p_window;
-		Renderer m_renderer;
 		Input m_input;
 
 		LayerStack m_layerStack;

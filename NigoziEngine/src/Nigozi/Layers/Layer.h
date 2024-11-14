@@ -1,7 +1,7 @@
 #pragma once
 
 #include "events/Event.h"
-#include "glcore/Renderer.h"
+#include "glcore/Renderer2D.h"
 
 namespace Nigozi
 {
@@ -13,7 +13,7 @@ namespace Nigozi
 		virtual void OnAttach() {}
 		virtual void OnEvent(Event& evnet) {}
 		virtual void OnUpdate(float timestep) {}
-		virtual void OnRender(Renderer& renderer) {}
+		virtual void OnRender() {}
 		virtual void OnImGuiRender() {}
 		virtual void OnDetach() {}
 	};

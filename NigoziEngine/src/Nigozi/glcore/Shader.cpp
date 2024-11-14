@@ -17,6 +17,7 @@ namespace Nigozi
         LOG(shaderSource.VertexShader);
         LOG(shaderSource.FragmentShader);
         m_shader = CreateShader(shaderSource.VertexShader, shaderSource.FragmentShader);
+        GLCall(glLinkProgram(m_shader));
         GLCall(glUseProgram(m_shader));
     }
 
@@ -38,6 +39,11 @@ namespace Nigozi
     void Shader::SetUniformMat4f(const std::string& name, const glm::mat4& matrix)
     {
         GLCall(glUniformMatrix4fv(GetUniformLocation(name), 1, GL_FALSE, &matrix[0][0]));
+    }
+
+    void Shader::SetUniform1iv(const std::string& name, unsigned int count, int* value)
+    {
+        GLCall(glUniform1iv(GetUniformLocation(name), count, value));
     }
 
     void Shader::Bind() const
@@ -63,7 +69,7 @@ namespace Nigozi
 
         std::string line;
         while (std::getline(stream, line)) {
-            if (line.find("#shader") != std::string::npos) {
+            if (line.find("//type") != std::string::npos) {
                 if (line.find("vertex") != std::string::npos) {
                     type = ShaderType::VERTEX;
                 }

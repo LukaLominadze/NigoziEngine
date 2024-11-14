@@ -15,9 +15,10 @@ namespace Nigozi
 		Delete();
 	}
 
-	void VertexArray::AddBuffer(const VertexBuffer& vbo, const VertexBufferLayout& vboLayout)
+	void VertexArray::AddVertexBuffer(const std::shared_ptr<VertexBuffer>& vbo, const VertexBufferLayout& vboLayout)
 	{
-		vbo.Bind();
+		r_vbo = vbo;
+		r_vbo->Bind();
 		const std::vector<VertexBufferLayoutElement>& elements = vboLayout.GetElements();
 		unsigned int offset = 0;
 		for (unsigned int i = 0; i < elements.size(); i++) {
@@ -29,14 +30,33 @@ namespace Nigozi
 		}
 	}
 
+	void VertexArray::AddIndexBuffer(const std::shared_ptr<IndexBuffer>& ibo)
+	{
+		r_ibo = ibo;
+	}
+
 	void VertexArray::Bind() const
 	{
 		GLCall(glBindVertexArray(m_rendererID));
+		r_ibo->Bind();
 	}
 
 	void VertexArray::Unbind() const
 	{
 		GLCall(glBindVertexArray(0));
+		r_ibo->Unbind();
+	}
+
+	void VertexArray::SetVertexBufferData(const void* data, unsigned int size)
+	{
+		r_vbo.get()->Bind();
+		r_vbo.get()->SetData(data, size);
+	}
+
+	void VertexArray::SetIndexBufferData(const void* data, unsigned int count)
+	{
+		r_ibo.get()->Bind();
+		r_ibo.get()->SetData(data, count);
 	}
 
 	void VertexArray::Delete()

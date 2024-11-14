@@ -4,18 +4,20 @@
 #include "events/Event.h"
 #include "events/MouseEvent.h"
 #include "events/ApplicationEvent.h"
+#include "layers/Layer.h"
 
 namespace Nigozi
 {
-	class OrthographicCameraController {
+	class OrthographicCameraController : public Layer {
 	public:
 		OrthographicCameraController(float aspectRatio, bool rotation = false);
 		~OrthographicCameraController();
 
 		inline const OrthographicCamera& GetCamera() const { return m_camera; }
 
-		void OnEvent(Event& event);
-		void OnUpdate(float timestep);
+		void OnEvent(Event& event) override;
+		void OnUpdate(float timestep) override;
+		void OnRender() override;
 	private:
 		bool OnMouseScrolled(MouseScrolledEvent& e);
 		bool OnWindowResized(WindowResizedEvent& e);

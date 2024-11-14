@@ -1,6 +1,7 @@
 #include "ngpch.h"
 
 #include "OrthographicCamera.h"
+#include "Renderer2D.h"
 
 namespace Nigozi
 {
@@ -20,6 +21,11 @@ namespace Nigozi
 	{
 		m_projectionMatrix = glm::ortho(left, right, bottom, top, -1.0f, 1.0f);
 		m_viewProjectionMatrix = m_projectionMatrix * m_viewMatrix;
+	}
+
+	void OrthographicCamera::SetMVPMatrix()
+	{
+		Renderer2D::SetMVPMatrix(m_viewProjectionMatrix);
 	}
 
 	void OrthographicCamera::SetPosition(const glm::vec3& position)

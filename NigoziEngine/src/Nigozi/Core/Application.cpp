@@ -1,6 +1,7 @@
 #include "ngpch.h"
 
 #include "Application.h"
+#include "glcore/Renderer2D.h"
 
 namespace Nigozi
 {
@@ -11,14 +12,15 @@ namespace Nigozi
         p_window->SetEventCallback(std::bind(&Application::OnEvent, this, std::placeholders::_1));
         p_window->SetVSync(props.VSync);
 
-        m_renderer = Renderer();
-
         PushOverlay(&m_imGuiLayer);
+
+        Renderer2D::Initialize();
+        Renderer2D::SetClearColor(0.1f, 0.1f, 0.1f, 1.0f);
     }
 
     Application::~Application()
     {
-        //delete p_input;
+        Renderer2D::Deinitialize();
         p_window->Delete();
 
         glfwTerminate();
@@ -58,7 +60,10 @@ namespace Nigozi
     void Application::OnEvent(Event& event)
     {
         if (event.GetEventType() == EventType::WindowClose)
+        {
             m_running = false;
+            return;
+        }
         p_window->OnEvent(event);
 
         for (auto it = m_layerStack.end(); it != m_layerStack.begin(); )
@@ -79,11 +84,12 @@ namespace Nigozi
 
     void Application::OnRender()
     {
-        m_renderer.SetClearColor(0.0f, 0.0f, 0.0f, 1.0f);
-        m_renderer.Clear();
+        Renderer2D::BeginScene();
+        Renderer2D::Clear();
         for (Layer* layer : m_layerStack) {
-            layer->OnRender(m_renderer);
+            layer->OnRender();
         }
+        Renderer2D::EndScene();
     }
 
     void Application::OnImGuiRender()

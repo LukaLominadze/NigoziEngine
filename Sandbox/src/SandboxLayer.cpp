@@ -2,6 +2,8 @@
 
 void SandboxLayer::OnAttach() {
 	LOG("Hey! it's wooorking!");
+	Nigozi::Renderer2D::SetClearColor(0.7f, 0.1f, 0.3f, 1.0f);
+	m_luigiTexture = std::make_shared<Nigozi::Texture>("src/Nigozi/res/textures/luigi.png");
 }
 
 void SandboxLayer::OnEvent(Nigozi::Event& event)
@@ -28,6 +30,29 @@ void SandboxLayer::OnUpdate(float timestep)
 	}
 	m_mouseDelta = Nigozi::Input::GetMousePositionDelta();
 	m_mousePosition = Nigozi::Input::GetMousePosition();
+
+	if (Nigozi::Input::IsKeyPressed(GLFW_KEY_LEFT))
+	{
+		m_luigiPosition.x -= 4.0f * timestep;
+	}
+	else if (Nigozi::Input::IsKeyPressed(GLFW_KEY_RIGHT))
+	{
+		m_luigiPosition.x += 4.0f * timestep;
+	}
+	if (Nigozi::Input::IsKeyPressed(GLFW_KEY_UP))
+	{
+		m_luigiPosition.y += 4.0f * timestep;
+	}
+	else if (Nigozi::Input::IsKeyPressed(GLFW_KEY_DOWN))
+	{
+		m_luigiPosition.y -= 4.0f * timestep;
+	}
+}
+
+void SandboxLayer::OnRender()
+{
+	Nigozi::Renderer2D::DrawQuad({ 0.0f, 0.0f, -1.0f }, { 0.8f, 0.8f }, nullptr, { 0.1f, 0.2f, 0.9f, 1.0f});
+	Nigozi::Renderer2D::DrawQuad(m_luigiPosition, { 0.4f, 0.4f }, m_luigiTexture, { 1.0f, 1.0f, 1.0f, 0.7f });
 }
 
 void SandboxLayer::OnImGuiRender()
@@ -43,6 +68,9 @@ void SandboxLayer::OnImGuiRender()
 	ImGui::Text(m_keystate.c_str());
 
 	ImGui::End();
+
+	static bool show = true;
+	ImGui::ShowDemoWindow(&show);
 }
 
 bool SandboxLayer::OnMouseButtonPressed(Nigozi::MouseButtonPressedEvent& event)

@@ -5,18 +5,19 @@
 #include "events/MouseEvent.h"
 #include "events/ApplicationEvent.h"
 #include "events/KeyEvent.h"
+#include "layers/Layer.h"
 
 namespace Nigozi
 {
-	class PerspectiveCameraController {
+	class PerspectiveCameraController : public Layer {
 	public:
 		PerspectiveCameraController(float aspectRatio, float fov = 60.0f);
 		~PerspectiveCameraController();
 
 		inline const PerspectiveCamera& GetCamera() const { return m_camera; }
 
-		void OnEvent(Event& event);
-		void OnUpdate(float timestep);
+		void OnEvent(Event& event) override;
+		void OnUpdate(float timestep) override;
 	private:
 		bool OnMouseScrolled(MouseScrolledEvent& e);
 		bool OnWindowResized(WindowResizedEvent& e);

@@ -12,6 +12,8 @@ namespace Nigozi
 		void Bind() const;
 		void Unbind() const;
 
+		void SetData(const void* data, unsigned int count);
+
 		inline unsigned int GetCount() const { return m_count; }
 
 		void Delete();

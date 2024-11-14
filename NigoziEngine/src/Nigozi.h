@@ -7,7 +7,7 @@
 #include "Nigozi/core/Application.h"
 #include "Nigozi/core/Input.h"
 
-#include "Nigozi/glcore/Renderer.h"
+#include "Nigozi/glcore/Renderer2D.h"
 #include "Nigozi/glcore/Shader.h"
 #include "Nigozi/glcore/Texture.h"
 #include "Nigozi/glcore/OrthographicCamera.h"
