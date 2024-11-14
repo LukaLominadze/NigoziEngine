@@ -1,7 +1,9 @@
 # Nigozi Engine
-![image](https://github.com/LukaLominadze/NigoziEngine/assets/142942110/a63aec34-2335-42a5-90e3-f77dd0552cff)
 
-![2024-04-27 10-12-14](https://github.com/LukaLominadze/NigoziEngine/assets/142942110/a601462e-4f31-4d54-95c7-24be2e2b9960)
+
+https://github.com/user-attachments/assets/0b82034c-a8a8-4e6f-9ab3-210ffa51dbb3
+
+
 
 Nigozi Engine is a game engine framework designed to make 2D devolopment easier in C++. The engine is in the beginning stages of devlopment, many features and systems are yet to come!
 
