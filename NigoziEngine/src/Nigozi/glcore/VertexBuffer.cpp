@@ -4,7 +4,7 @@
 
 namespace Nigozi
 {
-    VertexBuffer::VertexBuffer(const void* data, unsigned int size)
+    VertexBuffer::VertexBuffer(const void* data, uint32_t size)
     {
         GLCall(glGenBuffers(1, &m_rendererID));
         GLCall(glBindBuffer(GL_ARRAY_BUFFER, m_rendererID));
@@ -26,7 +26,7 @@ namespace Nigozi
         GLCall(glBindBuffer(GL_ARRAY_BUFFER, 0));
     }
 
-    void VertexBuffer::SetData(const void* data, unsigned int size)
+    void VertexBuffer::SetData(const void* data, uint32_t size)
     {
         GLCall(glBufferData(GL_ARRAY_BUFFER, size, data, GL_DYNAMIC_DRAW));
     }

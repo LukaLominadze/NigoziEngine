@@ -7,6 +7,7 @@ namespace Nigozi
 {
 	void ImGuiLayer::OnAttach()
 	{
+        // Initialize IMGUI
         IMGUI_CHECKVERSION();
         ImGui::CreateContext();
         ImGuiIO& io = ImGui::GetIO(); (void)io;

@@ -25,6 +25,7 @@ namespace Nigozi
 		std::unordered_map<int, uint16_t> m_keystates;
 		inline const std::pair<float, float>& GetMousePosDelta() { return m_mouseDeltaPos; }
 	private:
+		// Singleton for global and easy access
 		static Input* s_instance;
 
 

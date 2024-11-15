@@ -85,16 +85,6 @@ namespace Nigozi
         return ShaderProgramSource{ ss[0].str(), ss[1].str() };
     }
 
-    unsigned int Shader::CompileShader(unsigned int type, const std::string& source)
-    {
-        unsigned int id = glCreateShader(type);
-        const char* src = source.c_str();
-        GLCall(glShaderSource(id, 1, &src, nullptr));
-        GLCall(glCompileShader(id));
-
-        return id;
-    }
-
     unsigned int Shader::CreateShader(const std::string& vertexShader, const std::string& fragmentShader)
     {
         unsigned int program = glCreateProgram();
@@ -109,6 +99,16 @@ namespace Nigozi
         GLCall(glDeleteShader(_fragmentShader));
 
         return program;
+    }
+
+    unsigned int Shader::CompileShader(unsigned int type, const std::string& source)
+    {
+        unsigned int id = glCreateShader(type);
+        const char* src = source.c_str();
+        GLCall(glShaderSource(id, 1, &src, nullptr));
+        GLCall(glCompileShader(id));
+
+        return id;
     }
 
     int Shader::GetUniformLocation(const std::string& uniform)

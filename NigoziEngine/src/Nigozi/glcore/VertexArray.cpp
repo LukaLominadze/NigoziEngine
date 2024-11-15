@@ -20,8 +20,8 @@ namespace Nigozi
 		r_vbo = vbo;
 		r_vbo->Bind();
 		const std::vector<VertexBufferLayoutElement>& elements = vboLayout.GetElements();
-		unsigned int offset = 0;
-		for (unsigned int i = 0; i < elements.size(); i++) {
+		uint32_t offset = 0;
+		for (size_t i = 0; i < elements.size(); i++) {
 			const VertexBufferLayoutElement& element = elements[i];
 			GLCall(glEnableVertexAttribArray(i));
 			GLCall(glVertexAttribPointer(i, element.Count, element.Type, element.Normalized,
@@ -47,13 +47,13 @@ namespace Nigozi
 		r_ibo->Unbind();
 	}
 
-	void VertexArray::SetVertexBufferData(const void* data, unsigned int size)
+	void VertexArray::SetVertexBufferData(const void* data, uint32_t size)
 	{
 		r_vbo.get()->Bind();
 		r_vbo.get()->SetData(data, size);
 	}
 
-	void VertexArray::SetIndexBufferData(const void* data, unsigned int count)
+	void VertexArray::SetIndexBufferData(const void* data, uint32_t count)
 	{
 		r_ibo.get()->Bind();
 		r_ibo.get()->SetData(data, count);

@@ -5,6 +5,9 @@
 extern Nigozi::ApplicationProps CreateApplicationProps();
 extern void OnApplicationInitialized(Nigozi::Application& app);
 
+// Define MAIN before including Nigozi.h in the main file of the program to set the entry point
+#ifdef MAIN
+
 #if NG_PLATFORM_WINDOWS
 	#ifdef DISTRIBUTION
 	#include <windows.h>
@@ -21,4 +24,6 @@ extern void OnApplicationInitialized(Nigozi::Application& app);
 		app.Run();
 	}
 	#endif
+#endif
+
 #endif

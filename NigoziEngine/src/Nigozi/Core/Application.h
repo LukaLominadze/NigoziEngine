@@ -22,6 +22,7 @@ namespace Nigozi
 		Application(const ApplicationProps& props);
 		~Application();
 
+		// Launch mainloop
 		void Run();
 
 		void PushLayer(Layer* layer);

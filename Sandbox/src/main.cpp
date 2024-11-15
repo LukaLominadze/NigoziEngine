@@ -1,12 +1,12 @@
-#include <Nigozi.h>
-#include "Nigozi/core/EntryPoint.h"
+#define MAIN
 
+#include <Nigozi.h>
 #include "SandboxLayer.h"
 
 namespace Global 
 {
-	static Nigozi::OrthographicCameraController cameraLayer = Nigozi::OrthographicCameraController(16 / 9.0f);
-	static SandboxLayer sandboxLayer = SandboxLayer();
+	static Nigozi::OrthographicCameraController cameraLayer(16 / 9.0f);
+	static SandboxLayer sandboxLayer;
 }
 
 Nigozi::ApplicationProps CreateApplicationProps() {

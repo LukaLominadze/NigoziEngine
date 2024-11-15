@@ -7,6 +7,7 @@ namespace Nigozi
 	Texture::Texture(const std::string& filePath)
 		:m_rendererID(0), m_filePath(filePath), m_localBuffer(nullptr), m_width(0), m_height(0), m_BPP(0)
 	{
+		// Load image
 		stbi_set_flip_vertically_on_load(1);
 		m_localBuffer = stbi_load(filePath.c_str(), &m_width, &m_height, &m_BPP, 4);
 
@@ -32,7 +33,7 @@ namespace Nigozi
 		Delete();
 	}
 
-	void Texture::Bind(unsigned int slot = 0) const
+	void Texture::Bind(uint32_t slot = 0) const
 	{
 		GLCall(glActiveTexture(GL_TEXTURE0 + slot));
 		GLCall(glBindTexture(GL_TEXTURE_2D, m_rendererID));

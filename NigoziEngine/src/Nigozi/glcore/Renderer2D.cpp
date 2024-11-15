@@ -6,6 +6,9 @@ namespace Nigozi
 {
 	Renderer2DData* Renderer2D::s_data = nullptr;
 
+	/// <summary>
+	/// Sets OpenGL parameters, intializes rendererData: Shader, Texture array, VAO, VBO, IBO
+	/// </summary>
 	void Renderer2D::Initialize()
 	{
 		GLCall(glEnable(GL_BLEND));
@@ -14,6 +17,10 @@ namespace Nigozi
 		/*GLCall(glEnable(GL_DEPTH_TEST));
 		GLCall(glDepthFunc(GL_LESS));*/
 
+		LOG("OpenGL Info: ");
+		LOG("  Vendor: {0} " << glGetString(GL_VENDOR));
+		LOG("  Renderer: {0} " << glGetString(GL_RENDERER));
+		LOG("  Version: {0} " << glGetString(GL_VERSION));
 
 		// Create renderer data object
 		s_data = new Renderer2DData();
@@ -108,6 +115,7 @@ namespace Nigozi
 
 		s_data->CurrentVertex += 4 * s_data->VertexElementCount;
 		s_data->CurrentIndex += 6;
+		s_data->QuadCount++;
 	}
 
 	void Renderer2D::DrawRotatedQuad(const glm::vec3& position, const glm::vec2& scale, float rotation, const std::shared_ptr<Texture>& texture, glm::vec4 color)
@@ -140,10 +148,13 @@ namespace Nigozi
 
 		s_data->CurrentVertex += 4 * s_data->VertexElementCount;
 		s_data->CurrentIndex += 6;
+		s_data->QuadCount++;
 	}
 
 	void Renderer2D::BeginScene()
 	{
+		s_data->DrawCalls = 0;
+		s_data->QuadCount = 0;
 	}
 
 	void Renderer2D::EndScene()
@@ -167,6 +178,7 @@ namespace Nigozi
 		s_data->CurrentVertex = 0;
 		s_data->CurrentIndex = 0;
 		s_data->TextureSlot = 1;
+		s_data->DrawCalls++;
 	}
 
 	void Renderer2D::SetMVPMatrix(const glm::mat4& mvp)
@@ -174,7 +186,7 @@ namespace Nigozi
 		s_data->DefaultShader->SetUniformMat4f("modelViewProjection", mvp);
 	}
 
-	unsigned int Renderer2D::SetTextureAndGetSlot(const std::shared_ptr<Texture>& texture)
+	uint32_t Renderer2D::SetTextureAndGetSlot(const std::shared_ptr<Texture>& texture)
 	{
 		if (texture) {
 			if (s_data->TextureSlot > 16) {

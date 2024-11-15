@@ -18,12 +18,12 @@ namespace Nigozi
 		void Bind() const;
 		void Unbind() const;
 
-		void SetVertexBufferData(const void* data, unsigned int size);
-		void SetIndexBufferData(const void* data, unsigned int count);
+		void SetVertexBufferData(const void* data, uint32_t size);
+		void SetIndexBufferData(const void* data, uint32_t count);
 
 		void Delete();
 	private:
-		unsigned int m_rendererID;
+		uint32_t m_rendererID;
 
 		std::shared_ptr<VertexBuffer> r_vbo;
 		std::shared_ptr<IndexBuffer> r_ibo;

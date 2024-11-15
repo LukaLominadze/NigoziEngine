@@ -9,6 +9,7 @@ namespace Nigozi
         :m_running(false), m_input(Input())
     {
         p_window = new Window(props.Title, props.Width, props.Height, props.Fullscreen);
+        // Polled events will be sent to the OnEvent function in the application
         p_window->SetEventCallback(std::bind(&Application::OnEvent, this, std::placeholders::_1));
         p_window->SetVSync(props.VSync);
 
