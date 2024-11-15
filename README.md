@@ -13,7 +13,7 @@ Nigozi Engine is a game engine framework designed to make 2D devolopment easier 
 The engine primarly supports Windows.
 
 ## Getting Started
-Visual Studio 2020 (and above) is recommended, but you are free to try other applications to build the project.
+Visual Studio 2020 (and above) is recommended.
 
 <ins>**1. Downloading the repository:**</ins>
 
@@ -21,16 +21,16 @@ Start cloning the repository with ```git clone --recursive https://github.com/Lu
 
 <ins>**2. Building the project:**</ins>
 
-After cloning the repository, simply run the ```Setup-windows.bat``` file.
+After cloning the repository, run the ```Setup-windows.bat``` file.
 
-The project now is ready.
+The project is now ready.
 
 # Dependencies
 - GLFW - For window creation and event polling
-- GLEW - For importing OpenGL functions
+- GLEW - For rendering with OpenGL
 - GLM - For math
 - StbImage - For handling/loading images
-- DearImGui - For UI, very useful in realtime applications
+- DearImGui - For UI
 
 # The plan
 The plan for Nigozi Engine is to make a 2D framework that makes the development process simple and clear and to provide core functionality and features many games have.
