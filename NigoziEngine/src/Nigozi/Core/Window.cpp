@@ -26,6 +26,7 @@ namespace Nigozi
 
         Global::windowData.NativeWindow = p_window;
 
+        // Get the monitor to set the viewport and fullscreen mode
         p_monitor = glfwGetPrimaryMonitor();
 
         if (Global::windowData.Fullscreen) {
@@ -42,16 +43,9 @@ namespace Nigozi
             ASSERT(false, "Initializing GLEW...");
         }
 
-        LOG("OpenGL Info: ");
-        LOG("  Vendor: {0} " << glGetString(GL_VENDOR));
-        LOG("  Renderer: {0} " << glGetString(GL_RENDERER));
-        LOG("  Version: {0} " << glGetString(GL_VERSION));
-
-        /*GLCall(glEnable(GL_BLEND));
-        GLCall(glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA));*/
-
         glfwSetWindowUserPointer(p_window, &Global::windowData);
 
+        // Get and send the events to application
         glfwSetWindowCloseCallback(p_window, [](GLFWwindow* window)
             {
                 WindowData& data = *(WindowData*)glfwGetWindowUserPointer(window);

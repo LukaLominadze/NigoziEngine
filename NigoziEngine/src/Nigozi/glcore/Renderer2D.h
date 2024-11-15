@@ -9,23 +9,25 @@ namespace Nigozi
 {
 	struct Renderer2DData 
 	{
-		static const unsigned int MaxQuads = 10'000;
-		static const unsigned int MaxVertices = MaxQuads * 4;
-		static const unsigned int VertexElementCount = 10;
-		static const unsigned int MaxVerticesElements = MaxVertices * VertexElementCount;
-		static const unsigned int MaxIndicies = MaxQuads * 6;
+		static const uint32_t MaxQuads = 10'000;
+		static const uint32_t MaxVertices = MaxQuads * 4;
+		static const uint32_t VertexElementCount = 10;
+		static const uint32_t MaxVerticesElements = MaxVertices * VertexElementCount;
+		static const uint32_t MaxIndicies = MaxQuads * 6;
 
 		float Vertices[MaxVerticesElements];
-		unsigned int Indicies[MaxIndicies];
+		uint32_t Indicies[MaxIndicies];
 
-		unsigned int CurrentVertex = 0;
-		unsigned int CurrentIndex = 0;
+		uint32_t CurrentVertex = 0;
+		uint32_t CurrentIndex = 0;
+		uint32_t DrawCalls = 0;
+		uint32_t QuadCount = 0;
 
 		VertexArray* QuadVertexArray;
 		std::shared_ptr<Shader> DefaultShader;
 
 		std::shared_ptr<Texture> Textures[16];
-		unsigned int TextureSlot = 0;
+		uint32_t TextureSlot = 0;
 		int TextureUnits[16];
 	};
 
@@ -49,7 +51,7 @@ namespace Nigozi
 
 		static Renderer2DData* GetData() { return s_data; }
 	private:
-		static unsigned int SetTextureAndGetSlot(const std::shared_ptr<Texture>& texture);
+		static uint32_t SetTextureAndGetSlot(const std::shared_ptr<Texture>& texture);
 		static void FlushIfExceededMaxVertexCount();
 	private:
 		static Renderer2DData* s_data;

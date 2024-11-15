@@ -21,3 +21,5 @@
 #include "Nigozi/events/MouseEvent.h"
 
 #include "Nigozi/layers/Layer.h"
+
+#include "Nigozi/core/EntryPoint.h"

@@ -9,7 +9,7 @@ namespace Nigozi
 		Texture(const std::string& filePath);
 		~Texture();
 
-		void Bind(unsigned int slot) const;
+		void Bind(uint32_t slot) const;
 		void Unbind() const;
 
 		void Delete();
@@ -17,7 +17,7 @@ namespace Nigozi
 		inline int GetWidth() const { return m_width; }
 		inline int GetHeight() const { return m_height; }
 	private:
-		unsigned int m_rendererID;
+		uint32_t m_rendererID;
 		std::string m_filePath;
 		unsigned char* m_localBuffer;
 		int m_width, m_height, m_BPP;

@@ -12,7 +12,7 @@ namespace Nigozi
         if (!s_instance) {
             s_instance = this;
         }
-        // add all keycodes in keystates
+        // Add all keycodes in keystates
         for (int i = 32; i < 349; i++) 
         {
             m_keystates[i] = GLFW_RELEASE;

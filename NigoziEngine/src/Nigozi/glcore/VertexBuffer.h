@@ -6,17 +6,17 @@ namespace Nigozi
 	{
 	public:
 		VertexBuffer() = default;
-		VertexBuffer(const void* data, unsigned int size);
+		VertexBuffer(const void* data, uint32_t size);
 		~VertexBuffer();
 
 		void Bind() const;
 		void Unbind() const;
 
-		void SetData(const void* data, unsigned int size);
+		void SetData(const void* data, uint32_t size);
 
 		void Delete();
 	private:
-		unsigned int m_rendererID;
+		uint32_t m_rendererID;
 	};
 }
 
