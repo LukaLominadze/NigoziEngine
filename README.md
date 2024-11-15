@@ -104,12 +104,12 @@ class ExampleLayer : public Layer
 
 The base class layer has virtual functions which are run at different parts of the program
 
-OnAttach - When the layer is added to the application
-OnDetach - When the application closes.
-OnUpdate(timestep) - Runs every frame. "timestep" represents time between the frames (delta time)
-OnEvent(Event& e) - Runs every time an event occurs: mouse click, scroll, key press, release, etc.
-OnRender() - Runs before rendering the frame
-OnImGuiRender() - Runs after OnRender and is used to draw UI.
+- OnAttach - When the layer is added to the application
+- OnDetach - When the application closes.
+- OnUpdate(timestep) - Runs every frame. "timestep" represents time between the frames (delta time)
+- OnEvent(Event& e) - Runs every time an event occurs: mouse click, scroll, key press, release, etc.
+- OnRender() - Runs before rendering the frame
+- OnImGuiRender() - Runs after OnRender and is used to draw UI.
 ```cpp
 class ExampleLayer : public Layer
 {
