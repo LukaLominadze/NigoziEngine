@@ -125,7 +125,7 @@ public:
 
 You can go ahead and implement these functions the way you want.
 
-To add layers to the application, let's go back to our main file, in the OnApplicationInitialized function, and use the application AddLayer function to add an instance of our layer to the engine.
+To add layers to the application, let's go back to our main file, in the OnApplicationInitialized function, and use the application PushLayer function to add an instance of our layer to the engine.
 ```cpp
 app.PushLayer(new ExampleLayer());
 ```
