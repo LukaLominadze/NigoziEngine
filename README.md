@@ -43,3 +43,107 @@ The plan for Nigozi Engine is to make a 2D framework that makes the development 
 - Create an Editor to make game creation easier
 - Add a scripting language
 - Implement audio systems
+
+## Writing Code
+Once a project is set up with NigoziEngine, you can go ahead and create a main file. This is where the entry point of the application will be.
+
+First, you will need to define "MAIN" at the top of your source file to indicate the location of the entry point.
+```cpp
+#define MAIN
+```
+
+Include Nigozi.h
+```cpp
+#include <Nigozi.h>
+```
+
+Then you will define an external function to define the application title, size, flags.
+```cpp
+extern Nigozi::ApplicationProps CreateApplicationProps() {
+	return { "MyGame", 960, 540, true, false };
+}
+```
+
+After that you will define another external function, which is used for adding extra logic to the application before it runs.
+```cpp
+extern void OnApplicationInitialized(Nigozi::Application& app) {
+	// Write additional initialization code here
+}
+```
+
+At this point, the code should look something like this:
+```cpp
+#define MAIN
+
+#include <Nigozi.h>
+
+extern Nigozi::ApplicationProps CreateApplicationProps() {
+	return { "MyGame", 960, 540, true, false };
+}
+
+extern void OnApplicationInitialized(Nigozi::Application& app) {
+	// Write additional initialization code here
+}
+```
+
+The application is ready to be launched.
+
+## Layers
+Layers is an essential part of the engine, that simplifies the process of adding new systems in the engine.
+
+Create a new file and a layer class:
+```cpp
+#include <Nigozi.h>
+
+using namespace Nigozi;
+
+class ExampleLayer : public Layer
+{
+};
+```
+
+The base class layer has virtual functions which are run at different parts of the program
+
+OnAttach - When the layer is added to the application
+OnDetach - When the application closes.
+OnUpdate(timestep) - Runs every frame. "timestep" represents time between the frames (delta time)
+OnEvent(Event& e) - Runs every time an event occurs: mouse click, scroll, key press, release, etc.
+OnRender() - Runs before rendering the frame
+OnImGuiRender() - Runs after OnRender and is used to draw UI.
+```cpp
+class ExampleLayer : public Layer
+{
+public:
+	void OnAttach() override;
+	void OnDetach() override;
+	void OnUpdate(float timestep) override;
+	void OnEvent(Event& e) override;
+	void OnRender() override;
+	void OnImGuiRender() override;
+};
+```
+
+You can go ahead and implement these functions the way you want.
+
+To add layers to the application, let's go back to our main file, in the OnApplicationInitialized function, and use the application AddLayer function to add an instance of our layer to the engine.
+```cpp
+app.PushLayer(new ExampleLayer());
+```
+
+Final code should look something like this:
+```cpp
+#define MAIN
+
+#include <Nigozi.h>
+#include "ExampleLayer.h"
+
+extern Nigozi::ApplicationProps CreateApplicationProps() {
+	return { "MyGame", 960, 540, true, false };
+}
+
+extern void OnApplicationInitialized(Nigozi::Application& app) {
+	app.PushLayer(new ExampleLayer());
+}
+```
+
+The application is ready to be launched.
