@@ -1,6 +1,7 @@
 **.vs/
 .gitignore
 
+/releases/
 **/bin
 /bin-int
 **/obj

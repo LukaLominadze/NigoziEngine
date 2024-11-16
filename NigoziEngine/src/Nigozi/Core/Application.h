@@ -27,6 +27,8 @@ namespace Nigozi
 
 		void PushLayer(Layer* layer);
 		void PushOverlay(Layer* layer);
+		void PopLayer(Layer* layer);
+		void PopOverlay(Layer* layer);
 	private:
 		void OnEvent(Event& event);
 		void OnUpdate(float timestep);

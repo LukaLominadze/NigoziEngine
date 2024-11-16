@@ -2,11 +2,11 @@
 
 #include "Application.h"
 
-extern Nigozi::ApplicationProps CreateApplicationProps();
-extern void OnApplicationInitialized(Nigozi::Application& app);
-
 // Define MAIN before including Nigozi.h in the main file of the program to set the entry point
 #ifdef MAIN
+
+extern Nigozi::ApplicationProps CreateApplicationProps();
+extern void OnApplicationInitialized(Nigozi::Application& app);
 
 #if NG_PLATFORM_WINDOWS
 	#ifdef DISTRIBUTION
@@ -25,5 +25,4 @@ extern void OnApplicationInitialized(Nigozi::Application& app);
 	}
 	#endif
 #endif
-
 #endif
