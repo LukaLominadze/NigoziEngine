@@ -49,7 +49,7 @@ Once a project is set up with NigoziEngine, you can go ahead and create a main f
 
 Firs you will need to define "MAIN" before including Nigozi to indicate where the entry point is.
 
-There are to external functions:
+There are 2 external functions:
 CreateApplicationProps() - To define the window title, size, flags (vsync on/off, fullscreen on/off)
 OnApplicationInitialized(Nigozi::Application& app) - To add some extra initialization code before running the program.
 ```cpp
