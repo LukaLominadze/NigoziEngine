@@ -47,38 +47,18 @@ The plan for Nigozi Engine is to make a 2D framework that makes the development 
 ## Writing Code
 Once a project is set up with NigoziEngine, you can go ahead and create a main file. This is where the entry point of the application will be.
 
-First, you will need to define "MAIN" at the top of your source file to indicate the location of the entry point.
-```cpp
-#define MAIN
-```
+Firs you will need to define "MAIN" before including Nigozi to indicate where the entry point is.
 
-Include Nigozi.h
+There are to external functions:
+CreateApplicationProps() - To define the window title, size, flags (vsync on/off, fullscreen on/off)
+OnApplicationInitialized(Nigozi::Application& app) - To add some extra initialization code before running the program.
 ```cpp
-#include <Nigozi.h>
-```
-
-Then you will define an external function to define the application title, size, flags.
-```cpp
-extern Nigozi::ApplicationProps CreateApplicationProps() {
-	return { "MyGame", 960, 540, true, false };
-}
-```
-
-After that you will define another external function, which is used for adding extra logic to the application before it runs.
-```cpp
-extern void OnApplicationInitialized(Nigozi::Application& app) {
-	// Write additional initialization code here
-}
-```
-
-At this point, the code should look something like this:
-```cpp
-#define MAIN
+#define MAIN // sets the file as entry point
 
 #include <Nigozi.h>
 
 extern Nigozi::ApplicationProps CreateApplicationProps() {
-	return { "MyGame", 960, 540, true, false };
+	return { "MyGame", 960, 540, true, false }; // returns the window parameters
 }
 
 extern void OnApplicationInitialized(Nigozi::Application& app) {
@@ -126,9 +106,6 @@ public:
 You can go ahead and implement these functions the way you want.
 
 To add layers to the application, let's go back to our main file, in the OnApplicationInitialized function, and use the application PushLayer function to add an instance of our layer to the engine.
-```cpp
-app.PushLayer(new ExampleLayer());
-```
 
 Final code should look something like this:
 ```cpp
