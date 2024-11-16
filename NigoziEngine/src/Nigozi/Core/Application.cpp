@@ -17,6 +17,8 @@ namespace Nigozi
 
         Renderer2D::Initialize();
         Renderer2D::SetClearColor(0.1f, 0.1f, 0.1f, 1.0f);
+
+        LOG("\nWelcome To NigoziEngine!");
     }
 
     Application::~Application()
@@ -56,6 +58,16 @@ namespace Nigozi
     void Application::PushOverlay(Layer* layer)
     {
         m_layerStack.PushOverlay(layer);
+    }
+
+    void Application::PopLayer(Layer* layer)
+    {
+        m_layerStack.PopLayer(layer);
+    }
+
+    void Application::PopOverlay(Layer* layer)
+    {
+        m_layerStack.PopOverlay(layer);
     }
 
     void Application::OnEvent(Event& event)
