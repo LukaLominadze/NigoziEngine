@@ -12,6 +12,8 @@ public:
 private:
 	bool OnMouseButtonPressed(Nigozi::MouseButtonPressedEvent& event);
 
+	Nigozi::ParticleSystem m_particleSystem;
+
 	std::shared_ptr<Nigozi::Texture> m_luigiTexture;
 
 	std::string m_keystate;

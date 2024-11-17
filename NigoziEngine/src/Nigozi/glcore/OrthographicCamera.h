@@ -17,6 +17,7 @@ namespace Nigozi
 
 		inline const glm::vec3& GetPosition() const { return m_position; }
 		inline const float GetRotation() const { return m_rotation; }
+		const glm::vec2 GetMousePositionWorldSpace() const;
 
 		inline const glm::mat4& GetProjectionMatrix() const { return m_projectionMatrix; }
 		inline const glm::mat4& GetViewMatrix() const { return m_viewMatrix; }
@@ -30,5 +31,8 @@ namespace Nigozi
 
 		glm::vec3 m_position;
 		float m_rotation;
+
+		float m_aspect;
+		float m_zoom;
 	};
 }
