@@ -2,6 +2,7 @@
 
 #include "OrthographicCamera.h"
 #include "Renderer2D.h"
+#include "core/Input.h"
 
 namespace Nigozi
 {
@@ -11,6 +12,9 @@ namespace Nigozi
 		m_projectionMatrix = glm::ortho(left, right, bottom, top, -1.0f, 1.0f);
 		m_viewMatrix = glm::mat4(1.0f);
 		m_viewProjectionMatrix = m_projectionMatrix * m_viewMatrix;
+
+		m_zoom = top;
+		m_aspect = right / top;
 	}
 
 	OrthographicCamera::~OrthographicCamera()
@@ -21,6 +25,9 @@ namespace Nigozi
 	{
 		m_projectionMatrix = glm::ortho(left, right, bottom, top, -1.0f, 1.0f);
 		m_viewProjectionMatrix = m_projectionMatrix * m_viewMatrix;
+
+		m_zoom = top;
+		m_aspect = right / top;
 	}
 
 	void OrthographicCamera::SetMVPMatrix()
@@ -38,6 +45,34 @@ namespace Nigozi
 	{
 		m_rotation = rotation;
 		RecalculateViewMatrix();
+	}
+
+	const glm::vec2 OrthographicCamera::GetMousePositionWorldSpace() const
+	{
+		std::pair<float, float> mousePosition = Input::GetMousePosition();
+		mousePosition.second = Global::windowData.Height - mousePosition.second;
+		float normalWidth = m_aspect;
+		float transformedPositionX = (mousePosition.first / Global::windowData.Width) * normalWidth - 0.5f * normalWidth;
+		float transformedPositionY = mousePosition.second / Global::windowData.Height - 0.5f;
+		if (m_rotation != 0) {
+			float radians = glm::radians(m_rotation);
+
+			float cosTheta = cos(radians);
+			float sinTheta = sin(radians);
+			if (cosTheta == 0) {
+				cosTheta = 1;
+			}
+			if (sinTheta == 0) {
+				sinTheta = 1;
+			}
+
+			float rotatedX = cosTheta * transformedPositionX - sinTheta * transformedPositionY;
+			float rotatedY = sinTheta * transformedPositionX + cosTheta * transformedPositionY;
+
+			transformedPositionX = rotatedX;
+			transformedPositionY = rotatedY;
+		}
+		return { transformedPositionX * 2 * m_zoom + m_position.x, transformedPositionY * 2 * m_zoom + m_position.y };
 	}
 
 	void OrthographicCamera::RecalculateViewMatrix()

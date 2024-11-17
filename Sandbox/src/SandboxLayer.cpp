@@ -1,4 +1,5 @@
 #include "SandboxLayer.h"
+#include "Global.h"
 
 void SandboxLayer::OnAttach() {
 	LOG("Hey! it's wooorking!");
@@ -29,19 +30,30 @@ void SandboxLayer::OnUpdate(float timestep)
 		m_keystate = "NONE";
 	}
 	if (Nigozi::Input::IsKeyPressed(GLFW_KEY_LEFT)) {
-		m_luigiPosition.x -= 4.0f * timestep;
+		m_luigiPosition.x -= 2.0f * timestep;
 	}
 	if (Nigozi::Input::IsKeyPressed(GLFW_KEY_RIGHT)) {
-		m_luigiPosition.x += 4.0f * timestep;
+		m_luigiPosition.x += 2.0f * timestep;
 	}
 	if (Nigozi::Input::IsKeyPressed(GLFW_KEY_DOWN)) {
-		m_luigiPosition.y -= 4.0f * timestep;
+		m_luigiPosition.y -= 2.0f * timestep;
 	}
 	if (Nigozi::Input::IsKeyPressed(GLFW_KEY_UP)) {
-		m_luigiPosition.y += 4.0f * timestep;
+		m_luigiPosition.y += 2.0f * timestep;
+	}
+	if (Nigozi::Input::IsMouseButtonPressed(GLFW_MOUSE_BUTTON_1)) {
+		glm::vec2 mousePosition = Global::cameraLayer.GetCamera().GetMousePositionWorldSpace();
+		m_particleSystem.Emit(Nigozi::ParticleProps{
+			{ mousePosition.x, mousePosition.y },
+			glm::vec2(0.4f, 0.4f), glm::vec2(0.1f, 0.1f),
+			glm::vec4(1.0f, 1.0f, 0.0f, 1.0f), glm::vec4(1.0f, 0.2f, 0.0f, 0.7f),
+			0.02f, 0.005f, 0.01f,
+			1.2f
+			});
 	}
 	m_mouseDelta = Nigozi::Input::GetMousePositionDelta();
 	m_mousePosition = Nigozi::Input::GetMousePosition();
+	m_particleSystem.OnUpdate(timestep);
 }
 
 void SandboxLayer::OnRender()
@@ -58,17 +70,22 @@ void SandboxLayer::OnRender()
 		color.x += increment;
 	}
 	Nigozi::Renderer2D::DrawQuad(m_luigiPosition, { 0.2f, 0.2f }, m_luigiTexture, { 1.0f, 1.0f, 1.0f, 1.0f });
+	m_particleSystem.OnRender();
 }
 
 void SandboxLayer::OnImGuiRender()
 {
 	ImGui::Begin("Test Window!");
 
+	glm::vec2 mousePosition = Global::cameraLayer.GetCamera().GetMousePositionWorldSpace();
+
 	ImGui::Text("Congratulations! Yo balls!");
 	ImGui::Text("Mouse Delta");
 	ImGui::Text((std::to_string(m_mouseDelta.first) + ", " + std::to_string(m_mouseDelta.second)).c_str());
 	ImGui::Text("Mouse Position");
 	ImGui::Text((std::to_string(m_mousePosition.first) + ", " + std::to_string(m_mousePosition.second)).c_str());
+	ImGui::Text("Mouse Position World Space");
+	ImGui::Text((std::to_string(mousePosition.x) + ", " + std::to_string(mousePosition.y)).c_str());
 	ImGui::Text("Space key state");
 	ImGui::Text(m_keystate.c_str());
 	ImGui::Text("Draw Calls");
