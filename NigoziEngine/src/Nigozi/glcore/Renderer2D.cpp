@@ -93,7 +93,11 @@ namespace Nigozi
 		GLCall(glClear(GL_COLOR_BUFFER_BIT));
 	}
 
-	void Renderer2D::DrawQuad(const glm::vec3& position, const glm::vec2& scale, const std::shared_ptr<Texture>& texture, glm::vec4 color)
+	void Renderer2D::DrawQuad(const glm::vec3& position, const glm::vec2& scale, std::shared_ptr<SubTexture>& texture, const glm::vec4& color) {
+		DrawQuad(position, scale, texture->GetTexture(), color, texture->GetCoordMin(), texture->GetCoordMax());
+	}
+
+	void Renderer2D::DrawQuad(const glm::vec3& position, const glm::vec2& scale, const std::shared_ptr<Texture>& texture, const glm::vec4& color, const glm::vec2& coordMin, const glm::vec2& coordMax)
 	{
 		FlushIfExceededMaxVertexCount();
 
@@ -102,10 +106,10 @@ namespace Nigozi
 		glm::vec2 halfSize = scale / 2.0f;
 
 		float quad[] = {
-			position.x - halfSize.x, position.y - halfSize.y, position.z, 0.0f, 0.0f, color.x, color.y, color.z, color.w, textureSlot,
-			position.x - halfSize.x, position.y + halfSize.y, position.z, 0.0f, 1.0f, color.x, color.y, color.z, color.w, textureSlot,
-			position.x + halfSize.x, position.y + halfSize.y, position.z, 1.0f, 1.0f, color.x, color.y, color.z, color.w, textureSlot,
-			position.x + halfSize.x, position.y - halfSize.y, position.z, 1.0f, 0.0f, color.x, color.y, color.z, color.w, textureSlot,
+			position.x - halfSize.x, position.y - halfSize.y, position.z, coordMin.x, coordMin.y, color.x, color.y, color.z, color.w, textureSlot,
+			position.x - halfSize.x, position.y + halfSize.y, position.z, coordMin.x, coordMax.y, color.x, color.y, color.z, color.w, textureSlot,
+			position.x + halfSize.x, position.y + halfSize.y, position.z, coordMax.x, coordMax.y, color.x, color.y, color.z, color.w, textureSlot,
+			position.x + halfSize.x, position.y - halfSize.y, position.z, coordMax.x, coordMin.y, color.x, color.y, color.z, color.w, textureSlot,
 		};
 		int vertexIndex = s_data->CurrentVertex / s_data->VertexElementCount;
 
@@ -118,7 +122,12 @@ namespace Nigozi
 		s_data->QuadCount++;
 	}
 
-	void Renderer2D::DrawRotatedQuad(const glm::vec3& position, const glm::vec2& scale, float rotation, const std::shared_ptr<Texture>& texture, glm::vec4 color)
+	void Renderer2D::DrawRotatedQuad(const glm::vec3& position, const glm::vec2& scale, float rotation, std::shared_ptr<SubTexture>& texture, const glm::vec4& color)
+	{
+		DrawRotatedQuad(position, scale, rotation, texture->GetTexture(), color, texture->GetCoordMin(), texture->GetCoordMax());
+	}
+
+	void Renderer2D::DrawRotatedQuad(const glm::vec3& position, const glm::vec2& scale, float rotation, const std::shared_ptr<Texture>& texture, const glm::vec4& color, const glm::vec2& coordMin, const glm::vec2& coordMax)
 	{
 		FlushIfExceededMaxVertexCount();
 
@@ -135,10 +144,10 @@ namespace Nigozi
 		glm::vec2 downRight = rotationMatrix * glm::vec2(halfSize.x, -halfSize.y);
 
 		float quad[] = {
-			position.x + downLeft.x, position.y + downLeft.y, position.z, 0.0f, 0.0f, color.x, color.y, color.z, color.w, textureSlot,
-			position.x + upLeft.x, position.y + upLeft.y, position.z, 0.0f, 0.0f, color.x, color.y, color.z, color.w, textureSlot,
-			position.x + upRight.x, position.y + upRight.y, position.z, 0.0f, 0.0f, color.x, color.y, color.z, color.w, textureSlot,
-			position.x + downRight.x, position.y + downRight.y, position.z, 0.0f, 0.0f, color.x, color.y, color.z, color.w, textureSlot,
+			position.x + downLeft.x, position.y + downLeft.y, position.z, coordMin.x, coordMin.y, color.x, color.y, color.z, color.w, textureSlot,
+			position.x + upLeft.x, position.y + upLeft.y, position.z, coordMin.x, coordMax.y, color.x, color.y, color.z, color.w, textureSlot,
+			position.x + upRight.x, position.y + upRight.y, position.z, coordMax.x, coordMax.y, color.x, color.y, color.z, color.w, textureSlot,
+			position.x + downRight.x, position.y + downRight.y, position.z, coordMax.x, coordMin.y, color.x, color.y, color.z, color.w, textureSlot,
 		};
 		int vertexIndex = s_data->CurrentVertex / s_data->VertexElementCount;
 

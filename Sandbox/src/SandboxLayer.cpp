@@ -5,6 +5,8 @@ void SandboxLayer::OnAttach() {
 	LOG("Hey! it's wooorking!");
 	Nigozi::Renderer2D::SetClearColor(0.1f, 0.1f, 0.1f, 1.0f);
 	m_luigiTexture = std::make_shared<Nigozi::Texture>("src/Nigozi/res/textures/luigi.png");
+	std::shared_ptr<Nigozi::Texture> ref = std::make_shared<Nigozi::Texture>("src/res/Player.png");
+	m_playerTexture = std::make_shared<Nigozi::SubTexture>(ref, 16, 0, 0);
 }
 
 void SandboxLayer::OnEvent(Nigozi::Event& event)
@@ -54,6 +56,14 @@ void SandboxLayer::OnUpdate(float timestep)
 	m_mouseDelta = Nigozi::Input::GetMousePositionDelta();
 	m_mousePosition = Nigozi::Input::GetMousePosition();
 	m_particleSystem.OnUpdate(timestep);
+
+	m_elapsedTime += timestep;
+	if (m_elapsedTime > 0.2f) {
+		m_playerTexture->SetSlot(m_slotX++, 0);
+		if (m_slotX > 10)
+			m_slotX = 0;
+		m_elapsedTime = 0.0f;
+	}
 }
 
 void SandboxLayer::OnRender()
@@ -70,6 +80,7 @@ void SandboxLayer::OnRender()
 		color.x += increment;
 	}
 	Nigozi::Renderer2D::DrawQuad(m_luigiPosition, { 0.2f, 0.2f }, m_luigiTexture, { 1.0f, 1.0f, 1.0f, 1.0f });
+	Nigozi::Renderer2D::DrawQuad({ 1.0f, 1.0f, 0.0f }, { 0.2f, 0.2f }, m_playerTexture, glm::vec4(1));
 	m_particleSystem.OnRender();
 }
 
