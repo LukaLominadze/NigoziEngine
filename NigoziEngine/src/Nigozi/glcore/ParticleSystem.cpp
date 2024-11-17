@@ -69,7 +69,7 @@ namespace Nigozi
     {
         Particle& particle = m_particlePool[m_poolIndex];
         particle.Position = props.Position;
-        particle.Rotation = Random::Float() * 2.0f * glm::pi<float>();
+        particle.Rotation = glm::degrees(Random::Float() * 2.0f * glm::pi<float>());
 
         particle.Velocity = props.Velocity;
         particle.Velocity.x += props.VelocityVariation.x * (Random::Float() - 0.5f);
@@ -88,8 +88,7 @@ namespace Nigozi
 
         particle.Active = true;
 
-        m_poolIndex--;
-        if (m_poolIndex == 0) {
+        if (--m_poolIndex == -1) {
             m_poolIndex = m_particlePool.size() - 1;
         }
     }
