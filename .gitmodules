@@ -4,6 +4,7 @@
 [submodule "dependencies/imgui"]
 	path = dependencies/imgui
 	url = https://github.com/LukaLominadze/imgui
+	branch = docking
 [submodule "dependencies/stb"]
 	path = dependencies/stb
 	url = https://github.com/LukaLominadze/stb
