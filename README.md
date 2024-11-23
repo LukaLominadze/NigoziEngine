@@ -71,35 +71,18 @@ The application is ready to be launched.
 ## Layers
 Layers is an essential part of the engine, that simplifies the process of adding new systems in the engine.
 
-Create a new file and a layer class:
-```cpp
-#include <Nigozi.h>
-
-using namespace Nigozi;
-
-class ExampleLayer : public Layer
-{
-};
-```
-
+Create a new file and a layer class.
 The base class layer has virtual functions which are run at different parts of the program
-
-- OnAttach - When the layer is added to the application
-- OnDetach - When the application closes.
-- OnUpdate(timestep) - Runs every frame. "timestep" represents time between the frames (delta time)
-- OnEvent(Event& e) - Runs every time an event occurs: mouse click, scroll, key press, release, etc.
-- OnRender() - Runs before rendering the frame
-- OnImGuiRender() - Runs after OnRender and is used to draw UI.
 ```cpp
 class ExampleLayer : public Layer
 {
 public:
-	void OnAttach() override;
-	void OnDetach() override;
-	void OnUpdate(float timestep) override;
-	void OnEvent(Event& e) override;
-	void OnRender() override;
-	void OnImGuiRender() override;
+	void OnAttach() override; // When the layer is added to the application
+	void OnDetach() override; // When the application closes.
+	void OnUpdate(float timestep) override; // Runs every frame. "timestep" represents time between the frames (delta time)
+	void OnEvent(Event& e) override; // Runs every time an event occurs: mouse click, scroll, key press, release, etc.
+	void OnRender() override; // Runs before rendering the frame
+	void OnImGuiRender() override; // Runs after OnRender and is used to draw UI.
 };
 ```
 
