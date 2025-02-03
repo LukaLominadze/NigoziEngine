@@ -1,11 +1,13 @@
 **.vs/
-.gitignore
 
 /releases/
 **/bin
 /bin-int
 **/obj
 dependencies/libs
+dependencies/stb
+dependencies/glfw
+dependencies/imgui
 
 **.vcxproj
 **.vcxproj.filters
