@@ -4,7 +4,11 @@
 **/bin
 /bin-int
 **/obj
-/dependencies/
+/dependencies/imgui
+/dependencies/glfw
+/dependencies/stb
+/dependencies/obj
+/dependencies/libs
 
 **.vcxproj
 **.vcxproj.filters
