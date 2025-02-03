@@ -4,7 +4,7 @@
 **/bin
 /bin-int
 **/obj
-dependencies/
+/dependencies/
 
 **.vcxproj
 **.vcxproj.filters
