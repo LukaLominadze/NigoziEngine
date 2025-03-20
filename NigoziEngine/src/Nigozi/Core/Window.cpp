@@ -125,6 +125,7 @@ namespace Nigozi
         if (p_window) {
             Delete();
         }
+        glfwTerminate();
     }
 
     void Window::SetVSync(bool value)

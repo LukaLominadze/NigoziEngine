@@ -74,12 +74,16 @@ namespace Nigozi
 
 	void Renderer2D::Deinitialize()
 	{
+		for (int i = 0; i < 16; i++) {
+			if (s_data->Textures[i]) {
+				s_data->Textures[i]->Delete();
+				continue;
+			}
+			break;
+		}
 		s_data->QuadVertexArray->Delete();
 		s_data->DefaultShader->Delete();
 		delete s_data->QuadVertexArray;
-		for (int i = 0; i < 16; i++) {
-			s_data->Textures[i] = nullptr;
-		}
 		delete s_data;
 	}
 

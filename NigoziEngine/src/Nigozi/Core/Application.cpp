@@ -24,9 +24,7 @@ namespace Nigozi
     Application::~Application()
     {
         Renderer2D::Deinitialize();
-        p_window->Delete();
-
-        glfwTerminate();
+        delete p_window;
     }
 
     void Application::Run()
