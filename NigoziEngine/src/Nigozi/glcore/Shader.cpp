@@ -14,6 +14,10 @@ namespace Nigozi
         m_filePath = filePath;
         ShaderProgramSource shaderSource = ParseShader();
         LOG("Creating shader at " + filePath);
+        LOG("SHADER VERTEX");
+        LOG(shaderSource.VertexShader);
+        LOG("SHADER FRAGMENT");
+        LOG(shaderSource.FragmentShader);
         m_shader = CreateShader(shaderSource.VertexShader, shaderSource.FragmentShader);
         GLCall(glLinkProgram(m_shader));
         GLCall(glUseProgram(m_shader));
@@ -92,7 +96,25 @@ namespace Nigozi
         GLCall(glAttachShader(program, _vertexShader));
         GLCall(glAttachShader(program, _fragmentShader));
         GLCall(glLinkProgram(program));
+
+        int success;
+        GLCall(glGetProgramiv(program, GL_LINK_STATUS, &success));
+        if (!success) {
+            char infoLog[1024];
+            GLCall(glGetProgramInfoLog(program, 1024, nullptr, infoLog));
+            LOG("[Shader Linking Error]:\n" << infoLog);
+        }
+    
         GLCall(glValidateProgram(program));
+    
+        // Check for validation errors
+        GLCall(glGetProgramiv(program, GL_VALIDATE_STATUS, &success));
+        if (!success) {
+            char infoLog[1024];
+            GLCall(glGetProgramInfoLog(program, 1024, nullptr, infoLog));
+            LOG("[Shader Validation Error]:\n" << infoLog);
+        }
+
         GLCall(glDeleteShader(_vertexShader));
         GLCall(glDeleteShader(_fragmentShader));
 
@@ -105,6 +127,15 @@ namespace Nigozi
         const char* src = source.c_str();
         GLCall(glShaderSource(id, 1, &src, nullptr));
         GLCall(glCompileShader(id));
+
+        GLint success;
+        GLCall(glGetShaderiv(id, GL_COMPILE_STATUS, &success));
+        if (!success)
+        {
+            char infoLog[1024];
+            GLCall(glGetShaderInfoLog(id, 1024, NULL, infoLog));
+            LOG("[Shader Compilation Error] (" << m_filePath << "):\n" << infoLog);
+        }
 
         return id;
     }

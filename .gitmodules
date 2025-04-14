@@ -8,3 +8,7 @@
 [submodule "dependencies/stb"]
 	path = dependencies/stb
 	url = https://github.com/LukaLominadze/stb
+[submodule "dependencies/glew"]
+	path = dependencies/glew
+	url = https://www.github.com/LukaLominadze/glew
+	branch = linux-wayland

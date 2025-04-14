@@ -8,7 +8,7 @@ project "Sandbox"
 	targetdir ("%{wks.location}/bin/" ..outputdir.. "/%{prj.name}")
 	objdir ("%{wks.location}/bin-int/" ..outputdir.. "/%{prj.name}")
 
-	defines { "NG_PLATFORM_WINDOWS", "GLEW_STATIC" }
+	defines { "GLEW_STATIC" }
 	
 	files {
 		"src/**.h",
@@ -32,13 +32,16 @@ project "Sandbox"
 	libdirs { "%{wks.location}/dependencies/libs/GLFW",
 			  "%{wks.location}/dependencies/glew/lib/Release/x64",
 			  "%{wks.location}/dependencies/libs/STB",
-			  "%{wks.location}/dependencies/libs/ImGui" }
+			  "%{wks.location}/dependencies/libs/ImGui",
+			  "%{wks.location}/dependencies/glew/lib" }
 
-	links { "glew32s.lib",
-			"opengl32.lib",
-			"GLFW.lib",
-			"STB.lib",
-			"ImGui.lib" }
+	links {
+		"NigoziEngine",
+		"GLEW",
+		"GLFW",
+		"STB",
+		"ImGui",
+		 }
 
 	configurations {
 		"Debug",
@@ -53,6 +56,20 @@ project "Sandbox"
 	filter "system:windows"
 		cppdialect "C++20"
 		systemversion "latest"
+		
+		defines { "NG_PLATFORM_WINDOWS" }
+		
+		links { "opengl32.lib" }
+	
+	filter "system:linux"
+		cppdialect "C++20"
+		systemversion "latest"
+		
+		defines { "GLFW_USE_X11", "NG_PLATFORM_LINUX" }
+		
+		links { "GL",
+			"pthread",
+        		"dl" }
 
 	filter "configurations:Debug"
 		

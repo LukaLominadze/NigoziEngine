@@ -25,25 +25,26 @@ namespace Nigozi
 	public:
 		template<typename T>
 		void Push(uint32_t count) {
-			ERROR_LOG("Wrong type used on function template : VertexBufferLayout::Push(uint32_t count)");
-		}
+			unsigned int type;
+			char normalized;
+			if (std::is_same<T, float>::value) {
+				type = GL_FLOAT;
+				normalized = GL_FALSE;
+			}
+			else if (std::is_same<T, unsigned int>::value) {
+				type = GL_UNSIGNED_INT;
+				normalized = GL_FALSE;
+			}
+			else if (std::is_same<T, unsigned char>::value) {
+				type = GL_UNSIGNED_BYTE;
+				normalized = GL_TRUE;
+			}
+			else {
+				ERROR_LOG("Wrong type used on function template : VertexBufferLayout::Push(uint32_t count)");
+			}
 
-		template<>
-		void Push<float>(uint32_t count) {
-			m_elements.push_back(VertexBufferLayoutElement{ GL_FLOAT, count, GL_FALSE });
-			m_stride += VertexBufferLayoutElement::GetTypeSize(GL_FLOAT) * count;
-		}
-
-		template<>
-		void Push<uint32_t>(uint32_t count) {
-			m_elements.push_back(VertexBufferLayoutElement{ GL_UNSIGNED_INT, count, GL_FALSE });
-			m_stride += VertexBufferLayoutElement::GetTypeSize(GL_UNSIGNED_INT) * count;
-		}
-
-		template<>
-		void Push<unsigned char>(uint32_t count) {
-			m_elements.push_back(VertexBufferLayoutElement{ GL_UNSIGNED_BYTE, count, GL_TRUE });
-			m_stride += VertexBufferLayoutElement::GetTypeSize(GL_UNSIGNED_BYTE) * count;
+			m_elements.push_back(VertexBufferLayoutElement{ type, count, normalized });
+			m_stride += VertexBufferLayoutElement::GetTypeSize(type) * count;
 		}
 
 		inline const std::vector<VertexBufferLayoutElement>& GetElements() const { return m_elements; }
