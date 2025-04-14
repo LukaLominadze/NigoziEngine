@@ -10,7 +10,7 @@ Nigozi Engine is a game engine framework designed to make 2D devolopment easier 
 ***
 
 ## Platform
-The engine primarly supports Windows.
+The engine primarly is supported on Windows and Linux.
 
 ## Getting Started
 Visual Studio 2020 (and above) is recommended.
@@ -22,6 +22,7 @@ Start cloning the repository with ```git clone --recursive https://github.com/Lu
 <ins>**2. Building the project:**</ins>
 
 After cloning the repository, run the ```Setup-windows.bat``` file.
+or if you are on linux, run ```setup-linux.sh```, then build with ```sudo make```
 
 The project is now ready.
 
