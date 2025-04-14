@@ -24,9 +24,7 @@ namespace Nigozi
     Application::~Application()
     {
         Renderer2D::Deinitialize();
-        p_window->Delete();
-
-        glfwTerminate();
+        delete p_window;
     }
 
     void Application::Run()
@@ -77,7 +75,6 @@ namespace Nigozi
             m_running = false;
             return;
         }
-        p_window->OnEvent(event);
 
         for (auto it = m_layerStack.end(); it != m_layerStack.begin(); )
         {

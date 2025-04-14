@@ -11,6 +11,7 @@ public:
 	void OnImGuiRender() override;
 private:
 	bool OnMouseButtonPressed(Nigozi::MouseButtonPressedEvent& event);
+	bool OnFullscreenToggle(Nigozi::KeyPressedEvent& event);
 
 	Nigozi::ParticleSystem m_particleSystem;
 

@@ -25,16 +25,17 @@ namespace Nigozi
         }
 
         Global::windowData.NativeWindow = p_window;
+        Global::windowData.SetFullscreen = std::bind(&Window::SetFullscreen, this, std::placeholders::_1);
 
         // Get the monitor to set the viewport and fullscreen mode
-        p_monitor = glfwGetPrimaryMonitor();
+        GLCall(p_monitor = glfwGetPrimaryMonitor());
 
         if (Global::windowData.Fullscreen) {
             const GLFWvidmode* mode = glfwGetVideoMode(p_monitor);
             Global::windowData.Width = mode->width;
             Global::windowData.Height = mode->height;
             glfwSetWindowMonitor(p_window, p_monitor, 0, 0, mode->width, mode->height, GLFW_DONT_CARE);
-            glViewport(0, 0, mode->width, mode->height);
+            GLCall(glViewport(0, 0, mode->width, mode->height));
         }
 
         glfwMakeContextCurrent(p_window);
@@ -58,7 +59,7 @@ namespace Nigozi
                 WindowData& data = *(WindowData*)glfwGetWindowUserPointer(window);
                 data.Width = width;
                 data.Height = height;
-                glViewport(0, 0, data.Width, data.Height);
+                GLCall(glViewport(0, 0, data.Width, data.Height));
                 WindowResizedEvent event(width, height);
                 data.EventCallback(event);
             });
@@ -125,6 +126,12 @@ namespace Nigozi
         if (p_window) {
             Delete();
         }
+        glfwTerminate();
+    }
+
+    bool Window::IsFullscreen()
+    {
+        return Global::windowData.Fullscreen;
     }
 
     void Window::SetVSync(bool value)
@@ -133,12 +140,6 @@ namespace Nigozi
             glfwSwapInterval(1);
         else
             glfwSwapInterval(0);
-    }
-
-    void Window::OnEvent(Event& e)
-    {
-        EventDispatcher dispatcher = EventDispatcher(e);
-        dispatcher.Dispatch<KeyPressedEvent>(std::bind(&Window::OnFullscreenToggle, this, std::placeholders::_1));
     }
 
     void Window::OnUpdate()
@@ -152,15 +153,12 @@ namespace Nigozi
         glfwDestroyWindow(p_window);
     }
 
-    bool Window::OnFullscreenToggle(KeyPressedEvent& e)
+    bool Window::SetFullscreen(bool value)
     {
-        if (e.GetKeyCode() != GLFW_KEY_F11)
-            return false;
-        Global::windowData.Fullscreen = !Global::windowData.Fullscreen;
+        Global::windowData.Fullscreen = value;
         const GLFWvidmode* mode = glfwGetVideoMode(p_monitor);
         if (Global::windowData.Fullscreen) {
             glfwSetWindowMonitor(p_window, p_monitor, 0, 0, mode->width, mode->height, mode->refreshRate);
-            glViewport(0, 0, mode->width, mode->height);
         }
         else {
             int xpos = (mode->width / Global::windowData.Width) / 2;

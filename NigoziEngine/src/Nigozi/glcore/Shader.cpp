@@ -142,7 +142,8 @@ namespace Nigozi
 
     int Shader::GetUniformLocation(const std::string& uniform)
     {
-        return GLCall(glGetUniformLocation(m_shader, uniform.c_str()));
+        GLCall(int location = glGetUniformLocation(m_shader, uniform.c_str()))
+        return location;
     }
 
     void Shader::Delete()
