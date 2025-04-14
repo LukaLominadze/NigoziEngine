@@ -8,3 +8,6 @@
 [submodule "dependencies/stb"]
 	path = dependencies/stb
 	url = https://github.com/LukaLominadze/stb
+[submodule "dependencies/glew"]
+	path = dependencies/glew
+	url = https://github.com/LukaLominadze/glew

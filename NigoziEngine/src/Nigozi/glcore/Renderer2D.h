@@ -10,11 +10,11 @@ namespace Nigozi
 {
 	struct Renderer2DData 
 	{
-		static const uint32_t MaxQuads = 10'000;
-		static const uint32_t MaxVertices = MaxQuads * 4;
-		static const uint32_t VertexElementCount = 10;
-		static const uint32_t MaxVerticesElements = MaxVertices * VertexElementCount;
-		static const uint32_t MaxIndicies = MaxQuads * 6;
+		static constexpr uint32_t MaxQuads = 10'000;
+		static constexpr uint32_t MaxVertices = MaxQuads * 4;
+		static constexpr uint32_t VertexElementCount = 10;
+		static constexpr uint32_t MaxVerticesElements = MaxVertices * VertexElementCount;
+		static constexpr uint32_t MaxIndicies = MaxQuads * 6;
 
 		float Vertices[MaxVerticesElements];
 		uint32_t Indicies[MaxIndicies];

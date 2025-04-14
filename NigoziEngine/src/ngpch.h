@@ -9,6 +9,7 @@
 #include <iterator>
 
 #include <typeinfo>
+#include <type_traits>
 
 #include "imgui.h"
 #include "imgui_impl_glfw.h"

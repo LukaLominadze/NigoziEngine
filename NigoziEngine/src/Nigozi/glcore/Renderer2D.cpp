@@ -22,6 +22,10 @@ namespace Nigozi
 		LOG("  Renderer: {0} " << glGetString(GL_RENDERER));
 		LOG("  Version: {0} " << glGetString(GL_VERSION));
 
+		GLint maxTextures;
+		GLCall(glGetIntegerv(GL_MAX_TEXTURE_IMAGE_UNITS, &maxTextures));
+		LOG("Max Texture Units: " << maxTextures);
+
 		// Create renderer data object
 		s_data = new Renderer2DData();
 
