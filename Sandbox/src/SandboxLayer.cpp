@@ -13,10 +13,12 @@ void SandboxLayer::OnEvent(Nigozi::Event& event)
 {
 	Nigozi::EventDispatcher dispatcher(event);
 	dispatcher.Dispatch<Nigozi::MouseButtonPressedEvent>(std::bind(&SandboxLayer::OnMouseButtonPressed, this, std::placeholders::_1));
+	dispatcher.Dispatch<Nigozi::KeyPressedEvent>(std::bind(&SandboxLayer::OnFullscreenToggle, this, std::placeholders::_1));
 }
 
 void SandboxLayer::OnUpdate(float timestep)
 {
+	//Nigozi::Test::ScopedTimer timer;
 	if (Nigozi::Input::IsKeyJustPressed(GLFW_KEY_SPACE)) {
 		LOG("Space Just Pressed!");
 		m_keystate = "GLFW_PRESS";
@@ -117,4 +119,12 @@ bool SandboxLayer::OnMouseButtonPressed(Nigozi::MouseButtonPressedEvent& event)
 		return true;
 	}
 	return false;
+}
+
+bool SandboxLayer::OnFullscreenToggle(Nigozi::KeyPressedEvent& event) {
+	if (event.GetKeyCode() != GLFW_KEY_F11) {
+		return false;
+	}
+	Nigozi::Global::windowData.SetFullscreen(!Nigozi::Window::IsFullscreen());
+	return true;
 }

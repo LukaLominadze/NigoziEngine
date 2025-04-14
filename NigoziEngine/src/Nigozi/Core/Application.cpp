@@ -75,7 +75,6 @@ namespace Nigozi
             m_running = false;
             return;
         }
-        p_window->OnEvent(event);
 
         for (auto it = m_layerStack.end(); it != m_layerStack.begin(); )
         {
