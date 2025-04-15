@@ -29,12 +29,12 @@ namespace Nigozi
 		void PushOverlay(Layer* layer);
 		void PopLayer(Layer* layer);
 		void PopOverlay(Layer* layer);
-	private:
+	protected:
 		void OnEvent(Event& event);
 		void OnUpdate(float timestep);
 		void OnRender();
 		void OnImGuiRender();
-	private:
+	protected:
 		Window* p_window;
 		Input m_input;
 

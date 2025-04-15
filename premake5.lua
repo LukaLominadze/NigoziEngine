@@ -30,3 +30,7 @@ group ""
 group "Misc"
 	include "Sandbox"
 group ""
+
+group "Editor"
+	include "Kakali"
+group ""
