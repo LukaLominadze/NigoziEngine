@@ -15,6 +15,7 @@
 #include "Nigozi/glcore/PerspectiveCamera.h"
 #include "Nigozi/glcore/PerspectiveCameraController.h"
 #include "Nigozi/glcore/ParticleSystem.h"
+#include "Nigozi/glcore/FrameBuffer.h"
 
 #include "Nigozi/events/Event.h"
 #include "Nigozi/events/ApplicationEvent.h"

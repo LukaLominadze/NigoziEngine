@@ -31,10 +31,10 @@ namespace Nigozi
 		void PopLayer(Layer* layer);
 		void PopOverlay(Layer* layer);
 	protected:
-		void OnEvent(Event& event);
-		void OnUpdate(float timestep);
-		void OnRender();
-		void OnImGuiRender();
+		virtual void OnEvent(Event& event);
+		virtual void OnUpdate(float timestep);
+		virtual void OnRender();
+		virtual void OnImGuiRender();
 	protected:
 		Window* p_window;
 		Input m_input;

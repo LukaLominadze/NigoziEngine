@@ -1,5 +1,15 @@
 #include "EditorLayer.h"
 
+EditorLayer::EditorLayer(Nigozi::FrameBuffer* viewportBuffer)
+{
+    p_viewportBuffer = viewportBuffer;
+}
+
+void EditorLayer::OnRender()
+{
+    Nigozi::Renderer2D::DrawQuad(glm::vec3(0, 0, -1), glm::vec2(1, 1), nullptr, glm::vec4(0.1f, 0.3f, 0.8f, 1.0f));
+}
+
 void EditorLayer::OnImGuiRender()
 {
     // READ THIS !!!
@@ -17,6 +27,7 @@ void EditorLayer::OnImGuiRender()
     // - (4) we have a local menu bar in the host window (vs. you could use BeginMainMenuBar() + DockSpaceOverViewport()
     //      in your code, but we don't here because we allow the window to be floating)
 
+    
     static bool opt_fullscreen = true;
     static bool opt_padding = false;
     static ImGuiDockNodeFlags dockspace_flags = ImGuiDockNodeFlags_None;
@@ -104,5 +115,6 @@ void EditorLayer::OnImGuiRender()
 
     ImGui::Begin("Sample Window");
     ImGui::Button("Click Me!");
+    ImGui::Image((unsigned long long)(p_viewportBuffer->GetColorAttachment()), ImVec2(960, 540), ImVec2(0, 1), ImVec2(1, 0));
     ImGui::End();
 }
