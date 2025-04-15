@@ -5,8 +5,10 @@
 
 namespace Nigozi
 {
+    bool Application::s_running = false;
+
     Application::Application(const ApplicationProps& props)
-        :m_running(false), m_input(Input())
+        :m_input(Input())
     {
         p_window = new Window(props.Title, props.Width, props.Height, props.Fullscreen);
         // Polled events will be sent to the OnEvent function in the application
@@ -17,6 +19,8 @@ namespace Nigozi
 
         Renderer2D::Initialize();
         Renderer2D::SetClearColor(0.1f, 0.1f, 0.1f, 1.0f);
+
+        s_running = true;
 
         LOG("\nWelcome To NigoziEngine!");
     }
@@ -32,9 +36,9 @@ namespace Nigozi
         Test::Timer timer = Test::Timer();
         float timestep = 0.0f;
 
-        m_running = true;
+        s_running = true;
 
-        while (m_running)
+        while (s_running)
         {
             timer.StartTimerAndReturnSeconds();
 
@@ -46,6 +50,11 @@ namespace Nigozi
 
             timestep = timer.EndTimerAndReturnSeconds();
         }
+    }
+
+    void Application::Close()
+    {
+        s_running = false;
     }
 
     void Application::PushLayer(Layer* layer)
@@ -72,7 +81,7 @@ namespace Nigozi
     {
         if (event.GetEventType() == EventType::WindowClose)
         {
-            m_running = false;
+            s_running = false;
             return;
         }
 

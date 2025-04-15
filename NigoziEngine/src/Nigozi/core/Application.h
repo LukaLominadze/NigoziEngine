@@ -24,6 +24,7 @@ namespace Nigozi
 
 		// Launch mainloop
 		void Run();
+		static void Close();
 
 		void PushLayer(Layer* layer);
 		void PushOverlay(Layer* layer);
@@ -42,6 +43,6 @@ namespace Nigozi
 
 		ImGuiLayer m_imGuiLayer;
 
-		bool m_running;
+		static bool s_running;
 	};
 }
