@@ -12,7 +12,7 @@ workspace "NigoziEngine"
 
 	architecture "x64"
 
-	startproject "Sandbox"
+	startproject "Kakali"
 
 outputdir = "%{cfg.buildcfg}-%{cfg.system}-%{cfg.architecture}"
 
