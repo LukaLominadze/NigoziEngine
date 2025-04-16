@@ -23,7 +23,7 @@ namespace Nigozi
 		~Application();
 
 		// Launch mainloop
-		void Run();
+		virtual void Run();
 		static void Close();
 
 		void PushLayer(Layer* layer);

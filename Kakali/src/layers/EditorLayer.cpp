@@ -113,8 +113,13 @@ void EditorLayer::OnImGuiRender()
 
     ImGui::End();
 
-    ImGui::Begin("Sample Window");
+    ImGui::Begin("Left Window");
     ImGui::Button("Click Me!");
-    ImGui::Image((unsigned long long)(p_viewportBuffer->GetColorAttachment()), ImVec2(960, 540), ImVec2(0, 1), ImVec2(1, 0));
+    ImGui::End();
+
+    ImGui::Begin("Viewport");
+    m_viewportSize = ImGui::GetContentRegionAvail();
+    ImGui::Image((unsigned long long)(p_viewportBuffer->GetColorAttachment()), m_viewportSize, ImVec2(0, 1), ImVec2(1, 0));
+    ImGui::Text((std::to_string(m_viewportSize.x) + ", " + std::to_string(m_viewportSize.y)).c_str());
     ImGui::End();
 }

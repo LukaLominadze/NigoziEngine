@@ -206,7 +206,7 @@ namespace Nigozi
 	uint32_t Renderer2D::SetTextureAndGetSlot(const std::shared_ptr<Texture>& texture)
 	{
 		if (texture) {
-			if (s_data->TextureSlot > 16) {
+			if (s_data->TextureSlot > 15) {
 				Flush();
 			}
 			s_data->Textures[s_data->TextureSlot] = texture;

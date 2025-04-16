@@ -13,14 +13,20 @@ KakaliApplication::KakaliApplication(const Nigozi::ApplicationProps& props)
 
 KakaliApplication::~KakaliApplication()
 {
-	
 }
 
 void KakaliApplication::OnRender()
 {
+    ImVec2& viewportSize = m_editorLayer.GetViewportSize();
+    if (*(glm::vec2*)&viewportSize != *(glm::vec2*)&m_viewportSize) {
+        m_viewportSize = viewportSize;
+        m_framebuffer.Resize((uint32_t)viewportSize.x, (uint32_t)viewportSize.y);
+        m_framebuffer.Invalidate();
+        m_cameraLayer.OnResize((uint32_t)viewportSize.x, (uint32_t)viewportSize.y);
+    }
+
 	m_framebuffer.Bind();
 
-	Nigozi::Renderer2D::SetClearColor(0.6f, 0.4f, 0.0f, 1.0f);
 	Application::OnRender();
 
 	m_framebuffer.Unbind();
