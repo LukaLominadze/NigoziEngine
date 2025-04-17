@@ -48,6 +48,8 @@ The plan for Nigozi Engine is to make a 2D framework that makes the development 
 
 # Short-term goals
 - Add new shaders
+- Add UI for creating entities
+- Add CTRL+Z function
 
 # Long-term goals
 - Create an Editor to make game creation easier
