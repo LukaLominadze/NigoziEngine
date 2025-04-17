@@ -2,8 +2,13 @@
 
 ![poster](https://github.com/user-attachments/assets/90d53fd3-baf6-422a-8be8-be63c046fb53)
 
+## ___Sandbox application showcasing the engine in action!___
+
 https://github.com/user-attachments/assets/eba49d67-91fa-48c7-a1f6-ef870e182ad0
 
+## ___The editor (in development) to be used for game development with Nigozi!___
+
+https://github.com/user-attachments/assets/e2313d77-cdcb-4b7f-a6dc-f41b61983543
 
 Nigozi Engine is a game engine framework designed to make 2D devolopment easier in C++. The engine is in the beginning stages of devlopment, many features and systems are yet to come!
 
@@ -32,12 +37,16 @@ The project is now ready.
 - GLM - For math
 - StbImage - For handling/loading images
 - DearImGui - For UI
+- ENTT - For implementing game objects and components
 
 # The plan
 The plan for Nigozi Engine is to make a 2D framework that makes the development process simple and clear and to provide core functionality and features many games have.
 
+# Achieved goals
+- Added ENTT
+- Started creating the editor
+
 # Short-term goals
-- Add ECS
 - Add new shaders
 
 # Long-term goals
