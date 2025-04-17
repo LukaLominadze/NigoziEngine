@@ -2,8 +2,8 @@
 
 KakaliApplication::KakaliApplication(const Nigozi::ApplicationProps& props)
 	: Application(props), m_cameraLayer(props.Width / (float)props.Height),
-	  m_framebuffer({ props.Width, props.Height }), 
-	  m_editorLayer(&m_framebuffer)
+	  m_viewportBuffer({ props.Width, props.Height }), 
+	  m_editorLayer(&m_viewportBuffer)
 {
 	PushOverlay(&m_editorLayer);
 	PushLayer(&m_cameraLayer);
@@ -17,17 +17,19 @@ KakaliApplication::~KakaliApplication()
 
 void KakaliApplication::OnRender()
 {
+	// Adjust the framebuffer size according to the GUI viewport
     ImVec2& viewportSize = m_editorLayer.GetViewportSize();
     if (*(glm::vec2*)&viewportSize != *(glm::vec2*)&m_viewportSize) {
         m_viewportSize = viewportSize;
-        m_framebuffer.Resize((uint32_t)viewportSize.x, (uint32_t)viewportSize.y);
-        m_framebuffer.Invalidate();
+        m_viewportBuffer.Resize((uint32_t)viewportSize.x, (uint32_t)viewportSize.y);
+        m_viewportBuffer.Invalidate();
         m_cameraLayer.OnResize((uint32_t)viewportSize.x, (uint32_t)viewportSize.y);
     }
 
-	m_framebuffer.Bind();
+	// Draw everything onto the viewport
+	m_viewportBuffer.Bind();
 
 	Application::OnRender();
 
-	m_framebuffer.Unbind();
+	m_viewportBuffer.Unbind();
 }

@@ -2,7 +2,7 @@
 
 #include <Nigozi.h>
 #include "layers/EditorLayer.h"
-#include <layers/CameraController.h>
+#include <layers/CameraControllerLayer.h>
 
 class KakaliApplication : public Nigozi::Application
 {
@@ -12,8 +12,8 @@ public:
 protected:
 	void OnRender() override;
 private:
-	CameraController m_cameraLayer;
-	Nigozi::FrameBuffer m_framebuffer;
+	CameraControllerLayer m_cameraLayer;
+	Nigozi::FrameBuffer m_viewportBuffer;
 	EditorLayer m_editorLayer;
 
 	ImVec2 m_viewportSize, m_newViewportSize;

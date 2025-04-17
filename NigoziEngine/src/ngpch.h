@@ -21,3 +21,4 @@
 #include "stb_image.h"
 
 #include "Nigozi/core/Log.h"
+#include "Nigozi/entt/entt.hpp"

@@ -2,10 +2,10 @@
 
 #include <Nigozi.h>
 
-class CameraController : public Nigozi::Layer {
+class CameraControllerLayer : public Nigozi::Layer {
 public:
-	CameraController(float aspectRatio, bool rotation = false);
-	~CameraController();
+	CameraControllerLayer(float aspectRatio, bool rotation = false);
+	~CameraControllerLayer();
 
 	inline const Nigozi::OrthographicCamera& GetCamera() const { return m_camera; }
 

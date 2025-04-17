@@ -1,21 +1,21 @@
-#include "CameraController.h"
+#include "CameraControllerLayer.h"
 
-CameraController::CameraController(float aspectRatio, bool rotation)
+CameraControllerLayer::CameraControllerLayer(float aspectRatio, bool rotation)
 	:m_aspectRatio(aspectRatio), m_rotation(rotation), m_camera(-m_aspectRatio * m_zoom, m_aspectRatio* m_zoom, -m_zoom, m_zoom)
 {
 }
 
-CameraController::~CameraController()
+CameraControllerLayer::~CameraControllerLayer()
 {
 }
 
-void CameraController::OnEvent(Nigozi::Event& event)
+void CameraControllerLayer::OnEvent(Nigozi::Event& event)
 {
 	Nigozi::EventDispatcher dispatcher = Nigozi::EventDispatcher(event);
-	dispatcher.Dispatch<Nigozi::MouseScrolledEvent>(std::bind(&CameraController::OnMouseScrolled, this, std::placeholders::_1));
+	dispatcher.Dispatch<Nigozi::MouseScrolledEvent>(std::bind(&CameraControllerLayer::OnMouseScrolled, this, std::placeholders::_1));
 }
 
-void CameraController::OnUpdate(float timestep)
+void CameraControllerLayer::OnUpdate(float timestep)
 {
 	glm::vec3 cameraPosition = m_camera.GetPosition();
 	float cameraRotation = m_camera.GetRotation();
@@ -64,19 +64,19 @@ void CameraController::OnUpdate(float timestep)
 	m_cameraTranslationSpeed = 3 * m_zoom;
 }
 
-void CameraController::OnRender()
+void CameraControllerLayer::OnRender()
 {
 	m_camera.SetMVPMatrix();
 }
 
-void CameraController::OnResize(uint32_t width, uint32_t height)
+void CameraControllerLayer::OnResize(uint32_t width, uint32_t height)
 {
 	m_aspectRatio = (float)width / (float)height;
 	m_camera.SetProjection(-m_aspectRatio * m_zoom, m_aspectRatio * m_zoom, -m_zoom, m_zoom);
 	GLCall(glViewport(0, 0, width, height));
 }
 
-bool CameraController::OnMouseScrolled(Nigozi::MouseScrolledEvent& e)
+bool CameraControllerLayer::OnMouseScrolled(Nigozi::MouseScrolledEvent& e)
 {
 	m_zoom -= e.GetOffsetY() * 0.25f;
 	m_zoom = std::max(m_zoom, 0.25f);

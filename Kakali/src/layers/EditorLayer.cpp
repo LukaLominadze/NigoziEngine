@@ -7,6 +7,7 @@ EditorLayer::EditorLayer(Nigozi::FrameBuffer* viewportBuffer)
 
 void EditorLayer::OnRender()
 {
+    // A test square
     Nigozi::Renderer2D::DrawQuad(glm::vec3(0, 0, -1), glm::vec2(1, 1), nullptr, glm::vec4(0.1f, 0.3f, 0.8f, 1.0f));
 }
 
@@ -120,6 +121,5 @@ void EditorLayer::OnImGuiRender()
     ImGui::Begin("Viewport");
     m_viewportSize = ImGui::GetContentRegionAvail();
     ImGui::Image((unsigned long long)(p_viewportBuffer->GetColorAttachment()), m_viewportSize, ImVec2(0, 1), ImVec2(1, 0));
-    ImGui::Text((std::to_string(m_viewportSize.x) + ", " + std::to_string(m_viewportSize.y)).c_str());
     ImGui::End();
 }
