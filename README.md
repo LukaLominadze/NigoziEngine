@@ -1,5 +1,7 @@
 # Nigozi Engine
 
+Nigozi Engine is a game engine framework designed to make 2D devolopment easier in C++. The engine is in the beginning stages of devlopment, many features and systems are yet to come!
+
 ![poster](https://github.com/user-attachments/assets/90d53fd3-baf6-422a-8be8-be63c046fb53)
 
 ## ___Sandbox application showcasing the engine in action!___
@@ -9,8 +11,6 @@ https://github.com/user-attachments/assets/eba49d67-91fa-48c7-a1f6-ef870e182ad0
 ## ___The editor (in development) to be used for game development with Nigozi!___
 
 https://github.com/user-attachments/assets/e2313d77-cdcb-4b7f-a6dc-f41b61983543
-
-Nigozi Engine is a game engine framework designed to make 2D devolopment easier in C++. The engine is in the beginning stages of devlopment, many features and systems are yet to come!
 
 ***
 
