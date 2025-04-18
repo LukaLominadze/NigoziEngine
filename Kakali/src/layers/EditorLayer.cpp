@@ -3,12 +3,19 @@
 EditorLayer::EditorLayer(Nigozi::FrameBuffer* viewportBuffer)
 {
     p_viewportBuffer = viewportBuffer;
+    m_scene.OnAttach();
+}
+
+void EditorLayer::OnUpdate(float timestep)
+{
+    m_scene.OnUpdate(timestep);
 }
 
 void EditorLayer::OnRender()
 {
     // A test square
-    Nigozi::Renderer2D::DrawQuad(glm::vec3(0, 0, -1), glm::vec2(1, 1), nullptr, glm::vec4(0.1f, 0.3f, 0.8f, 1.0f));
+    //Nigozi::Renderer2D::DrawQuad(glm::vec3(0, 0, -1), glm::vec2(1, 1), nullptr, glm::vec4(0.1f, 0.3f, 0.8f, 1.0f));
+    m_scene.OnRender();
 }
 
 void EditorLayer::OnImGuiRender()

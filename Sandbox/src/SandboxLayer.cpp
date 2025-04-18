@@ -6,7 +6,7 @@ void SandboxLayer::OnAttach() {
 	Nigozi::Renderer2D::SetClearColor(0.1f, 0.1f, 0.1f, 1.0f);
 	m_luigiTexture = std::make_shared<Nigozi::Texture>("src/Nigozi/res/textures/luigi.png");
 	std::shared_ptr<Nigozi::Texture> ref = std::make_shared<Nigozi::Texture>("src/res/Player.png");
-	m_playerTexture = std::make_shared<Nigozi::SubTexture>(ref, 16, 0, 0);
+	m_playerTexture = std::make_shared<Nigozi::SubTexture>(ref, glm::vec2{ 16, 16 }, 0, 0);
 }
 
 void SandboxLayer::OnEvent(Nigozi::Event& event)

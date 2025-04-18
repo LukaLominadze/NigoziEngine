@@ -5,7 +5,6 @@
 #include <functional>
 
 #include <string>
-#include <vector>
 #include <iterator>
 
 #include <typeinfo>
@@ -19,6 +18,9 @@
 #include "gtc/matrix_transform.hpp"
 
 #include "stb_image.h"
+#include <vector>
+
+#include <utility>
 
 #include "Nigozi/core/Log.h"
 #include "Nigozi/entt/entt.hpp"
