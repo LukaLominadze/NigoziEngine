@@ -4,6 +4,9 @@ EditorLayer::EditorLayer(Nigozi::FrameBuffer* viewportBuffer)
 {
     p_viewportBuffer = viewportBuffer;
     m_scene.OnAttach();
+
+    Nigozi::Entity entity = m_scene.CreateEntity("Mark", "Ent");
+    entity.AddComponent<Nigozi::SpriteRendererComponent>("src/Nigozi/res/textures/luigi.png", glm::vec2{ 0, 0 });
 }
 
 void EditorLayer::OnUpdate(float timestep)

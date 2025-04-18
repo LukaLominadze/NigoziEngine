@@ -7,8 +7,6 @@ namespace Nigozi
 {
     Scene::Scene()
     {
-        Entity entity = CreateEntity("Mark", "Ent");
-        entity.AddComponent<SpriteRendererComponent>("src/Nigozi/res/textures/luigi.png", glm::vec2{ 0, 0 });
     }
 
     Scene::~Scene()
@@ -18,11 +16,6 @@ namespace Nigozi
 
     void Scene::OnUpdate(float timestep)
     {
-        auto group = m_Registry.view<TransformComponent>();
-        for (auto& entity : group) {
-            auto& transform = group.get<TransformComponent>(entity);
-            transform.Position.x += 0.1f * timestep;
-        }
     }
 
     void Scene::OnRender()

@@ -10,6 +10,7 @@ namespace Nigozi {
 
 		NameComponent() = default;
 		NameComponent(const NameComponent& other) = default;
+		/// <param name="name"></param>
 		NameComponent(const std::string& name)
 			:Name(name) {
 		}
@@ -23,6 +24,7 @@ namespace Nigozi {
 
 		TagComponent() = default;
 		TagComponent(const TagComponent& other) = default;
+		/// <param name="tag"></param>
 		TagComponent(const std::string& tag)
 			:Tag(tag) {
 		}
@@ -37,6 +39,8 @@ namespace Nigozi {
 
 		TransformComponent() = default;
 		TransformComponent(const TransformComponent& other) = default;
+		/// <param name="position"></param>
+		/// <param name="scale"></param>
 		TransformComponent(glm::vec3 position, glm::vec3 scale)
 			:Position(position), Scale(1.0) { }
 	};
@@ -51,9 +55,6 @@ namespace Nigozi {
 
 		SpriteRendererComponent() = default;
 		SpriteRendererComponent(const SpriteRendererComponent& other) = default;
-		/// <summary>
-		/// 
-		/// </summary>
 		/// <param name="filePath"></param>
 		/// <param name="size"></param>
 		/// <param name="slotX"></param>

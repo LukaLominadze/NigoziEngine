@@ -9,6 +9,9 @@ namespace Nigozi
 		std::string FragmentShader;
 	};
 
+	// TODO
+	// Create a shader library
+
 	class Shader
 	{
 	public:
