@@ -40,7 +40,6 @@ namespace Nigozi
 		Input m_input;
 
 		LayerStack m_layerStack;
-
 		ImGuiLayer m_imGuiLayer;
 
 		static bool s_running;

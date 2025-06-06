@@ -10,11 +10,18 @@ namespace Nigozi
     Application::Application(const ApplicationProps& props)
         :m_input(Input())
     {
+        // Window class is used for initializing the context,
+        // handling GLFW functions (like vsync, fullscreen, etc.)
+        // and events
         p_window = new Window(props.Title, props.Width, props.Height, props.Fullscreen);
+
         // Polled events will be sent to the OnEvent function in the application
+        // Because the application class handles the distribution of all occurred events
         p_window->SetEventCallback(std::bind(&Application::OnEvent, this, std::placeholders::_1));
         p_window->SetVSync(props.VSync);
 
+        // ImGUI is an overlay, because we want to render UI last and for UI to
+        // get the events FIRST
         PushOverlay(&m_imGuiLayer);
 
         Renderer2D::Initialize();
