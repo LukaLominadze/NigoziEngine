@@ -14,11 +14,6 @@ namespace Nigozi
 		std::function<void(Event&)> EventCallback;
 	};
 
-	namespace Global 
-	{
-		inline WindowData windowData;
-	}
-
 	class Window {
 	public:
 		Window() = default;
@@ -30,7 +25,7 @@ namespace Nigozi
 		static bool SetFullscreen(bool value);
 
 		inline void SetEventCallback(const std::function<void(Event&)>& function) {
-			Global::windowData.EventCallback = function;
+			m_windowData.EventCallback = function;
 		}
 
 		void SetVSync(bool value);
@@ -38,6 +33,9 @@ namespace Nigozi
 		void OnUpdate();
 
 		GLFWwindow* GetNativeWindow() const { return p_window; }
+		static inline WindowData& GetWindowData() {
+			return *(WindowData*)glfwGetWindowUserPointer(glfwGetCurrentContext());
+		}
 
 		void Delete();
 	private:
@@ -46,6 +44,8 @@ namespace Nigozi
 		bool StartGLEW();
 		bool CreateCallbacks();
 	private:
+		WindowData m_windowData;
+
 		GLFWwindow* p_window;
 		GLFWmonitor* p_monitor;
 

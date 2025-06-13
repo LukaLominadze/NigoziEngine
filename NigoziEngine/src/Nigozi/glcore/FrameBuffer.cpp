@@ -74,7 +74,6 @@ namespace Nigozi
 		GLCall(glBindFramebuffer(GL_FRAMEBUFFER, 0));
 	}
 
-
 	void FrameBuffer::Bind() const
 	{
 		GLCall(glBindFramebuffer(GL_FRAMEBUFFER, m_rendererID));

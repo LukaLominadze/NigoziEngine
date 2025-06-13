@@ -20,9 +20,10 @@ namespace Nigozi
 		bool DeleteShader(const std::string& name);
 
 		const std::shared_ptr<Shader>& GetShader(const std::string& name) const { return m_shaderMap.at(name); }
+		const std::map<std::string, std::shared_ptr<Shader>>& GetShaderMap() const { return m_shaderMap; }
 	private:
 		// Shaders will be stored in a map for fast access
-		std::unordered_map<std::string, std::shared_ptr<Shader>> m_shaderMap;
+		std::map<std::string, std::shared_ptr<Shader>> m_shaderMap;
 	};
 }
 

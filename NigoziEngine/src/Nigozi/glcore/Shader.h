@@ -28,6 +28,7 @@ namespace Nigozi
 		void Unbind() const;
 
 		unsigned int GetProgram() const { return m_shader; }
+		const std::string& GetFilePath() const { return m_filePath; }
 
 		int GetUniformLocation(const std::string& uniform);
 

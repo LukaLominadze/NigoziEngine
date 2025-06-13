@@ -39,7 +39,7 @@ namespace Nigozi
 
     bool Window::IsFullscreen()
     {
-        return Global::windowData.Fullscreen;
+        return Window::GetWindowData().Fullscreen;
     }
 
     void Window::SetVSync(bool value)
@@ -68,9 +68,9 @@ namespace Nigozi
 
     bool Window::CreateWindow(const char* title, uint32_t width, uint32_t height, bool fullscreen)
     {
-        Global::windowData.Width = width;
-        Global::windowData.Height = height;
-        Global::windowData.Fullscreen = fullscreen;
+        m_windowData.Width = width;
+        m_windowData.Height = height;
+        m_windowData.Fullscreen = fullscreen;
 
         p_window = glfwCreateWindow(width, height, title, NULL, NULL);
         if (!p_window)
@@ -79,15 +79,15 @@ namespace Nigozi
         }
 
         glfwMakeContextCurrent(p_window);
-        glfwSetWindowUserPointer(p_window, &Global::windowData);
+        glfwSetWindowUserPointer(p_window, &m_windowData);
 
         // Get the monitor to set the viewport and fullscreen mode
         GLCall(p_monitor = glfwGetPrimaryMonitor());
 
-        if (Global::windowData.Fullscreen) {
+        if (m_windowData.Fullscreen) {
             const GLFWvidmode* mode = glfwGetVideoMode(p_monitor);
-            Global::windowData.Width = mode->width;
-            Global::windowData.Height = mode->height;
+            m_windowData.Width = mode->width;
+            m_windowData.Height = mode->height;
             glfwSetWindowMonitor(p_window, p_monitor, 0, 0, mode->width, mode->height, GLFW_DONT_CARE);
             GLCall(glViewport(0, 0, mode->width, mode->height));
         }
@@ -179,17 +179,18 @@ namespace Nigozi
 
     bool Window::SetFullscreen(bool value)
     {
-        Global::windowData.Fullscreen = value;
+        WindowData& windowData = Window::GetWindowData();
+        windowData.Fullscreen = value;
         GLFWmonitor* monitor = glfwGetPrimaryMonitor();
         GLFWwindow* window = glfwGetCurrentContext();
         const GLFWvidmode* mode = glfwGetVideoMode(monitor);
-        if (Global::windowData.Fullscreen) {
+        if (windowData.Fullscreen) {
             glfwSetWindowMonitor(window, monitor, 0, 0, mode->width, mode->height, mode->refreshRate);
         }
         else {
-            int xpos = (mode->width / Global::windowData.Width) / 2;
-            int ypos = (mode->height / Global::windowData.Height) / 2 + 40;
-            glfwSetWindowMonitor(window, NULL, xpos, ypos, Global::windowData.Width, Global::windowData.Height, 0);
+            int xpos = (mode->width / windowData.Width) / 2;
+            int ypos = (mode->height / windowData.Height) / 2 + 40;
+            glfwSetWindowMonitor(window, NULL, xpos, ypos, windowData.Width, windowData.Height, 0);
         }
         return true;
     }

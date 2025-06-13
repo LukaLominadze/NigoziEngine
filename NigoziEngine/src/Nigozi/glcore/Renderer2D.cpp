@@ -65,7 +65,7 @@ namespace Nigozi
 		// Create shader and set up texture units
 		s_data->DefaultShader = std::make_shared<Shader>("src/Nigozi/res/shaders/Default.glsl");
 		
-		for (int i = 0; i < 16; i++) 
+		for (int i = 0; i < 16; i++)
 		{
 			s_data->TextureUnits[i] = i;
 		}

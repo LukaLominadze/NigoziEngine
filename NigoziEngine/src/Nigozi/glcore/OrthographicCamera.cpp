@@ -50,10 +50,10 @@ namespace Nigozi
 	const glm::vec2 OrthographicCamera::GetMousePositionWorldSpace() const
 	{
 		std::pair<float, float> mousePosition = Input::GetMousePosition();
-		mousePosition.second = Global::windowData.Height - mousePosition.second;
+		mousePosition.second = Window::GetWindowData().Height - mousePosition.second;
 		float normalWidth = m_aspect;
-		float transformedPositionX = (mousePosition.first / Global::windowData.Width) * normalWidth - 0.5f * normalWidth;
-		float transformedPositionY = mousePosition.second / Global::windowData.Height - 0.5f;
+		float transformedPositionX = (mousePosition.first / Window::GetWindowData().Width) * normalWidth - 0.5f * normalWidth;
+		float transformedPositionY = mousePosition.second / Window::GetWindowData().Height - 0.5f;
 		if (m_rotation != 0) {
 			float radians = glm::radians(m_rotation);
 
