@@ -20,8 +20,8 @@ namespace Nigozi
 		Entity CreateEntity(const std::string& name, const std::string& tag);
 
 		friend class Entity;
-	private:
 		entt::registry m_Registry;
+	private:
 	};
 }
 

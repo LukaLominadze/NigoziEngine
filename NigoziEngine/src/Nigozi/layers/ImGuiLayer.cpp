@@ -27,7 +27,7 @@ namespace Nigozi
             style.Colors[ImGuiCol_WindowBg].w = 1.0f;
         }
 
-        ImGui_ImplGlfw_InitForOpenGL(Global::windowData.NativeWindow, true);
+        ImGui_ImplGlfw_InitForOpenGL(glfwGetCurrentContext(), true);
         ImGui_ImplOpenGL3_Init(glsl_version);
 	}
 

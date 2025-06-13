@@ -5,30 +5,24 @@
 
 namespace Nigozi
 {
-    bool Application::s_running = false;
-
     Application::Application(const ApplicationProps& props)
-        :m_input(Input())
     {
-        // Window class is used for initializing the context,
-        // handling GLFW functions (like vsync, fullscreen, etc.)
-        // and events
-        p_window = new Window(props.Title, props.Width, props.Height, props.Fullscreen);
+        if (!CreateWindow(props)) {
+            std::cout << "Couldn't create window! Shutting down..." << std::endl;
+            return;
+        }
 
-        // Polled events will be sent to the OnEvent function in the application
-        // Because the application class handles the distribution of all occurred events
-        p_window->SetEventCallback(std::bind(&Application::OnEvent, this, std::placeholders::_1));
-        p_window->SetVSync(props.VSync);
+        if (!CreateGUILayer()) {
+            std::cout << "Couldn't create GUI layer! Shutting down..." << std::endl;
+            return;
+        }
 
-        // ImGUI is an overlay, because we want to render UI last and for UI to
-        // get the events FIRST
-        PushOverlay(&m_imGuiLayer);
+        if (!StartRenderer()) {
+            std::cout << "Couldn't initialize renderer! Shutting down..." << std::endl;
+            return;
+        }
 
-        Renderer2D::Initialize();
-        Renderer2D::SetClearColor(0.1f, 0.1f, 0.1f, 1.0f);
-
-        s_running = true;
-
+        initialized = true;
         LOG("\nWelcome To NigoziEngine!");
     }
 
@@ -43,9 +37,9 @@ namespace Nigozi
         Test::Timer timer = Test::Timer();
         float timestep = 0.0f;
 
-        s_running = true;
+        GLFWwindow* nativeWindow = p_window->GetNativeWindow();
 
-        while (s_running)
+        while (!glfwWindowShouldClose(nativeWindow))
         {
             timer.StartTimerAndReturnSeconds();
 
@@ -61,7 +55,7 @@ namespace Nigozi
 
     void Application::Close()
     {
-        s_running = false;
+        glfwSetWindowShouldClose(glfwGetCurrentContext(), GL_TRUE);
     }
 
     void Application::PushLayer(Layer* layer)
@@ -88,7 +82,7 @@ namespace Nigozi
     {
         if (event.GetEventType() == EventType::WindowClose)
         {
-            s_running = false;
+            Application::Close();
             return;
         }
 
@@ -102,7 +96,7 @@ namespace Nigozi
 
     void Application::OnUpdate(float timestep)
     {
-        m_input.OnUpdate();
+        Input::OnUpdate();
         for (Layer* layer : m_layerStack) {
             layer->OnUpdate(timestep);
         }
@@ -125,5 +119,36 @@ namespace Nigozi
             layer->OnImGuiRender();
         }
         m_imGuiLayer.End();
+    }
+
+    // Window class is used for initializing the context,
+    // handling GLFW functions (like vsync, fullscreen, etc.)
+    // and events
+    bool Application::CreateWindow(const ApplicationProps& props)
+    {
+        p_window = new Window();
+        if (!p_window->StartUp(props.Title, props.Width, props.Height, props.Fullscreen)) {
+            return false;
+        }
+        // Polled events will be sent to the OnEvent function in the application
+        // Because the application class handles the distribution of all occurred events
+        p_window->SetEventCallback(std::bind(&Application::OnEvent, this, std::placeholders::_1));
+        p_window->SetVSync(props.VSync);
+        return p_window;
+    }
+
+    bool Application::CreateGUILayer()
+    {
+        // ImGUI is an overlay, because we want to render UI last and for UI to
+        // get the events FIRST
+        PushOverlay(&m_imGuiLayer);
+        return &m_imGuiLayer;
+    }
+
+    bool Application::StartRenderer()
+    {
+        Renderer2D::Initialize();
+        Renderer2D::SetClearColor(0.1f, 0.1f, 0.1f, 1.0f);
+        return Renderer2D::GetData()->QuadVertexArray;
     }
 }

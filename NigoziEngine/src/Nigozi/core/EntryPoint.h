@@ -14,7 +14,9 @@ extern Nigozi::Application* CreateApplication();
 		#include <windows.h>
 		int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow) {
 			Nigozi::Application* app = CreateApplication();
-			app->Run();
+			if (app->Initialized()) {
+				app->Run();
+			}
 			delete app;
 			return 0;
 		}
@@ -26,7 +28,9 @@ extern Nigozi::Application* CreateApplication();
 #else
 int main(int argc, char* argv[]) {
 	Nigozi::Application* app = CreateApplication();
-	app->Run();
+	if (app->Initialized()) {
+		app->Run();
+	}
 	delete app;
 }
 #endif

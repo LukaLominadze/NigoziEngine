@@ -5,7 +5,7 @@ EditorLayer::EditorLayer(Nigozi::FrameBuffer* viewportBuffer)
     p_viewportBuffer = viewportBuffer;
     m_scene.OnAttach();
 
-    Nigozi::Entity entity = m_scene.CreateEntity("Mark", "Ent");
+    Nigozi::Entity entity = m_scene.CreateEntity("Mario", "Ent");
     entity.AddComponent<Nigozi::SpriteRendererComponent>("src/Nigozi/res/textures/luigi.png", glm::vec2{ 0, 0 });
 }
 
@@ -124,8 +124,11 @@ void EditorLayer::OnImGuiRender()
 
     ImGui::End();
 
-    ImGui::Begin("Left Window");
-    ImGui::Button("Click Me!");
+    ImGui::Begin("Scene Hierarchy");
+    auto view = m_scene.m_Registry.view<Nigozi::NameComponent>();
+    view.each([](auto name) {
+        ImGui::Button(name.Name.c_str());
+        });
     ImGui::End();
 
     ImGui::Begin("Viewport");

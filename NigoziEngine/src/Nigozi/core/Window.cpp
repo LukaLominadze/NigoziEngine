@@ -8,11 +8,66 @@
 
 namespace Nigozi
 {
-    Window::Window(const char* title, uint32_t width, uint32_t height, bool fullscreen = false)
+    Window::~Window()
     {
-        int initialization = glfwInit();
-        ASSERT(initialization, "Initializing GLFW...");
+        if (p_window) {
+            Delete();
+        }
+        glfwTerminate();
+    }
 
+    bool Window::StartUp(const char* title, uint32_t width, uint32_t height, bool fullscreen)
+    {
+        if (!StartGLFW()) {
+            std::cout << "Couldn't initialize GLFW...";
+            return false;
+        }
+
+        if (!CreateWindow(title, width, height, fullscreen)) {
+            std::cout << "Couldn't create GLFW window...";
+            return false;
+        }
+
+        if (!StartGLEW()) {
+            std::cout << "Couldn't initialize GLEW...";
+            return false;
+        }
+
+        CreateCallbacks();
+        return true;
+    }
+
+    bool Window::IsFullscreen()
+    {
+        return Global::windowData.Fullscreen;
+    }
+
+    void Window::SetVSync(bool value)
+    {
+        if (value)
+            glfwSwapInterval(1);
+        else
+            glfwSwapInterval(0);
+    }
+
+    void Window::OnUpdate()
+    {
+        glfwPollEvents();
+        glfwSwapBuffers(p_window);
+    }
+
+    void Window::Delete()
+    {
+        glfwDestroyWindow(p_window);
+    }
+
+    bool Window::StartGLFW()
+    {
+        return glfwInit() == GLFW_TRUE;
+    }
+
+    bool Window::CreateWindow(const char* title, uint32_t width, uint32_t height, bool fullscreen)
+    {
         Global::windowData.Width = width;
         Global::windowData.Height = height;
         Global::windowData.Fullscreen = fullscreen;
@@ -20,12 +75,11 @@ namespace Nigozi
         p_window = glfwCreateWindow(width, height, title, NULL, NULL);
         if (!p_window)
         {
-            ASSERT(p_window, "Initializing Window...");
-            glfwTerminate();
+            return p_window;
         }
 
-        Global::windowData.NativeWindow = p_window;
-        Global::windowData.SetFullscreen = std::bind(&Window::SetFullscreen, this, std::placeholders::_1);
+        glfwMakeContextCurrent(p_window);
+        glfwSetWindowUserPointer(p_window, &Global::windowData);
 
         // Get the monitor to set the viewport and fullscreen mode
         GLCall(p_monitor = glfwGetPrimaryMonitor());
@@ -37,15 +91,16 @@ namespace Nigozi
             glfwSetWindowMonitor(p_window, p_monitor, 0, 0, mode->width, mode->height, GLFW_DONT_CARE);
             GLCall(glViewport(0, 0, mode->width, mode->height));
         }
+        return p_window;
+    }
 
-        glfwMakeContextCurrent(p_window);
+    bool Window::StartGLEW()
+    {
+        return glewInit() == GLEW_OK;
+    }
 
-        if (glewInit() != GLEW_OK) {
-            ASSERT(false, "Initializing GLEW...");
-        }
-
-        glfwSetWindowUserPointer(p_window, &Global::windowData);
-
+    bool Window::CreateCallbacks()
+    {
         // Get and send the events to application
         glfwSetWindowCloseCallback(p_window, [](GLFWwindow* window)
             {
@@ -119,51 +174,22 @@ namespace Nigozi
                 MouseScrolledEvent event((float)xOffset, (float)yOffset);
                 data.EventCallback(event);
             });
-    }
-
-    Window::~Window()
-    {
-        if (p_window) {
-            Delete();
-        }
-        glfwTerminate();
-    }
-
-    bool Window::IsFullscreen()
-    {
-        return Global::windowData.Fullscreen;
-    }
-
-    void Window::SetVSync(bool value)
-    {
-        if (value)
-            glfwSwapInterval(1);
-        else
-            glfwSwapInterval(0);
-    }
-
-    void Window::OnUpdate()
-    {
-        glfwPollEvents();
-        glfwSwapBuffers(p_window);
-    }
-
-    void Window::Delete()
-    {
-        glfwDestroyWindow(p_window);
+        return true;
     }
 
     bool Window::SetFullscreen(bool value)
     {
         Global::windowData.Fullscreen = value;
-        const GLFWvidmode* mode = glfwGetVideoMode(p_monitor);
+        GLFWmonitor* monitor = glfwGetPrimaryMonitor();
+        GLFWwindow* window = glfwGetCurrentContext();
+        const GLFWvidmode* mode = glfwGetVideoMode(monitor);
         if (Global::windowData.Fullscreen) {
-            glfwSetWindowMonitor(p_window, p_monitor, 0, 0, mode->width, mode->height, mode->refreshRate);
+            glfwSetWindowMonitor(window, monitor, 0, 0, mode->width, mode->height, mode->refreshRate);
         }
         else {
             int xpos = (mode->width / Global::windowData.Width) / 2;
             int ypos = (mode->height / Global::windowData.Height) / 2 + 40;
-            glfwSetWindowMonitor(p_window, NULL, xpos, ypos, Global::windowData.Width, Global::windowData.Height, 0);
+            glfwSetWindowMonitor(window, NULL, xpos, ypos, Global::windowData.Width, Global::windowData.Height, 0);
         }
         return true;
     }

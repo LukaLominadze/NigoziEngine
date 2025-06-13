@@ -21,6 +21,7 @@ namespace Nigozi
 	public:
 		Application(const ApplicationProps& props);
 		~Application();
+		const bool Initialized() const { return initialized; }
 
 		// Launch mainloop
 		virtual void Run();
@@ -35,13 +36,14 @@ namespace Nigozi
 		virtual void OnUpdate(float timestep);
 		virtual void OnRender();
 		virtual void OnImGuiRender();
+	private:
+		bool CreateWindow(const ApplicationProps& props);
+		bool CreateGUILayer();
+		bool StartRenderer();
+		bool initialized = false;
 	protected:
 		Window* p_window;
-		Input m_input;
-
 		LayerStack m_layerStack;
 		ImGuiLayer m_imGuiLayer;
-
-		static bool s_running;
 	};
 }

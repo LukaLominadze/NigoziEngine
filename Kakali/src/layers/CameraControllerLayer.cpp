@@ -47,16 +47,15 @@ void CameraControllerLayer::OnUpdate(float timestep)
 		cameraPosition.y -= m_cameraTranslationSpeed * timestep;
 	}
 
-	if (Nigozi::Input::IsKeyPressed(GLFW_KEY_Q)) {
+	if (Nigozi::Input::IsKeyPressed(GLFW_KEY_Q)) 
+	{
 		cameraRotation += m_cameraRotationSpeed * timestep;
 		m_camera.SetRotation(cameraRotation);
 	}
-	if (Nigozi::Input::IsKeyPressed(GLFW_KEY_E)) {
+	if (Nigozi::Input::IsKeyPressed(GLFW_KEY_E)) 
+	{
 		cameraRotation -= m_cameraRotationSpeed * timestep;
 		m_camera.SetRotation(cameraRotation);
-	}
-	if (Nigozi::Input::IsKeyJustPressed(GLFW_KEY_R)) {
-		m_camera.SetRotation(0);
 	}
 
 	m_camera.SetPosition(cameraPosition);

@@ -61,9 +61,6 @@ namespace Nigozi
 			cameraRotation -= m_cameraRotationSpeed * timestep;
 			m_camera.SetRotation(cameraRotation);
 		}
-		if (Input::IsKeyJustPressed(GLFW_KEY_R)) {
-			m_camera.SetRotation(0);
-		}
 
 		m_camera.SetPosition(cameraPosition);
 

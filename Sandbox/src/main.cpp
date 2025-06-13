@@ -1,12 +1,9 @@
 #define MAIN
 
 #include <Nigozi.h>
-#include "SandboxLayer.h"
-#include "Global.h"
+#include "Sandbox.h"
 
 Nigozi::Application* CreateApplication() {
-	Nigozi::Application* app = new Nigozi::Application({ "Test App", 960, 540, true, false });
-	app->PushLayer(&Global::cameraLayer);
-	app->PushLayer(&Global::sandboxLayer);
+	Nigozi::Application* app = new Sandbox({ "Test App", 960, 540, true, false });
 	return app;
 }
