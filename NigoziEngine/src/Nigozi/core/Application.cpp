@@ -22,7 +22,7 @@ namespace Nigozi
             return;
         }
 
-        initialized = true;
+        m_initialized = true;
         LOG("\nWelcome To NigoziEngine!");
     }
 
