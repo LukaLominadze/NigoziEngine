@@ -68,7 +68,7 @@ Then, you will need to define a function for creating the application:
 #include <Nigozi.h>
 
 extern Nigozi::Application* CreateApplication() {
-	Nigozi::Aplication app = new Nigozi::Application({ "MyGame", 960, 540, true, false });
+	Nigozi::Aplication* app = new Nigozi::Application({ "MyGame", 960, 540, true, false });
 	return app;
 }
 ```
@@ -105,7 +105,7 @@ Final code should look something like this:
 #include "ExampleLayer.h"
 
 extern Nigozi::Application* CreateApplication() {
-	Nigozi::Aplication app = new Nigozi::Application({ "MyGame", 960, 540, true, false });
+	Nigozi::Aplication* app = new Nigozi::Application({ "MyGame", 960, 540, true, false });
 	app->PushLayer(new ExampleLayer());
 	return app;
 }
