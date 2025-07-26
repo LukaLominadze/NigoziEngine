@@ -10,6 +10,8 @@ namespace Nigozi
 			:Event(EventType::WindowResize), m_width(width), m_height(height)
 		{}
 
+		inline void Initialize(int width, int height) { m_type = EventType::WindowResize; m_width = width; m_height = height; }
+
 		inline const int GetWidth() const { return m_width; }
 		inline const int GetHeight() const { return m_height; }
 
@@ -23,5 +25,7 @@ namespace Nigozi
 		WindowClosedEvent()
 			:Event(EventType::WindowClose)
 		{}
+
+		inline void Initialize() { m_type = EventType::WindowClose; }
 	};
 }

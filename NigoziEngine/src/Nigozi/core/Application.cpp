@@ -36,18 +36,18 @@ namespace Nigozi
     {
         Test::Timer timer = Test::Timer();
         float timestep = 0.0f;
-
-        GLFWwindow* nativeWindow = p_window->GetNativeWindow();
-
-        while (!glfwWindowShouldClose(nativeWindow))
+        while (!p_window->ShouldClose())
         {
             timer.StartTimerAndReturnSeconds();
 
+            p_window->PollEvents();
+
+            OnEvent();
             OnUpdate(timestep);
             OnRender();
             OnImGuiRender();
 
-            p_window->OnUpdate();
+            p_window->Update();
 
             timestep = timer.EndTimerAndReturnSeconds();
         }
@@ -55,7 +55,7 @@ namespace Nigozi
 
     void Application::Close()
     {
-        glfwSetWindowShouldClose(glfwGetCurrentContext(), GL_TRUE);
+        Window::Close();
     }
 
     void Application::PushLayer(Layer* layer)
@@ -78,19 +78,37 @@ namespace Nigozi
         m_layerStack.PopOverlay(layer);
     }
 
-    void Application::OnEvent(Event& event)
+    void Application::QueueEvent(std::function<Event* ()>&& func)
     {
-        if (event.GetEventType() == EventType::WindowClose)
-        {
-            Application::Close();
-            return;
-        }
+        m_eventQueue.push(func);
+    }
 
-        for (auto it = m_layerStack.end(); it != m_layerStack.begin(); )
-        {
-            (*--it)->OnEvent(event);
-            if (event.Handled)
-                break;
+    void Application::OnEvent()
+    {
+        std::scoped_lock<std::mutex> lock(m_eventQueueMutex);
+        /*
+            The events are created on the stack with _malloca(), 
+            we do this so we can have different types of events
+            (MousePressed, KeyPressed, etc.) that have different
+            amount of data and size (12 bytes vs 16 bytes, etc.)
+            To ensure these are created on the stack and that
+            they can be used as different types of events,
+            we use _malloca, configure the event and then return
+            as Event*
+        */
+        while (m_eventQueue.size() > 0) {
+            Event* event = m_eventQueue.front()();
+            if (event->GetEventType() == EventType::WindowClose) {
+                Window::Close();
+            }
+            for (auto it = m_layerStack.end(); it != m_layerStack.begin(); )
+            {
+                (*--it)->OnEvent(*event);
+                if (event->Handled)
+                    break;
+            }
+            _freea(event);
+            m_eventQueue.pop();
         }
     }
 
@@ -132,7 +150,7 @@ namespace Nigozi
         }
         // Polled events will be sent to the OnEvent function in the application
         // Because the application class handles the distribution of all occurred events
-        p_window->SetEventCallback(std::bind(&Application::OnEvent, this, std::placeholders::_1));
+        p_window->SetEventCallback(std::bind(&Application::QueueEvent, this, std::placeholders::_1));
         p_window->SetVSync(props.VSync);
         return p_window;
     }

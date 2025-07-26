@@ -7,6 +7,8 @@
 #include "layers/ImGuiLayer.h"
 #include "Input.h"
 #include "Benchmarking/Timer.h"
+#include <queue>
+#include <mutex>
 
 namespace Nigozi 
 {
@@ -32,7 +34,8 @@ namespace Nigozi
 		void PopLayer(Layer* layer);
 		void PopOverlay(Layer* layer);
 	protected:
-		virtual void OnEvent(Event& event);
+		void QueueEvent(std::function<Event*()>&& func);
+		virtual void OnEvent();
 		virtual void OnUpdate(float timestep);
 		virtual void OnRender();
 		virtual void OnImGuiRender();
@@ -45,5 +48,8 @@ namespace Nigozi
 		Window* p_window;
 		LayerStack m_layerStack;
 		ImGuiLayer m_imGuiLayer;
+	private:
+		std::mutex m_eventQueueMutex;
+		std::queue<std::function<Event* ()>> m_eventQueue;
 	};
 }

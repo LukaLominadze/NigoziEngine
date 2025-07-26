@@ -19,7 +19,7 @@ namespace Nigozi
 
 		inline EventType GetEventType() const { return m_type; }
 
-	private:
+	protected:
 		EventType m_type;
 	};
 

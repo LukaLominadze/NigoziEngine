@@ -11,7 +11,7 @@ namespace Nigozi
 		KeyEvent(EventType type, int keyCode)
 			:Event(type), m_keyCode(keyCode)
 		{}
-	private:
+	protected:
 		int m_keyCode;
 	};
 
@@ -20,6 +20,8 @@ namespace Nigozi
 		KeyPressedEvent(int keyCode)
 			:KeyEvent(EventType::KeyPressed, keyCode)
 		{}
+
+		inline void Initialize(int keyCode) { m_type = EventType::KeyPressed; m_keyCode = keyCode; }
 
 		inline static EventType GetStaticType() { return EventType::KeyPressed; }
 	};
@@ -30,6 +32,8 @@ namespace Nigozi
 			:KeyEvent(EventType::KeyReleased, keyCode)
 		{}
 
+		inline void Initialize(int keyCode) { m_type = EventType::KeyReleased; m_keyCode = keyCode; }
+
 		inline static EventType GetStaticType() { return EventType::KeyReleased; }
 	};
 
@@ -38,6 +42,8 @@ namespace Nigozi
 		KeyTypedEvent(int keyCode)
 			:KeyEvent(EventType::KeyTyped, keyCode)
 		{}
+
+		inline void Initialize(int keyCode) { m_type = EventType::KeyTyped; m_keyCode = keyCode; }
 
 		inline static EventType GetStaticType() { return EventType::KeyTyped; }
 	};
