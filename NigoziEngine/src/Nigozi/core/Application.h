@@ -23,7 +23,7 @@ namespace Nigozi
 	public:
 		Application(const ApplicationProps& props);
 		~Application();
-		const bool Initialized() const { return initialized; }
+		const bool Initialized() const { return m_initialized; }
 
 		// Launch mainloop
 		virtual void Run();
@@ -43,7 +43,6 @@ namespace Nigozi
 		bool CreateWindow(const ApplicationProps& props);
 		bool CreateGUILayer();
 		bool StartRenderer();
-		bool initialized = false;
 	protected:
 		Window* p_window;
 		LayerStack m_layerStack;
@@ -51,5 +50,6 @@ namespace Nigozi
 	private:
 		std::mutex m_eventQueueMutex;
 		std::queue<std::function<Event* ()>> m_eventQueue;
+		bool m_initialized = false;
 	};
 }
