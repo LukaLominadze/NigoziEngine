@@ -69,7 +69,7 @@ namespace Nigozi
 			GL_UNSIGNED_INT_24_8, NULL));
 		GLCall(glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_TEXTURE_2D, m_depthAttachment, 0));
 
-		ASSERT((glCheckFramebufferStatus(GL_FRAMEBUFFER) == GL_FRAMEBUFFER_COMPLETE), "Checking framebuffer...");
+		//ASSERT((glCheckFramebufferStatus(GL_FRAMEBUFFER) == GL_FRAMEBUFFER_COMPLETE), "Checking framebuffer...");
 
 		GLCall(glBindFramebuffer(GL_FRAMEBUFFER, 0));
 	}

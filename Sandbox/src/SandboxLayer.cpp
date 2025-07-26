@@ -123,6 +123,6 @@ bool SandboxLayer::OnFullscreenToggle(Nigozi::KeyPressedEvent& event) {
 	if (event.GetKeyCode() != GLFW_KEY_F11) {
 		return false;
 	}
-	Nigozi::Window::SetFullscreen(!Nigozi::Window::IsFullscreen());
+	Nigozi::Window::SetGlobalFullscreen(!Nigozi::Window::IsGlobalFullscreen());
 	return true;
 }
