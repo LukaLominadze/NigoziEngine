@@ -96,6 +96,7 @@ namespace Nigozi
             they can be used as different types of events,
             we use _malloca, then configure the event and then return
             as Event*
+            To see how these functions are created, go to Window::CreateCallbacks()
         */
         while (m_eventQueue.size() > 0) {
             std::function<Event* ()>& func = m_eventQueue.front();
