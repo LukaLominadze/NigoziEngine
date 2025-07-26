@@ -151,7 +151,7 @@ namespace Nigozi
 	}
 
 	/*
-		To understand why we use _malloca to create and add events
+		To understand why we use alloca to create and add events
 		to the event queue, go to Application::OnEvent()
 	*/
 	void Window::CreateCallbacks()
@@ -161,7 +161,7 @@ namespace Nigozi
 			{
 				WindowData& data = *(WindowData*)glfwGetWindowUserPointer(window);
 				data.EventQueueCallback([](){
-					WindowClosedEvent* event = (WindowClosedEvent*)_malloca(sizeof(WindowClosedEvent));
+					WindowClosedEvent* event = (WindowClosedEvent*)alloca(sizeof(WindowClosedEvent));
 					event->Initialize();
 					return (Event*)event;
 				});
@@ -178,7 +178,7 @@ namespace Nigozi
 				}
 				glViewport(0, 0, data.Width, data.Height);
 				data.EventQueueCallback([width, height]() {
-					WindowResizedEvent* event = (WindowResizedEvent*)_malloca(sizeof(WindowResizedEvent));
+					WindowResizedEvent* event = (WindowResizedEvent*)alloca(sizeof(WindowResizedEvent));
 					event->Initialize(width, height);
 					return (Event*)event;
 					});
@@ -193,7 +193,7 @@ namespace Nigozi
 				case GLFW_PRESS:
 				{
 					data.EventQueueCallback([key]() {
-						KeyPressedEvent* event = (KeyPressedEvent*)_malloca(sizeof(KeyPressedEvent));
+						KeyPressedEvent* event = (KeyPressedEvent*)alloca(sizeof(KeyPressedEvent));
 						event->Initialize(key);
 						return (Event*)event;
 						});
@@ -202,7 +202,7 @@ namespace Nigozi
 				case GLFW_RELEASE:
 				{
 					data.EventQueueCallback([key]() {
-						KeyReleasedEvent* event = (KeyReleasedEvent*)_malloca(sizeof(KeyReleasedEvent));
+						KeyReleasedEvent* event = (KeyReleasedEvent*)alloca(sizeof(KeyReleasedEvent));
 						event->Initialize(key);
 						return (Event*)event;
 						});
@@ -211,7 +211,7 @@ namespace Nigozi
 				case GLFW_REPEAT:
 				{
 					data.EventQueueCallback([key]() {
-						KeyPressedEvent* event = (KeyPressedEvent*)_malloca(sizeof(KeyPressedEvent));
+						KeyPressedEvent* event = (KeyPressedEvent*)alloca(sizeof(KeyPressedEvent));
 						event->Initialize(key);
 						return (Event*)event;
 						});
@@ -229,7 +229,7 @@ namespace Nigozi
 				case GLFW_PRESS:
 				{
 					data.EventQueueCallback([button]() {
-						MouseButtonPressedEvent* event = (MouseButtonPressedEvent*)_malloca(sizeof(MouseButtonPressedEvent));
+						MouseButtonPressedEvent* event = (MouseButtonPressedEvent*)alloca(sizeof(MouseButtonPressedEvent));
 						event->Initialize(button);
 						return (Event*)event;
 						});
@@ -238,7 +238,7 @@ namespace Nigozi
 				case GLFW_RELEASE:
 				{
 					data.EventQueueCallback([button]() {
-						MouseButtonReleasedEvent* event = (MouseButtonReleasedEvent*)_malloca(sizeof(MouseButtonReleasedEvent));
+						MouseButtonReleasedEvent* event = (MouseButtonReleasedEvent*)alloca(sizeof(MouseButtonReleasedEvent));
 						event->Initialize(button);
 						return (Event*)event;
 						});
@@ -252,7 +252,7 @@ namespace Nigozi
 				WindowData& data = *(WindowData*)glfwGetWindowUserPointer(window);
 
 				data.EventQueueCallback([xOffset, yOffset]() {
-					MouseScrolledEvent* event = (MouseScrolledEvent*)_malloca(sizeof(MouseScrolledEvent));
+					MouseScrolledEvent* event = (MouseScrolledEvent*)alloca(sizeof(MouseScrolledEvent));
 					event->Initialize((float)xOffset, (float)yOffset);
 					return (Event*)event;
 					});
