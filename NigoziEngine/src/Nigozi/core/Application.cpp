@@ -91,13 +91,15 @@ namespace Nigozi
             we do this so we can have different types of events
             (MousePressed, KeyPressed, etc.) that have different
             amount of data and size (12 bytes vs 16 bytes, etc.)
+            and also have them stack allocated.
             To ensure these are created on the stack and that
             they can be used as different types of events,
-            we use _malloca, configure the event and then return
+            we use _malloca, then configure the event and then return
             as Event*
         */
         while (m_eventQueue.size() > 0) {
-            Event* event = m_eventQueue.front()();
+            std::function<Event* ()>& func = m_eventQueue.front();
+            Event* event = func();
             if (event->GetEventType() == EventType::WindowClose) {
                 Window::Close();
             }
