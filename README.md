@@ -47,22 +47,17 @@ The plan for Nigozi Engine is to make a 2D framework that makes the development 
 ## Writing Code
 Once a project is set up with NigoziEngine, you can go ahead and create a main file. This is where the entry point of the application will be.
 
-Firs you will need to define "MAIN" before including Nigozi to indicate where the entry point is.
+First you will need to define "MAIN" before including Nigozi to indicate where the entry point is.
 
-There are 2 external functions:
-CreateApplicationProps() - To define the window title, size, flags (vsync on/off, fullscreen on/off)
-OnApplicationInitialized(Nigozi::Application& app) - To add some extra initialization code before running the program.
+Next, define this function to create the application
 ```cpp
 #define MAIN // sets the file as entry point
 
 #include <Nigozi.h>
 
-extern Nigozi::ApplicationProps CreateApplicationProps() {
-	return { "MyGame", 960, 540, true, false }; // returns the window parameters
-}
-
-extern void OnApplicationInitialized(Nigozi::Application& app) {
-	// Write additional initialization code here
+Nigozi::Application* CreateApplication() {
+	Application* app = new Application({ "My app", 960, 540, true, false });
+	return app;
 }
 ```
 
@@ -88,7 +83,7 @@ public:
 
 You can go ahead and implement these functions the way you want.
 
-To add layers to the application, let's go back to our main file, in the OnApplicationInitialized function, and use the application PushLayer function to add an instance of our layer to the engine.
+To add layers to the application, let's go back to our main file, in the ```CreateApplication()``` function, and use the application's ```PushLayer()``` function to add an instance of our layer to the engine.
 
 Final code should look something like this:
 ```cpp
@@ -97,12 +92,10 @@ Final code should look something like this:
 #include <Nigozi.h>
 #include "ExampleLayer.h"
 
-extern Nigozi::ApplicationProps CreateApplicationProps() {
-	return { "MyGame", 960, 540, true, false };
-}
-
-extern void OnApplicationInitialized(Nigozi::Application& app) {
-	app.PushLayer(new ExampleLayer());
+Nigozi::Application* CreateApplication() {
+	Application* app = new Application({ "My app", 960, 540, true, false });
+	app->PushLayer(new ExampleLayer());
+	return app;
 }
 ```
 
