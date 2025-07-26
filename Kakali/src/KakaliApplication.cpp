@@ -24,7 +24,6 @@ void KakaliApplication::OnRender()
     if (*(glm::vec2*)&viewportSize != *(glm::vec2*)&m_viewportSize) {
         m_viewportSize = viewportSize;
         m_viewportBuffer.Resize((uint32_t)viewportSize.x, (uint32_t)viewportSize.y);
-        m_viewportBuffer.Invalidate();
         m_cameraLayer.OnResize((uint32_t)viewportSize.x, (uint32_t)viewportSize.y);
     }
 

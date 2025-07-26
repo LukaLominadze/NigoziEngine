@@ -40,9 +40,6 @@ namespace Nigozi
 		}
 
 		void Destroy() {
-			// TODO
-			// The destroy function doesn't destroy the components attached to the entity
-			// look through this
 			p_scene->m_Registry.destroy(m_entityHandle);
 		}
 
