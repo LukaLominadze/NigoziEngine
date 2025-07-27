@@ -58,7 +58,7 @@ namespace Nigozi
 			:Event(EventType::MouseScrolled), m_offsetX(x), m_offsetY(y)
 		{}
 
-		inline void Initialize(float x, float y) { m_type = EventType::MouseScrolled; m_offsetX = x; m_offsetY = y; }
+		inline void Initialize(float x, float y) { m_type = EventType::MouseScrolled; m_Handled = false; m_offsetX = x; m_offsetY = y; }
 
 		inline const float GetOffsetX() const { return m_offsetX; }
 		inline const float GetOffsetY() const { return m_offsetY; }
