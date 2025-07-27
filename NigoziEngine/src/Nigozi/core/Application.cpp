@@ -87,14 +87,14 @@ namespace Nigozi
     {
         std::scoped_lock<std::mutex> lock(m_eventQueueMutex);
         /*
-            The events are created on the stack with alloca(), 
+            The events are created on the stack with _malloca(), 
             we do this so we can have different types of events
             (MousePressed, KeyPressed, etc.) that have different
             amount of data and size (12 bytes vs 16 bytes, etc.)
             and also have them stack allocated.
             To ensure these are created on the stack and that
             they can be used as different types of events,
-            we use alloca, then configure the event and then return
+            we use _malloca, then configure the event and then return
             as Event*
             To see how these functions are created, go to Window::CreateCallbacks()
         */
@@ -107,9 +107,10 @@ namespace Nigozi
             for (auto it = m_layerStack.end(); it != m_layerStack.begin(); )
             {
                 (*--it)->OnEvent(*event);
-                if (event->Handled)
+                if (event->m_Handled)
                     break;
             }
+            _freea(event);
             m_eventQueue.pop();
         }
     }
