@@ -155,6 +155,11 @@ namespace Nigozi
         // Because the application class handles the distribution of all occurred events
         p_window->SetEventCallback(std::bind(&Application::QueueEvent, this, std::placeholders::_1));
         p_window->SetVSync(props.VSync);
+
+        if (props.IconPath) {
+            p_window->SetIcon(props.IconPath);
+        }
+
         return p_window;
     }
 

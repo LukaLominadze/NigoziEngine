@@ -42,6 +42,15 @@ namespace Nigozi
 		return true;
 	}
 
+	void Window::SetIcon(const char* path)
+	{
+		int width, height, BPP;
+		unsigned char* buffer = stbi_load(path, &width, &height, &BPP, 4);
+		GLFWimage icon = { width, height, buffer };
+		glfwSetWindowIcon(p_window, 1, &icon);
+		stbi_image_free(buffer);
+	}
+
 	void Window::PollEvents()
 	{
 		glfwPollEvents();

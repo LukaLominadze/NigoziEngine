@@ -17,6 +17,7 @@ namespace Nigozi
 		uint32_t Width, Height;
 		bool VSync;
 		bool Fullscreen;
+		const char* IconPath;
 	};
 
 	class Application {

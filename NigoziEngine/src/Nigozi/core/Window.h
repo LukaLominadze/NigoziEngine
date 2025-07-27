@@ -24,6 +24,7 @@ namespace Nigozi
 		~Window();
 
 		bool StartUp(const char* title, uint32_t width, uint32_t height, bool fullscreen = false, bool vsync = false);
+		void SetIcon(const char* path);
 
 		inline void SetEventCallback(const std::function<void(std::function<Event* ()>&&)>& callback) {
 			m_windowData.EventQueueCallback = callback;
