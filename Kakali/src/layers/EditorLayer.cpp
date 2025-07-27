@@ -133,6 +133,6 @@ void EditorLayer::OnImGuiRender()
 
     ImGui::Begin("Viewport");
     m_viewportSize = ImGui::GetContentRegionAvail();
-    ImGui::Image((unsigned long long)(p_viewportBuffer->GetColorAttachment()), m_viewportSize, ImVec2(0, 1), ImVec2(1, 0));
+    ImGui::Image((uint64_t)(p_viewportBuffer->GetColorAttachment()), m_viewportSize, ImVec2(0, 1), ImVec2(1, 0));
     ImGui::End();
 }
