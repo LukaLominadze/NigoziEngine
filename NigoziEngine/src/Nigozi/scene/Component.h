@@ -3,6 +3,7 @@
 #include "ngpch.h"
 #include "Nigozi/glcore/Texture.h"
 #include "Nigozi/glcore/SubTexture.h"
+#include "Script.h"
 
 namespace Nigozi {
 	struct NameComponent {
@@ -10,7 +11,6 @@ namespace Nigozi {
 
 		NameComponent() = default;
 		NameComponent(const NameComponent& other) = default;
-		/// <param name="name"></param>
 		NameComponent(const std::string& name)
 			:Name(name) {
 		}
@@ -24,7 +24,6 @@ namespace Nigozi {
 
 		TagComponent() = default;
 		TagComponent(const TagComponent& other) = default;
-		/// <param name="tag"></param>
 		TagComponent(const std::string& tag)
 			:Tag(tag) {
 		}
@@ -39,15 +38,10 @@ namespace Nigozi {
 
 		TransformComponent() = default;
 		TransformComponent(const TransformComponent& other) = default;
-		/// <param name="position"></param>
-		/// <param name="scale"></param>
 		TransformComponent(glm::vec3 position, glm::vec3 scale)
 			:Position(position), Scale(1.0) { }
 	};
 
-	/// <summary>
-	/// Used to display textures on the screen
-	/// </summary>
 	struct SpriteRendererComponent {
 		std::shared_ptr<Texture> SpriteTexture;
 		std::shared_ptr<SubTexture> Sprite;
@@ -55,10 +49,6 @@ namespace Nigozi {
 
 		SpriteRendererComponent() = default;
 		SpriteRendererComponent(const SpriteRendererComponent& other) = default;
-		/// <param name="filePath"></param>
-		/// <param name="size"></param>
-		/// <param name="slotX"></param>
-		/// <param name="slotY"></param>
 		SpriteRendererComponent(const std::shared_ptr<Texture>& texture, const std::shared_ptr<SubTexture> sprite) {
 			SpriteTexture = texture;
 			Sprite = sprite;
@@ -66,5 +56,15 @@ namespace Nigozi {
 		SpriteRendererComponent(const std::string& filePath, glm::vec2 size, uint32_t slotX = 0, uint32_t slotY = 0)
 			:SpriteTexture(std::make_shared<Texture>(filePath)),
 			 Sprite(std::make_shared<SubTexture>(SpriteTexture, size, slotX, slotY)) { }
+	};
+
+	struct ScriptComponent {
+		std::shared_ptr<Script> ScriptHandle;
+
+		ScriptComponent() = default;
+		ScriptComponent(const ScriptComponent& other) = default;
+		ScriptComponent(const std::shared_ptr<Script>& script) {
+			ScriptHandle = script;
+		}
 	};
 }

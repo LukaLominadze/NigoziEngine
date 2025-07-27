@@ -16,10 +16,19 @@ namespace Nigozi
 
     void Scene::OnUpdate(float timestep)
     {
+        auto scriptView = m_Registry.view<ScriptComponent>();
+        scriptView.each([timestep](auto script) {
+            script.ScriptHandle->OnUpdate(timestep);
+            });
     }
 
     void Scene::OnRender()
     {
+        auto scriptView = m_Registry.view<ScriptComponent>();
+        scriptView.each([](auto script) {
+            script.ScriptHandle->OnRender();
+            });
+
         auto group = m_Registry.group<TransformComponent>(entt::get<SpriteRendererComponent>);
         for (auto& entity : group) {
             auto [transform, sprite] = group.get<TransformComponent, SpriteRendererComponent>(entity);
@@ -30,6 +39,10 @@ namespace Nigozi
 
     void Scene::OnImGuiRender()
     {
+        auto scriptView = m_Registry.view<ScriptComponent>();
+        scriptView.each([](auto script) {
+            script.ScriptHandle->OnImGuiRender();
+            });
     }
 
     Entity Scene::CreateEntity(const std::string& name, const std::string& tag)
