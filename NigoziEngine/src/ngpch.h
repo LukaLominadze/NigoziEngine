@@ -21,6 +21,9 @@
 #include "stb_image.h"
 #include <vector>
 
+#include <map>
+#include <unordered_map>
+
 #include <utility>
 
 #include "Nigozi/core/Log.h"

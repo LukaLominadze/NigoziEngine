@@ -25,6 +25,7 @@
 #include "Nigozi/events/MouseEvent.h"
 
 #include "Nigozi/scene/Scene.h"
+#include "Nigozi/scene/SceneManager.h"
 #include "Nigozi/scene/Entity.h"
 #include "Nigozi/scene/Component.h"
 

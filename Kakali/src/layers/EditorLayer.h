@@ -13,8 +13,9 @@ public:
 
 	inline ImVec2& GetViewportSize() { return m_viewportSize; }
 private:
+	Nigozi::SceneManager m_sceneManager;
 	Nigozi::FrameBuffer* p_viewportBuffer;
-	Nigozi::Scene m_scene;
+	std::shared_ptr<Nigozi::Scene> m_scene;
 
 	ImVec2 m_viewportSize;
 };

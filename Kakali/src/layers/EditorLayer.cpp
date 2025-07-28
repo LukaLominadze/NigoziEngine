@@ -3,22 +3,25 @@
 EditorLayer::EditorLayer(Nigozi::FrameBuffer* viewportBuffer)
 {
     p_viewportBuffer = viewportBuffer;
-    m_scene.OnAttach();
+    m_sceneManager = Nigozi::SceneManager("Sample", []() { return std::make_shared<Nigozi::Scene>(); });
+    m_sceneManager.OnAttach();
+    m_scene = m_sceneManager.GetCurrentScene();
+    m_scene->OnAttach();
 
-    Nigozi::Entity entity = m_scene.CreateEntity("Mario", "Ent");
+    Nigozi::Entity entity = m_scene->CreateEntity("Mario", "Ent");
     entity.AddComponent<Nigozi::SpriteRendererComponent>("src/Nigozi/res/textures/luigi.png", glm::vec2{ 0, 0 });
 }
 
 void EditorLayer::OnUpdate(float timestep)
 {
-    m_scene.OnUpdate(timestep);
+    m_scene->OnUpdate(timestep);
 }
 
 void EditorLayer::OnRender()
 {
     // A test square
     //Nigozi::Renderer2D::DrawQuad(glm::vec3(0, 0, -1), glm::vec2(1, 1), nullptr, glm::vec4(0.1f, 0.3f, 0.8f, 1.0f));
-    m_scene.OnRender();
+    m_scene->OnRender();
 }
 
 void EditorLayer::OnImGuiRender()
@@ -125,7 +128,7 @@ void EditorLayer::OnImGuiRender()
     ImGui::End();
 
     ImGui::Begin("Scene Hierarchy");
-    auto view = m_scene.m_Registry.view<Nigozi::NameComponent>();
+    auto view = m_scene->m_Registry.view<Nigozi::NameComponent>();
     view.each([](auto name) {
         ImGui::Button(name.Name.c_str());
         });
