@@ -43,10 +43,11 @@ namespace Nigozi
 			p_scene->m_Registry.destroy(m_entityHandle);
 		}
 
+		inline Scene* GetScene() { return p_scene; }
+
 	private:
 		entt::entity m_entityHandle;
 
-		friend class Script;
 		Scene* p_scene;
 	};
 }
