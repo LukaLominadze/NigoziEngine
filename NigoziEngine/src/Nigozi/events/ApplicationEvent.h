@@ -26,6 +26,6 @@ namespace Nigozi
 			:Event(EventType::WindowClose)
 		{}
 
-		inline void Initialize() { m_type = EventType::WindowClose; }
+		inline void Initialize() { m_type = EventType::WindowClose; m_Handled = false; }
 	};
 }

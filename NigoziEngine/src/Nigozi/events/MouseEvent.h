@@ -20,7 +20,7 @@ namespace Nigozi
 			:MouseButtonEvent(EventType::MouseButtonPressed, button)
 		{}
 
-		inline void Initialize(int button) { m_type = EventType::MouseButtonPressed; m_button = button; }
+		inline void Initialize(int button) { m_type = EventType::MouseButtonPressed; m_Handled = false; m_button = button; }
 
 		inline static EventType GetStaticType() { return EventType::MouseButtonPressed; }
 	};
@@ -31,7 +31,7 @@ namespace Nigozi
 			:MouseButtonEvent(EventType::MouseButtonReleased, button)
 		{}
 
-		inline void Initialize(int button) { m_type = EventType::MouseButtonReleased; m_button = button; }
+		inline void Initialize(int button) { m_type = EventType::MouseButtonReleased; m_Handled = false; m_button = button; }
 
 		inline static EventType GetStaticType() { return EventType::MouseButtonReleased; }
 	};
@@ -42,7 +42,7 @@ namespace Nigozi
 			:Event(EventType::MouseMoved), m_x(x), m_y(y)
 		{}
 
-		inline void Initialize(float x, float y) { m_type = EventType::MouseMoved; m_x = x; m_y = y; }
+		inline void Initialize(float x, float y) { m_type = EventType::MouseMoved; m_Handled = false; m_x = x; m_y = y; }
 
 		inline const float GetX() const { return m_x; }
 		inline const float GetY() const { return m_y; }
