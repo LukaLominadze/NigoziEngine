@@ -24,7 +24,7 @@ namespace Nigozi
 		T& GetComponent() const {
 			if (!HasComponent<T>()) {
 				LOG("Component not present!");
-				return nullptr;
+				assert(false);
 			}
 			return p_scene->m_Registry.get<T>(m_entityHandle);
 		}
