@@ -6,6 +6,7 @@
 namespace Nigozi
 {
 	class Entity;
+	class Script;
 
 	class Scene : public Layer
 	{
@@ -22,6 +23,7 @@ namespace Nigozi
 		std::vector<Entity> TryGetEntitiesByTag(const std::string& tag = "");
 
 		friend class Entity;
+		friend class Scene;
 		entt::registry m_Registry;
 	private:
 	};
