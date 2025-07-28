@@ -20,6 +20,7 @@ namespace Nigozi
 		virtual void OnImGuiRender() override;
 
 		// TODO: Add ability to have multiple scenes at once
+		// NOTE: The heap allocation of scenes is addres in Scene.h
 		void AddSceneToMap(const std::string& name, std::function<std::shared_ptr<Scene>()>&& func);
 		void LoadScene(const std::string& name);
 		void LoadCurrentScene();

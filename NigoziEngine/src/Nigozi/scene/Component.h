@@ -43,6 +43,10 @@ namespace Nigozi {
 			:Position(position), Scale(scale), Rotation(rotation) { }
 	};
 
+	/*
+		TODO: Having shared pointers everywhere kind of defeats the purpose
+		of entt. Figure out a way to have these stack allocated
+	*/ 
 	struct SpriteRendererComponent {
 		std::shared_ptr<Texture> SpriteTexture;
 		std::shared_ptr<SubTexture> Sprite;
@@ -59,6 +63,7 @@ namespace Nigozi {
 			 Sprite(std::make_shared<SubTexture>(SpriteTexture, size, slotX, slotY)) { }
 	};
 
+	// TODO: Maybe figure out a way to not have scripts heap allocated?
 	struct ScriptComponent {
 		std::shared_ptr<Script> ScriptHandle;
 

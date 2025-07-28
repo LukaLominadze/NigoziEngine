@@ -41,6 +41,12 @@ namespace Nigozi
 		static void SetClearColor(float v0, float v1, float v2, float v3);
 		static void Clear();
 
+		/*
+			TODO: Right now the textures and sub textures are heap allocated
+			and the same texture cannot be identified as equal if we
+			do not have the texture pointer stored somewhere explicitly.
+			Maybe it would be good to create my own Ref wrapper
+		*/
 		static void DrawQuad(const glm::vec3& position, const glm::vec2& scale,
 							 const std::shared_ptr<Texture>& texture, const glm::vec4& color,
 							 const glm::vec2& coordMin = glm::vec2(0),
