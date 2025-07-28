@@ -18,6 +18,12 @@ namespace Nigozi
             return state == GLFW_RELEASE;
         }
 
+        float GetAxis(int negativeKeycode, int positiveKeycode)
+        {
+            return -(static_cast<float>(IsKeyPressed(negativeKeycode))) +
+                    (static_cast<float>(IsKeyPressed(positiveKeycode)));
+        }
+
         bool IsMouseButtonPressed(int button)
         {
             int state = glfwGetMouseButton(glfwGetCurrentContext(), button);

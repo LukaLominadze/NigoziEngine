@@ -13,6 +13,7 @@ namespace Nigozi
 
 		bool IsKeyPressed(int keycode);
 		bool IsKeyReleased(int keycode);
+		float GetAxis(int negativeKeycode, int positiveKeycode);
 		bool IsMouseButtonPressed(int button);
 		std::pair<float, float> GetMousePosition();
 		inline std::pair<float, float> GetMousePositionDelta() { return MousePosDelta; }
