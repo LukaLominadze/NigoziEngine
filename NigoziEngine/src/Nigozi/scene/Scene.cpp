@@ -5,7 +5,8 @@
 
 namespace Nigozi
 {
-    Scene::Scene()
+    Scene::Scene(SceneManager* sceneManager)
+        :p_sceneManager(sceneManager)
     {
     }
 

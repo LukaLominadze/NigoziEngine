@@ -3,7 +3,7 @@
 EditorLayer::EditorLayer(Nigozi::FrameBuffer* viewportBuffer)
 {
     p_viewportBuffer = viewportBuffer;
-    m_sceneManager = Nigozi::SceneManager("Sample", []() { return std::make_shared<Nigozi::Scene>(); });
+    m_sceneManager = Nigozi::SceneManager("Sample", [this]() { return std::make_shared<Nigozi::Scene>(&m_sceneManager); });
     m_sceneManager.OnAttach();
     m_scene = m_sceneManager.GetCurrentScene();
     m_scene->OnAttach();

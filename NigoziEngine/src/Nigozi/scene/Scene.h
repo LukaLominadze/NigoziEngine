@@ -6,11 +6,12 @@
 namespace Nigozi
 {
 	class Entity;
+	class SceneManager;
 
 	class Scene : public Layer
 	{
 	public:
-		Scene();
+		Scene(SceneManager* sceneManager);
 		~Scene();
 
 		void OnUpdate(float timestep) override;
@@ -23,7 +24,10 @@ namespace Nigozi
 
 		friend class Entity;
 		entt::registry m_Registry;
+
+		inline SceneManager* GetSceneManager() { return p_sceneManager; }
 	private:
+		SceneManager* p_sceneManager;
 	};
 }
 
