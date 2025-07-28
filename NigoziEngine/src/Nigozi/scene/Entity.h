@@ -22,8 +22,8 @@ namespace Nigozi
 
 		template<typename T>
 		T& GetComponent() const {
-			if (HasComponent<T>()) {
-				LOG("Component already present!");
+			if (!HasComponent<T>()) {
+				LOG("Component not present!");
 				return nullptr;
 			}
 			return p_scene->m_Registry.get<T>(m_entityHandle);
