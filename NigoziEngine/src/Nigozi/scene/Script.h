@@ -15,11 +15,12 @@ namespace Nigozi
 		}
 
 		virtual void OnAttach() {}
+		virtual void OnEvent(Event& event) {}
 		virtual void OnUpdate(float timestep) {}
 		virtual void OnRender() {}
 		virtual void OnImGuiRender() {}
 		virtual void OnDetach() {}
-	private:
+	protected:
 		Entity m_entityHandle;
 	};
 }
