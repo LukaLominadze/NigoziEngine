@@ -33,7 +33,7 @@ namespace Nigozi
         for (auto& entity : group) {
             auto [transform, sprite] = group.get<TransformComponent, SpriteRendererComponent>(entity);
             
-            Renderer2D::DrawQuad(transform.Position, transform.Scale, sprite.Sprite, sprite.Color);
+            Renderer2D::DrawRotatedQuad(transform.Position, transform.Scale, glm::radians(transform.Rotation), sprite.Sprite, sprite.Color);
         }
     }
 

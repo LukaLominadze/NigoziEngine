@@ -9,6 +9,7 @@ EditorLayer::EditorLayer(Nigozi::FrameBuffer* viewportBuffer)
     m_scene->OnAttach();
 
     Nigozi::Entity entity = m_scene->CreateEntity("Mario", "Ent");
+    entity.GetComponent<Nigozi::TransformComponent>().Rotation = 30.0f;
     entity.AddComponent<Nigozi::SpriteRendererComponent>("src/Nigozi/res/textures/luigi.png", glm::vec2{ 0, 0 });
 }
 

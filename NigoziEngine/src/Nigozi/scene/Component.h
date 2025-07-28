@@ -35,11 +35,12 @@ namespace Nigozi {
 	struct TransformComponent {
 		glm::vec3 Position{ 1.0f };
 		glm::vec3 Scale{ 1.0f };
+		float Rotation = 0.0f;
 
 		TransformComponent() = default;
 		TransformComponent(const TransformComponent& other) = default;
-		TransformComponent(glm::vec3 position, glm::vec3 scale)
-			:Position(position), Scale(1.0) { }
+		TransformComponent(glm::vec3 position, glm::vec3 scale=glm::vec3(1.0f), float rotation=0.0f)
+			:Position(position), Scale(scale), Rotation(rotation) { }
 	};
 
 	struct SpriteRendererComponent {
