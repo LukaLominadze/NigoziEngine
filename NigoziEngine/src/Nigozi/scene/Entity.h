@@ -46,6 +46,7 @@ namespace Nigozi
 	private:
 		entt::entity m_entityHandle;
 
+		friend class Script;
 		Scene* p_scene;
 	};
 }
