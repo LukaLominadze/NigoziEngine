@@ -8,6 +8,11 @@ namespace Nigozi
 	class Entity;
 	class SceneManager;
 
+	/*
+		TODO: There probably should be different versions of a scene,
+		for runtime and for the editor, since components behave differently
+		in each
+	*/
 	class Scene : public Layer
 	{
 	public:
@@ -20,6 +25,7 @@ namespace Nigozi
 			data to that scene. This way we also wouldn't have to create
 			inherited scene classes to have different scenes
 		*/
+		void OnEvent(Event& event) override;
 		void OnUpdate(float timestep) override;
 		void OnRender() override;
 		void OnImGuiRender() override;
