@@ -13,8 +13,8 @@ namespace Nigozi
 
 		inline const std::shared_ptr<Texture>& GetTexture() const { return m_texture; }
 
-		inline uint32_t& GetSlotX() { return m_slotX; }
-		inline uint32_t& GetSlotXY() { return m_slotY; }
+		inline uint32_t GetSlotX() { return m_slotX; }
+		inline uint32_t GetSlotY() { return m_slotY; }
 		inline glm::vec2& GetTextureSize() { return m_textureSize; }
 		inline const glm::vec2& GetCoordMin() { return m_coordMin; }
 		inline const glm::vec2& GetCoordMax() { return m_coordMax; }
