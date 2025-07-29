@@ -19,5 +19,5 @@ void Nigozi::SubTexture::SetSubTexture(glm::vec2 size, uint32_t slotX = 0, uint3
 void Nigozi::SubTexture::SetSlot(uint32_t slotX, uint32_t slotY)
 {
 	m_coordMin = { slotX * m_size.x / m_textureSize.x, slotY * m_size.y / m_textureSize.y };
-	m_coordMax = { (slotX + 1) * m_size.y / m_textureSize.x, (slotY + 1) * m_size.y / m_textureSize.y };
+	m_coordMax = { (slotX + 1) * m_size.x / m_textureSize.x, (slotY + 1) * m_size.y / m_textureSize.y };
 }

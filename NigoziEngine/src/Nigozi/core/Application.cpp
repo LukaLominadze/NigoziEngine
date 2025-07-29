@@ -85,7 +85,6 @@ namespace Nigozi
 
     void Application::OnEvent()
     {
-        std::scoped_lock<std::mutex> lock(m_eventQueueMutex);
         /*
             The events are created on the stack with _malloca(), 
             we do this so we can have different types of events
@@ -98,6 +97,7 @@ namespace Nigozi
             as Event*
             To see how these functions are created, go to Window::CreateCallbacks()
         */
+        std::scoped_lock<std::mutex> lock(m_eventQueueMutex);
         while (m_eventQueue.size() > 0) {
             std::function<Event* ()>& func = m_eventQueue.front();
             Event* event = func();
