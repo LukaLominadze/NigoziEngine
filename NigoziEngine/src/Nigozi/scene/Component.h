@@ -33,13 +33,13 @@ namespace Nigozi {
 	};
 
 	struct TransformComponent {
-		glm::vec2 Position{ 1.0f };
-		glm::vec2 Scale{ 1.0f };
+		glm::vec2 Position{ 0.0f, 0.0f };
+		glm::vec2 Scale{ 1.0f, 1.0f };
 		float Rotation = 0.0f;
 
 		TransformComponent() = default;
 		TransformComponent(const TransformComponent& other) = default;
-		TransformComponent(glm::vec2 position, glm::vec2 scale=glm::vec3(1.0f), float rotation=0.0f)
+		TransformComponent(glm::vec2 position = glm::vec2(0.0f, 0.0f), glm::vec2 scale = glm::vec2(1.0f), float rotation = 0.0f)
 			:Position(position), Scale(scale), Rotation(rotation) { }
 	};
 
