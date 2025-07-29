@@ -12,7 +12,7 @@ namespace Nigozi
 	{
 		static constexpr uint32_t MaxQuads = 10'000;
 		static constexpr uint32_t MaxVertices = MaxQuads * 4;
-		static constexpr uint32_t VertexElementCount = 10;
+		static constexpr uint32_t VertexElementCount = 9;
 		static constexpr uint32_t MaxVerticesElements = MaxVertices * VertexElementCount;
 		static constexpr uint32_t MaxIndicies = MaxQuads * 6;
 
@@ -47,18 +47,18 @@ namespace Nigozi
 			do not have the texture pointer stored somewhere explicitly.
 			Maybe it would be good to create my own Ref wrapper
 		*/
-		static void DrawQuad(const glm::vec3& position, const glm::vec2& scale,
+		static void DrawQuad(const glm::vec2& position, const glm::vec2& scale,
 							 const std::shared_ptr<Texture>& texture, const glm::vec4& color,
 							 const glm::vec2& coordMin = glm::vec2(0),
 							 const glm::vec2& coordMax = glm::vec2(1));
-		static void DrawQuad(const glm::vec3& position, const glm::vec2& scale,
+		static void DrawQuad(const glm::vec2& position, const glm::vec2& scale,
 							 std::shared_ptr<SubTexture>& texture, const glm::vec4& color);
-		static void DrawRotatedQuad(const glm::vec3& position, const glm::vec2& scale,
+		static void DrawRotatedQuad(const glm::vec2& position, const glm::vec2& scale,
 									float rotation, const std::shared_ptr<Texture>& texture,
 									const glm::vec4& color,
 									const glm::vec2& coordMin = glm::vec2(0),
 									const glm::vec2 & coordMax = glm::vec2(1));
-		static void DrawRotatedQuad(const glm::vec3& position, const glm::vec2& scale,
+		static void DrawRotatedQuad(const glm::vec2& position, const glm::vec2& scale,
 									float rotation, std::shared_ptr<SubTexture>& texture,
 									const glm::vec4& color);
 		static void BeginScene();

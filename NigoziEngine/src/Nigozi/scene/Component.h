@@ -34,12 +34,12 @@ namespace Nigozi {
 
 	struct TransformComponent {
 		glm::vec3 Position{ 1.0f };
-		glm::vec3 Scale{ 1.0f };
+		glm::vec2 Scale{ 1.0f };
 		float Rotation = 0.0f;
 
 		TransformComponent() = default;
 		TransformComponent(const TransformComponent& other) = default;
-		TransformComponent(glm::vec3 position, glm::vec3 scale=glm::vec3(1.0f), float rotation=0.0f)
+		TransformComponent(glm::vec3 position, glm::vec2 scale=glm::vec3(1.0f), float rotation=0.0f)
 			:Position(position), Scale(scale), Rotation(rotation) { }
 	};
 
@@ -51,16 +51,19 @@ namespace Nigozi {
 		std::shared_ptr<Texture> SpriteTexture;
 		std::shared_ptr<SubTexture> Sprite;
 		glm::vec4 Color{ 1.0f };
+		int8_t ZOrder = 0;
 
 		SpriteRendererComponent() = default;
 		SpriteRendererComponent(const SpriteRendererComponent& other) = default;
-		SpriteRendererComponent(const std::shared_ptr<Texture>& texture, const std::shared_ptr<SubTexture> sprite) {
+		SpriteRendererComponent(const std::shared_ptr<Texture>& texture, const std::shared_ptr<SubTexture> sprite, int8_t zOrder = 0) {
 			SpriteTexture = texture;
 			Sprite = sprite;
+			ZOrder = zOrder;
 		}
-		SpriteRendererComponent(const std::string& filePath, glm::vec2 size, uint32_t slotX = 0, uint32_t slotY = 0)
+		SpriteRendererComponent(const std::string& filePath, glm::vec2 size, int8_t zOrder = 0, uint32_t slotX = 0, uint32_t slotY = 0)
 			:SpriteTexture(std::make_shared<Texture>(filePath)),
-			 Sprite(std::make_shared<SubTexture>(SpriteTexture, size, slotX, slotY)) { }
+			 Sprite(std::make_shared<SubTexture>(SpriteTexture, size, slotX, slotY)),
+			 ZOrder(zOrder) { }
 	};
 
 	// TODO: Maybe figure out a way to not have scripts heap allocated?

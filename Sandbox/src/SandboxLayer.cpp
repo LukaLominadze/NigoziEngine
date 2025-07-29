@@ -73,14 +73,14 @@ void SandboxLayer::OnRender()
 
 	for (float i = 1 / 200.0f; i < 1; i += increment) {
 		for (float j = 1 / 200.0f; j < 1; j += increment) {
-			Nigozi::Renderer2D::DrawQuad({ i, j, -1.0f }, { increment, increment }, nullptr, color);
+			Nigozi::Renderer2D::DrawQuad({ i, j }, { increment, increment }, nullptr, color);
 			color.z -= (increment * increment);
 			color.y = i * j;
 		}
 		color.x += increment;
 	}
 	Nigozi::Renderer2D::DrawQuad(m_luigiPosition, { 0.2f, 0.2f }, m_luigiTexture, { 1.0f, 1.0f, 1.0f, 1.0f });
-	Nigozi::Renderer2D::DrawQuad({ 1.0f, 1.0f, 0.0f }, { 0.2f, 0.2f }, m_playerTexture, glm::vec4(1));
+	Nigozi::Renderer2D::DrawQuad({ 1.0f, 1.0f }, { 0.2f, 0.2f }, m_playerTexture, glm::vec4(1));
 	m_particleSystem.OnRender();
 }
 

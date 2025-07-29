@@ -59,7 +59,7 @@ namespace Nigozi
             if (!particle.Active) {
                 continue;
             }
-            Renderer2D::DrawRotatedQuad({ particle.Position.x, particle.Position.y, 0.0f },
+            Renderer2D::DrawRotatedQuad({ particle.Position.x, particle.Position.y },
                                         { particle.Size, particle.Size },
                                         particle.Rotation, nullptr, particle.Color);
         }
