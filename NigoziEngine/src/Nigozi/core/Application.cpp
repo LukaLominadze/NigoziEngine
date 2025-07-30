@@ -88,10 +88,10 @@ namespace Nigozi
     void Application::OnEvent()
     {
         /*
-            The event pointer will that is passed
+            The event pointer that is passed
             in the queued functions will initialize
             the buffer as the queued event
-            fore ex.: WindowResizeEvent, KeyEvent, etc.
+            for ex.: WindowResizeEvent, KeyEvent, etc.
         */
         std::scoped_lock<std::mutex> lock(m_eventQueueMutex);
         while (m_eventQueue.size() > 0) {

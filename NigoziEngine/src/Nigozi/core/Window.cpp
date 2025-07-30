@@ -159,13 +159,9 @@ namespace Nigozi
 		return true;
 	}
 
-	/*
-		To understand why we use _malloca to create and add events
-		to the event queue, go to Application::OnEvent()
-	*/
+	// Get and send the events to application
 	void Window::CreateCallbacks()
 	{
-		// Get and send the events to application
 		glfwSetWindowCloseCallback(p_window, [](GLFWwindow* window)
 			{
 				WindowData& data = *(WindowData*)glfwGetWindowUserPointer(window);
