@@ -22,6 +22,8 @@ namespace Nigozi
             return;
         }
 
+        p_eventBufferPointer = (Event*)(m_eventBuffer);
+
         m_initialized = true;
         LOG("\nWelcome To NigoziEngine!");
     }
@@ -78,7 +80,7 @@ namespace Nigozi
         m_layerStack.PopOverlay(layer);
     }
 
-    void Application::QueueEvent(std::function<Event* ()>&& func)
+    void Application::QueueEvent(std::function<void(Event*)>&& func)
     {
         m_eventQueue.push(func);
     }
@@ -86,31 +88,24 @@ namespace Nigozi
     void Application::OnEvent()
     {
         /*
-            The events are created on the stack with _malloca(), 
-            we do this so we can have different types of events
-            (MousePressed, KeyPressed, etc.) that have different
-            amount of data and size (12 bytes vs 16 bytes, etc.)
-            and also have them stack allocated.
-            To ensure these are created on the stack and that
-            they can be used as different types of events,
-            we use _malloca, then configure the event and then return
-            as Event*
-            To see how these functions are created, go to Window::CreateCallbacks()
+            The event pointer will that is passed
+            in the queued functions will initialize
+            the buffer as the queued event
+            fore ex.: WindowResizeEvent, KeyEvent, etc.
         */
         std::scoped_lock<std::mutex> lock(m_eventQueueMutex);
         while (m_eventQueue.size() > 0) {
-            std::function<Event* ()>& func = m_eventQueue.front();
-            Event* event = func();
-            if (event->GetEventType() == EventType::WindowClose) {
+            std::function<void(Event*)>& func = m_eventQueue.front();
+            func(p_eventBufferPointer);
+            if (p_eventBufferPointer->GetEventType() == EventType::WindowClose) {
                 Window::Close();
             }
             for (auto it = m_layerStack.end(); it != m_layerStack.begin(); )
             {
-                (*--it)->OnEvent(*event);
-                if (event->m_Handled)
+                (*--it)->OnEvent(*p_eventBufferPointer);
+                if (p_eventBufferPointer->m_Handled)
                     break;
             }
-            _freea(event);
             m_eventQueue.pop();
         }
     }

@@ -35,7 +35,7 @@ namespace Nigozi
 		void PopLayer(Layer* layer);
 		void PopOverlay(Layer* layer);
 	protected:
-		void QueueEvent(std::function<Event*()>&& func);
+		void QueueEvent(std::function<void(Event*)>&& func);
 		virtual void OnEvent();
 		virtual void OnUpdate(float timestep);
 		virtual void OnRender();
@@ -50,7 +50,16 @@ namespace Nigozi
 		ImGuiLayer m_imGuiLayer;
 	private:
 		std::mutex m_eventQueueMutex;
-		std::queue<std::function<Event* ()>> m_eventQueue;
+		std::queue<std::function<void(Event*)>> m_eventQueue;
 		bool m_initialized = false;
+
+		/*
+			All events will be loaded in the same buffer
+			on "OnEvent()" to reserve memory and keep it
+			in the same place in the duration of the
+			application
+		*/
+		char m_eventBuffer[64];
+		Event* p_eventBufferPointer;
 	};
 }

@@ -14,7 +14,7 @@ namespace Nigozi
 		bool Fullscreen, VSync;
 		bool ShouldClose;
 
-		std::function<void(std::function<Event* ()>&&)> EventQueueCallback;
+		std::function<void(std::function<void(Event*)>&&)> EventQueueCallback;
 	};
 
 	class Window
@@ -26,7 +26,7 @@ namespace Nigozi
 		bool StartUp(const char* title, uint32_t width, uint32_t height, bool fullscreen = false, bool vsync = false);
 		void SetIcon(const char* path);
 
-		inline void SetEventCallback(const std::function<void(std::function<Event* ()>&&)>& callback) {
+		inline void SetEventCallback(const std::function<void(std::function<void(Event*)>&&)>& callback) {
 			m_windowData.EventQueueCallback = callback;
 		}
 

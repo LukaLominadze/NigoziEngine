@@ -169,10 +169,8 @@ namespace Nigozi
 		glfwSetWindowCloseCallback(p_window, [](GLFWwindow* window)
 			{
 				WindowData& data = *(WindowData*)glfwGetWindowUserPointer(window);
-				data.EventQueueCallback([](){
-					WindowClosedEvent* event = (WindowClosedEvent*)_malloca(sizeof(WindowClosedEvent));
-					event->Initialize();
-					return (Event*)event;
+				data.EventQueueCallback([](Event* ref){
+					((WindowClosedEvent*)(ref))->Initialize();
 				});
 			});
 
@@ -186,10 +184,8 @@ namespace Nigozi
 					data.WindowedHeight = height;
 				}
 				glViewport(0, 0, data.Width, data.Height);
-				data.EventQueueCallback([width, height]() {
-					WindowResizedEvent* event = (WindowResizedEvent*)_malloca(sizeof(WindowResizedEvent));
-					event->Initialize(width, height);
-					return (Event*)event;
+				data.EventQueueCallback([width, height](Event* ref) {
+					((WindowResizedEvent*)(ref))->Initialize(width, height);
 					});
 			});
 
@@ -201,28 +197,22 @@ namespace Nigozi
 				{
 				case GLFW_PRESS:
 				{
-					data.EventQueueCallback([key]() {
-						KeyPressedEvent* event = (KeyPressedEvent*)_malloca(sizeof(KeyPressedEvent));
-						event->Initialize(key);
-						return (Event*)event;
+					data.EventQueueCallback([key](Event* ref) {
+						((KeyPressedEvent*)(ref))->Initialize(key);
 						});
 					break;
 				}
 				case GLFW_RELEASE:
 				{
-					data.EventQueueCallback([key]() {
-						KeyReleasedEvent* event = (KeyReleasedEvent*)_malloca(sizeof(KeyReleasedEvent));
-						event->Initialize(key);
-						return (Event*)event;
+					data.EventQueueCallback([key](Event* ref) {
+						((KeyReleasedEvent*)(ref))->Initialize(key);
 						});
 					break;
 				}
 				case GLFW_REPEAT:
 				{
-					data.EventQueueCallback([key]() {
-						KeyPressedEvent* event = (KeyPressedEvent*)_malloca(sizeof(KeyPressedEvent));
-						event->Initialize(key);
-						return (Event*)event;
+					data.EventQueueCallback([key](Event* ref) {
+						((KeyPressedEvent*)(ref))->Initialize(key);
 						});
 					break;
 				}
@@ -237,19 +227,15 @@ namespace Nigozi
 				{
 				case GLFW_PRESS:
 				{
-					data.EventQueueCallback([button]() {
-						MouseButtonPressedEvent* event = (MouseButtonPressedEvent*)_malloca(sizeof(MouseButtonPressedEvent));
-						event->Initialize(button);
-						return (Event*)event;
+					data.EventQueueCallback([button](Event* ref) {
+						((MouseButtonPressedEvent*)(ref))->Initialize(button);
 						});
 					break;
 				}
 				case GLFW_RELEASE:
 				{
-					data.EventQueueCallback([button]() {
-						MouseButtonReleasedEvent* event = (MouseButtonReleasedEvent*)_malloca(sizeof(MouseButtonReleasedEvent));
-						event->Initialize(button);
-						return (Event*)event;
+					data.EventQueueCallback([button](Event* ref) {
+						((MouseButtonReleasedEvent*)(ref))->Initialize(button);
 						});
 					break;
 				}
@@ -260,10 +246,8 @@ namespace Nigozi
 			{
 				WindowData& data = *(WindowData*)glfwGetWindowUserPointer(window);
 
-				data.EventQueueCallback([xOffset, yOffset]() {
-					MouseScrolledEvent* event = (MouseScrolledEvent*)_malloca(sizeof(MouseScrolledEvent));
-					event->Initialize((float)xOffset, (float)yOffset);
-					return (Event*)event;
+				data.EventQueueCallback([xOffset, yOffset](Event* ref) {
+					((MouseScrolledEvent*)(ref))->Initialize((float)xOffset, (float)yOffset);
 					});
 			});
 	}
