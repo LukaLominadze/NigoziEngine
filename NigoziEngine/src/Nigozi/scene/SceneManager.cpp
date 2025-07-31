@@ -22,10 +22,10 @@ namespace Nigozi
 
 	void SceneManager::OnEvent(Event& event)
 	{
+		m_currentScene.second->OnEvent(event);
 		if (m_sceneLoadEvent.Queued) {
 			m_sceneLoadEvent.Func();
 		}
-		m_currentScene.second->OnEvent(event);
 	}
 
 	void SceneManager::OnUpdate(float timestep)
