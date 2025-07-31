@@ -51,8 +51,11 @@ project "Sandbox"
 
 	postbuildcommands {
 		"{COPYDIR} %{wks.location}/NigoziEngine/src/Nigozi/res %{prj.location}/src/Nigozi/res",
-		"{COPYDIR} %{prj.location}/src/Nigozi %{wks.location}/bin/" ..outputdir.. "/%{prj.name}/src/Nigozi/",
-		"{COPYDIR} %{prj.location}/src/res %{wks.location}/bin/" ..outputdir.. "/%{prj.name}/src/" 
+		"{MKDIR} %{wks.location}/bin/" .. outputdir .. "/%{prj.name}/src/Nigozi",
+		"{COPYDIR} %{prj.location}/src/Nigozi %{wks.location}/bin/" ..outputdir.. "/%{prj.name}/src",
+		"{MKDIR} %{wks.location}/bin/" .. outputdir .. "/%{prj.name}/src/res",
+		"{COPYDIR} %{prj.location}/src/res %{wks.location}/bin/" ..outputdir.. "/%{prj.name}/src",
+		"{MKDIR} %{wks.location}/bin/" .. outputdir .. "/%{prj.name}/src", 
 	}
 
 	filter "system:windows"
@@ -62,6 +65,10 @@ project "Sandbox"
 		defines { "NG_PLATFORM_WINDOWS" }
 		
 		links { "opengl32.lib" }
+
+		filter "configurations:Distribution"
+
+			kind "WindowedApp"
 	
 	filter "system:linux"
 		cppdialect "C++20"
@@ -72,12 +79,6 @@ project "Sandbox"
 		links { "GL",
 			"pthread",
         		"dl" }
-		
-		postbuildcommands {
-			"cp -r %{wks.location}/NigoziEngine/src/Nigozi/res %{prj.location}/src/Nigozi/res",
-			"cp -r %{prj.location}/src/Nigozi %{wks.location}/bin/" ..outputdir.. "/%{prj.name}/src/Nigozi/",
-			"cp -r %{prj.location}/src/res %{wks.location}/bin/" ..outputdir.. "/%{prj.name}/src/" 
-		}
 
 
 	filter "configurations:Debug"
@@ -95,8 +96,6 @@ project "Sandbox"
 		optimize "on"
 
 	filter "configurations:Distribution"
-		
-		kind "WindowedApp"
 
 		defines { "DISTRIBUTION" }
 	
