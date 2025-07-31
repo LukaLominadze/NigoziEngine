@@ -8,7 +8,7 @@ project "NigoziEngine"
 	targetdir ("%{wks.location}/bin/" ..outputdir.. "/%{prj.name}")	
 	objdir ("%{wks.location}/bin-int/" ..outputdir.. "/%{prj.name}")
 
-	defines { "NG_PLATFORM_WINDOWS", "GLEW_STATIC" }
+	defines { "GLEW_STATIC" }
 	
 	files {
 		"src/**.h",
@@ -27,22 +27,22 @@ project "NigoziEngine"
 
 	includedirs { "src",
 				  "src/Nigozi",
-				  "%{wks.location}/dependencies/glew/include",
-				  "%{wks.location}/dependencies/glfw/include",
-				  "%{wks.location}/dependencies/stb",
-				  "%{wks.location}/dependencies/imgui",
-				  "%{wks.location}/dependencies/glm" }
+				  "%{prj.location}/../dependencies/glew/include",
+				  "%{prj.location}/../dependencies/glfw/include",
+				  "%{prj.location}/../dependencies/stb",
+				  "%{prj.location}/../dependencies/imgui",
+				  "%{prj.location}/../dependencies/glm" }
 
-	libdirs { "%{wks.location}/dependencies/libs/GLFW",
-			  "%{wks.location}/dependencies/glew/lib/Release/x64",
-			  "%{wks.location}/dependencies/libs/STB",
-			  "%{wks.location}/dependencies/libs/ImGui" }
-
-	links { "glew32s.lib",
-			"opengl32.lib",
-			"GLFW.lib",
-			"STB.lib",
-			"ImGui.lib" }
+	libdirs { "%{prj.location}/../dependencies/libs/GLFW",
+			  "%{prj.location}/../dependencies/glew/lib/Release/x64",
+			  "%{prj.location}/../dependencies/libs/STB",
+			  "%{prj.location}/../dependencies/libs/ImGui",
+			  "%{prj.location}/../dependencies/glew/lib" }
+			  
+	links { "GLEW",
+		"GLFW",
+		"STB",
+		"ImGui" }
 
 	configurations {
 		"Debug",
@@ -52,6 +52,27 @@ project "NigoziEngine"
 
 	filter "system:windows"
 		systemversion "latest"
+		
+		defines { "NG_PLATFORM_WINDOWS" }
+		
+		links { "GLEW",
+			"opengl32.lib",
+			"GLFW",
+			"STB",
+			"ImGui" }
+	
+	filter "system:linux"
+		systemversion "latest"
+		
+		defines { "GLFW_USE_X11", "_GLFW_X11", "NG_PLATFORM_LINUX" }
+		
+		links { "GL",
+			"GLEW",
+			"GLFW",
+			"STB",
+			"ImGui",
+			"pthread",
+        		"dl" }
 
 	filter "configurations:Debug"
 		

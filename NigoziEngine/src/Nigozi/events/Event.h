@@ -15,11 +15,11 @@ namespace Nigozi
 			:m_type(type)
 		{}
 
-		bool Handled = false;
+		bool m_Handled = false;
 
 		inline EventType GetEventType() const { return m_type; }
 
-	private:
+	protected:
 		EventType m_type;
 	};
 
@@ -33,7 +33,7 @@ namespace Nigozi
 		template<typename T, typename F>
 		void Dispatch(const F& function) {
 			if (m_event.GetEventType() == T::GetStaticType()) {
-				m_event.Handled = function(static_cast<T&>(m_event));
+				m_event.m_Handled = function(static_cast<T&>(m_event));
 			}
 		}
 
