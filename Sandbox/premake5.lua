@@ -52,9 +52,9 @@ project "Sandbox"
 	postbuildcommands {
 		"{COPYDIR} %{wks.location}/NigoziEngine/src/Nigozi/res %{prj.location}/src/Nigozi/res",
 		"{MKDIR} %{wks.location}/bin/" .. outputdir .. "/%{prj.name}/src/Nigozi",
-		"{COPYDIR} %{prj.location}/src/Nigozi %{wks.location}/bin/" ..outputdir.. "/%{prj.name}/src",
+		"{COPYDIR} %{prj.location}/src/Nigozi %{wks.location}/bin/" ..outputdir.. "/%{prj.name}/src/Nigozi",
 		"{MKDIR} %{wks.location}/bin/" .. outputdir .. "/%{prj.name}/src/res",
-		"{COPYDIR} %{prj.location}/src/res %{wks.location}/bin/" ..outputdir.. "/%{prj.name}/src",
+		"{COPYDIR} %{prj.location}/src/res %{wks.location}/bin/" ..outputdir.. "/%{prj.name}/src/res",
 		"{MKDIR} %{wks.location}/bin/" .. outputdir .. "/%{prj.name}/src", 
 	}
 
