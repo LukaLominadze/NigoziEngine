@@ -64,7 +64,7 @@ project "NigoziEngine"
 	filter "system:linux"
 		systemversion "latest"
 		
-		defines { "GLFW_USE_X11", "NG_PLATFORM_LINUX" }
+		defines { "GLFW_USE_X11", "_GLFW_X11", "NG_PLATFORM_LINUX" }
 		
 		links { "GL",
 			"GLEW",
