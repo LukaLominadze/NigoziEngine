@@ -25,6 +25,7 @@ namespace Nigozi
 		m_currentScene.second->OnEvent(event);
 		if (m_sceneLoadEvent.Queued) {
 			m_sceneLoadEvent.Func();
+			m_sceneLoadEvent.Queued = false;
 		}
 	}
 
