@@ -50,7 +50,9 @@ project "Kakali"
 	}
 
 	postbuildcommands {
-		"{COPYDIR} %{wks.location}/NigoziEngine/src/Nigozi/res %{prj.location}/src/Nigozi/res"
+		"{COPYDIR} %{wks.location}/NigoziEngine/src/Nigozi/res %{prj.location}/src/Nigozi/res",
+		"{COPYDIR} %{prj.location}/src/Nigozi " ..outputdir.. "src/Nigozi/",
+		"{COPYDIR} %{prj.location}/kakali-small.png " ..outputdir.. ""
 	}
 
 	filter "system:windows"
@@ -65,7 +67,7 @@ project "Kakali"
 		cppdialect "C++20"
 		systemversion "latest"
 		
-		defines { "GLFW_USE_X11", "NG_PLATFORM_LINUX" }
+		defines { "GLFW_USE_X11", "_GLFW_X11", "NG_PLATFORM_LINUX" }
 		
 		links { "GL",
 			"pthread",
