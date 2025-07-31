@@ -23,14 +23,14 @@ namespace Nigozi
 	void SceneManager::OnEvent(Event& event)
 	{
 		m_currentScene.second->OnEvent(event);
-		if (m_sceneLoadEvent.Queued) {
-			m_sceneLoadEvent.Func();
-			m_sceneLoadEvent.Queued = false;
-		}
 	}
 
 	void SceneManager::OnUpdate(float timestep)
 	{
+		if (m_sceneLoadEvent.Queued) {
+			m_sceneLoadEvent.Func();
+			m_sceneLoadEvent.Queued = false;
+		}
 		m_currentScene.second->OnUpdate(timestep);
 	}
 
