@@ -51,8 +51,9 @@ project "Kakali"
 
 	postbuildcommands {
 		"{COPYDIR} %{wks.location}/NigoziEngine/src/Nigozi/res %{prj.location}/src/Nigozi/res",
-		"{COPYDIR} %{prj.location}/src/Nigozi %{wks.location}/bin/" ..outputdir.. "/%{prj.name}/src/Nigozi/",
-		"{COPYDIR} %{prj.location}/src/res %{wks.location}/bin/" ..outputdir.. "/%{prj.name}/src/" 
+		"{MKDIR} %{wks.location}/bin/" .. outputdir .. "/%{prj.name}/src/Nigozi",
+		"{COPYDIR} %{prj.location}/src/Nigozi %{wks.location}/bin/" ..outputdir.. "/%{prj.name}/src/",
+		"{COPYDIR} %{prj.location}/kakali-small.png %{wks.location}/bin/" ..outputdir.. "/%{prj.name}/" 
 	}
 
 	filter "system:windows"
@@ -62,6 +63,10 @@ project "Kakali"
 		defines { "NG_PLATFORM_WINDOWS" }
 		
 		links { "opengl32.lib" }
+
+		filter "configurations:Distribution"
+		
+			kind "WindowedApp"
 	
 	filter "system:linux"
 		cppdialect "C++20"
@@ -88,8 +93,6 @@ project "Kakali"
 		optimize "on"
 
 	filter "configurations:Distribution"
-		
-		kind "WindowedApp"
 
 		defines { "DISTRIBUTION" }
 	
