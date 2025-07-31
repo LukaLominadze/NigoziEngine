@@ -51,8 +51,8 @@ project "Sandbox"
 
 	postbuildcommands {
 		"{COPYDIR} %{wks.location}/NigoziEngine/src/Nigozi/res %{prj.location}/src/Nigozi/res",
-		"{COPYDIR} %{prj.location}/src/Nigozi " ..outputdir.. "src/Nigozi/",
-		"{COPYDIR} %{prj.location}/src/res " ..outputdir.. "src/" 
+		"{COPYDIR} %{prj.location}/src/Nigozi %{wks.location}/bin/" ..outputdir.. "/%{prj.name}/src/Nigozi/",
+		"{COPYDIR} %{prj.location}/src/res %{wks.location}/bin/" ..outputdir.. "/%{prj.name}/src/" 
 	}
 
 	filter "system:windows"
@@ -72,6 +72,13 @@ project "Sandbox"
 		links { "GL",
 			"pthread",
         		"dl" }
+		
+		postbuildcommands {
+			"cp -r %{wks.location}/NigoziEngine/src/Nigozi/res %{prj.location}/src/Nigozi/res",
+			"cp -r %{prj.location}/src/Nigozi %{wks.location}/bin/" ..outputdir.. "/%{prj.name}/src/Nigozi/",
+			"cp -r %{prj.location}/src/res %{wks.location}/bin/" ..outputdir.. "/%{prj.name}/src/" 
+		}
+
 
 	filter "configurations:Debug"
 		

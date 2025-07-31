@@ -51,8 +51,8 @@ project "Kakali"
 
 	postbuildcommands {
 		"{COPYDIR} %{wks.location}/NigoziEngine/src/Nigozi/res %{prj.location}/src/Nigozi/res",
-		"{COPYDIR} %{prj.location}/src/Nigozi " ..outputdir.. "src/Nigozi/",
-		"{COPYDIR} %{prj.location}/kakali-small.png " ..outputdir.. ""
+		"{COPYDIR} %{prj.location}/src/Nigozi %{wks.location}/bin/" ..outputdir.. "/%{prj.name}/src/Nigozi/",
+		"{COPYDIR} %{prj.location}/src/res %{wks.location}/bin/" ..outputdir.. "/%{prj.name}/src/" 
 	}
 
 	filter "system:windows"
