@@ -12,7 +12,7 @@ namespace Nigozi
 
 	PerspectiveCameraController::~PerspectiveCameraController()
 	{
-		glfwSetInputMode(Global::windowData.NativeWindow, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
+		glfwSetInputMode(glfwGetCurrentContext(), GLFW_CURSOR, GLFW_CURSOR_NORMAL);
 	}
 
 	void PerspectiveCameraController::OnEvent(Event& event)
@@ -92,7 +92,7 @@ namespace Nigozi
 	bool PerspectiveCameraController::OnMouseButtonPressed(MouseButtonPressedEvent& e)
 	{
 		if (e.GetButton() == GLFW_MOUSE_BUTTON_1) {
-			glfwSetInputMode(Global::windowData.NativeWindow, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+			glfwSetInputMode(glfwGetCurrentContext(), GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 			m_mouseLocked = true;
 		}
 		return false;
@@ -101,7 +101,7 @@ namespace Nigozi
 	bool PerspectiveCameraController::OnEscPressed(KeyPressedEvent& e)
 	{
 		if (e.GetKeyCode() == GLFW_KEY_ESCAPE) {
-			glfwSetInputMode(Global::windowData.NativeWindow, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
+			glfwSetInputMode(glfwGetCurrentContext(), GLFW_CURSOR, GLFW_CURSOR_NORMAL);
 			m_mouseLocked = false;
 		}
 		return false;

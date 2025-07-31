@@ -24,7 +24,7 @@ namespace Nigozi
 	void OrthographicCamera::SetProjection(float left, float right, float bottom, float top)
 	{
 		m_projectionMatrix = glm::ortho(left, right, bottom, top, -1.0f, 1.0f);
-		m_viewProjectionMatrix = m_projectionMatrix * m_viewMatrix;
+		m_viewProjectionMatrix = m_viewMatrix * m_projectionMatrix;
 
 		m_zoom = top;
 		m_aspect = right / top;
@@ -50,10 +50,10 @@ namespace Nigozi
 	const glm::vec2 OrthographicCamera::GetMousePositionWorldSpace() const
 	{
 		std::pair<float, float> mousePosition = Input::GetMousePosition();
-		mousePosition.second = Global::windowData.Height - mousePosition.second;
+		mousePosition.second = Window::GetGlobalWindowData().Height - mousePosition.second;
 		float normalWidth = m_aspect;
-		float transformedPositionX = (mousePosition.first / Global::windowData.Width) * normalWidth - 0.5f * normalWidth;
-		float transformedPositionY = mousePosition.second / Global::windowData.Height - 0.5f;
+		float transformedPositionX = (mousePosition.first / Window::GetGlobalWindowData().Width) * normalWidth - 0.5f * normalWidth;
+		float transformedPositionY = mousePosition.second / Window::GetGlobalWindowData().Height - 0.5f;
 		if (m_rotation != 0) {
 			float radians = glm::radians(m_rotation);
 

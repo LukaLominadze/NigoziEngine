@@ -4,6 +4,7 @@
 
 class SandboxLayer : public Nigozi::Layer {
 public:
+	SandboxLayer(Nigozi::OrthographicCameraController* cameraLayer);
 	void OnAttach() override;
 	void OnEvent(Nigozi::Event& event) override;
 	void OnUpdate(float timestep) override;
@@ -13,6 +14,7 @@ private:
 	bool OnMouseButtonPressed(Nigozi::MouseButtonPressedEvent& event);
 	bool OnFullscreenToggle(Nigozi::KeyPressedEvent& event);
 
+	Nigozi::OrthographicCameraController* p_cameraLayer;
 	Nigozi::ParticleSystem m_particleSystem;
 
 	std::shared_ptr<Nigozi::Texture> m_luigiTexture;

@@ -7,6 +7,8 @@
 #include "layers/ImGuiLayer.h"
 #include "Input.h"
 #include "Benchmarking/Timer.h"
+#include <queue>
+#include <mutex>
 
 namespace Nigozi 
 {
@@ -15,33 +17,49 @@ namespace Nigozi
 		uint32_t Width, Height;
 		bool VSync;
 		bool Fullscreen;
+		const char* IconPath;
 	};
 
 	class Application {
 	public:
 		Application(const ApplicationProps& props);
 		~Application();
+		const bool Initialized() const { return m_initialized; }
 
 		// Launch mainloop
-		void Run();
+		virtual void Run();
+		static void Close();
 
 		void PushLayer(Layer* layer);
 		void PushOverlay(Layer* layer);
 		void PopLayer(Layer* layer);
 		void PopOverlay(Layer* layer);
+	protected:
+		void QueueEvent(std::function<void(Event*)>&& func);
+		virtual void OnEvent();
+		virtual void OnUpdate(float timestep);
+		virtual void OnRender();
+		virtual void OnImGuiRender();
 	private:
-		void OnEvent(Event& event);
-		void OnUpdate(float timestep);
-		void OnRender();
-		void OnImGuiRender();
-	private:
+		bool CreateWindow(const ApplicationProps& props);
+		bool CreateGUILayer();
+		bool StartRenderer();
+	protected:
 		Window* p_window;
-		Input m_input;
-
 		LayerStack m_layerStack;
-
 		ImGuiLayer m_imGuiLayer;
+	private:
+		std::mutex m_eventQueueMutex;
+		std::queue<std::function<void(Event*)>> m_eventQueue;
+		bool m_initialized = false;
 
-		bool m_running;
+		/*
+			All events will be loaded in the same buffer
+			on "OnEvent()" to reserve memory and keep it
+			in the same place in the duration of the
+			application
+		*/
+		char m_eventBuffer[64];
+		Event* p_eventBufferPointer;
 	};
 }

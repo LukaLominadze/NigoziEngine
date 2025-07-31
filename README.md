@@ -1,11 +1,16 @@
 # Nigozi Engine
 
+Nigozi Engine is a game engine framework designed to make 2D devolopment easier in C++. The engine is in the beginning stages of devlopment, many features and systems are yet to come!
+
 ![poster](https://github.com/user-attachments/assets/90d53fd3-baf6-422a-8be8-be63c046fb53)
+
+## ___Sandbox application showcasing the engine in action!___
 
 https://github.com/user-attachments/assets/eba49d67-91fa-48c7-a1f6-ef870e182ad0
 
+## ___The editor (in development) to be used for game development with Nigozi!___
 
-Nigozi Engine is a game engine framework designed to make 2D devolopment easier in C++. The engine is in the beginning stages of devlopment, many features and systems are yet to come!
+https://github.com/user-attachments/assets/e2313d77-cdcb-4b7f-a6dc-f41b61983543
 
 ***
 
@@ -32,13 +37,19 @@ The project is now ready.
 - GLM - For math
 - StbImage - For handling/loading images
 - DearImGui - For UI
+- ENTT - For implementing game objects and components
 
 # The plan
 The plan for Nigozi Engine is to make a 2D framework that makes the development process simple and clear and to provide core functionality and features many games have.
 
+# Achieved goals
+- Added ENTT
+- Started creating the editor
+
 # Short-term goals
-- Add ECS
 - Add new shaders
+- Add UI for creating entities
+- Add CTRL+Z function
 
 # Long-term goals
 - Create an Editor to make game creation easier
@@ -50,20 +61,15 @@ Once a project is set up with NigoziEngine, you can go ahead and create a main f
 
 Firs you will need to define "MAIN" before including Nigozi to indicate where the entry point is.
 
-There are 2 external functions:
-CreateApplicationProps() - To define the window title, size, flags (vsync on/off, fullscreen on/off)
-OnApplicationInitialized(Nigozi::Application& app) - To add some extra initialization code before running the program.
+Then, you will need to define a function for creating the application:
 ```cpp
 #define MAIN // sets the file as entry point
 
 #include <Nigozi.h>
 
-extern Nigozi::ApplicationProps CreateApplicationProps() {
-	return { "MyGame", 960, 540, true, false }; // returns the window parameters
-}
-
-extern void OnApplicationInitialized(Nigozi::Application& app) {
-	// Write additional initialization code here
+Nigozi::Application* CreateApplication() {
+	Nigozi::Aplication* app = new Nigozi::Application({ "MyGame", 960, 540, true, false });
+	return app;
 }
 ```
 
@@ -89,7 +95,7 @@ public:
 
 You can go ahead and implement these functions the way you want.
 
-To add layers to the application, let's go back to our main file, in the OnApplicationInitialized function, and use the application PushLayer function to add an instance of our layer to the engine.
+To add layers to the application, let's go back to our main file, in the CreateApplication() function.
 
 Final code should look something like this:
 ```cpp
@@ -98,12 +104,10 @@ Final code should look something like this:
 #include <Nigozi.h>
 #include "ExampleLayer.h"
 
-extern Nigozi::ApplicationProps CreateApplicationProps() {
-	return { "MyGame", 960, 540, true, false };
-}
-
-extern void OnApplicationInitialized(Nigozi::Application& app) {
-	app.PushLayer(new ExampleLayer());
+Nigozi::Application* CreateApplication() {
+	Nigozi::Aplication* app = new Nigozi::Application({ "MyGame", 960, 540, true, false });
+	app->PushLayer(new ExampleLayer());
+	return app;
 }
 ```
 

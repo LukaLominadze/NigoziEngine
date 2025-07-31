@@ -4,92 +4,55 @@
 
 namespace Nigozi
 {
-    Input* Input::s_instance = nullptr;
-
-    Input::Input()
-        :m_mouseStartPos(std::pair<float, float>()), m_mouseEndPos(std::pair<float, float>())
+    namespace Input 
     {
-        if (!s_instance) {
-            s_instance = this;
-        }
-        // Add all keycodes in keystates
-        for (int i = 32; i < 349; i++) 
+        bool IsKeyPressed(int keycode)
         {
-            m_keystates[i] = GLFW_RELEASE;
+            int state = glfwGetKey(glfwGetCurrentContext(), keycode);
+            return state == GLFW_PRESS || state == GLFW_REPEAT;
         }
-    }
 
-    Input::~Input()
-    {
-        s_instance = nullptr;
-    }
-
-    bool Input::IsKeyJustPressed(int keycode)
-    {
-        int state = glfwGetKey(Global::windowData.NativeWindow, keycode);
-        if (state == GLFW_PRESS) {
-            if (s_instance->m_keystates[keycode] == GLFW_RELEASE) {
-                s_instance->m_keystates[keycode] = GLFW_PRESS;
-                return true;
-            }
+        bool IsKeyReleased(int keycode)
+        {
+            int state = glfwGetKey(glfwGetCurrentContext(), keycode);
+            return state == GLFW_RELEASE;
         }
-        return false;
-    }
 
-    bool Input::IsKeyPressed(int keycode)
-    {
-        int state = glfwGetKey(Global::windowData.NativeWindow, keycode);
-        if (state == GLFW_PRESS || state == GLFW_REPEAT) {
-            if (s_instance->m_keystates[keycode] == GLFW_PRESS || s_instance->m_keystates[keycode] == GLFW_REPEAT)
-            {
-                s_instance->m_keystates[keycode] = GLFW_REPEAT;
-                return true;
-            }
-            return true;
+        float GetAxis(int negativeKeycode, int positiveKeycode)
+        {
+            return -(static_cast<float>(IsKeyPressed(negativeKeycode))) +
+                    (static_cast<float>(IsKeyPressed(positiveKeycode)));
         }
-        return false;
-    }
 
-    bool Input::IsKeyReleased(int keycode)
-    {
-        int state = glfwGetKey(Global::windowData.NativeWindow, keycode);
-        if (state == GLFW_RELEASE) {
-            if (!s_instance->m_keystates[keycode] == state) {
-                s_instance->m_keystates[keycode] = GLFW_RELEASE;
-                return true;
-            }
+        bool IsMouseButtonPressed(int button)
+        {
+            int state = glfwGetMouseButton(glfwGetCurrentContext(), button);
+            return state == GLFW_PRESS;
         }
-        return false;
-    }
 
-    bool Input::IsMouseButtonPressed(int button)
-    {
-        int state = glfwGetMouseButton(Global::windowData.NativeWindow, button);
-        return state == GLFW_PRESS;
-    }
+        std::pair<float, float> GetMousePosition()
+        {
+            double xpos, ypos;
+            glfwGetCursorPos(glfwGetCurrentContext(), &xpos, &ypos);
+            return std::pair<float, float>((float)xpos, (float)ypos);
+        }
 
-    std::pair<float, float> Input::GetMousePosition()
-    {
-        double xpos, ypos;
-        glfwGetCursorPos(Global::windowData.NativeWindow, &xpos, &ypos);
-        return std::pair<float, float>((float)xpos, (float)ypos);
-    }
+        float GetMouseX()
+        {
+            return GetMousePosition().first;
+        }
 
-    float Input::GetMouseX()
-    {
-        return GetMousePosition().first;
-    }
+        float GetMouseY()
+        {
+            return GetMousePosition().second;
+        }
 
-    float Input::GetMouseY()
-    {
-        return GetMousePosition().second;
-    }
-
-    void Input::OnUpdate()
-    {
-        m_mouseEndPos = GetMousePosition();
-        m_mouseDeltaPos = std::pair<float, float>(m_mouseEndPos.first - m_mouseStartPos.first,
-                                                  m_mouseEndPos.second - m_mouseStartPos.second);
-        m_mouseStartPos = m_mouseEndPos;
+        void OnUpdate()
+        {
+            std::pair<float, float> endPos = GetMousePosition();
+            MousePosDelta = std::pair<float, float>(endPos.first - MouseStartPos.first,
+                                                    endPos.second - MouseStartPos.second);
+            MouseStartPos = endPos;
+        }
     }
 }

@@ -6,18 +6,25 @@
 namespace Nigozi
 {
     Application::Application(const ApplicationProps& props)
-        :m_running(false), m_input(Input())
     {
-        p_window = new Window(props.Title, props.Width, props.Height, props.Fullscreen);
-        // Polled events will be sent to the OnEvent function in the application
-        p_window->SetEventCallback(std::bind(&Application::OnEvent, this, std::placeholders::_1));
-        p_window->SetVSync(props.VSync);
+        if (!CreateWindow(props)) {
+            std::cout << "Couldn't create window! Shutting down..." << std::endl;
+            return;
+        }
 
-        PushOverlay(&m_imGuiLayer);
+        if (!CreateGUILayer()) {
+            std::cout << "Couldn't create GUI layer! Shutting down..." << std::endl;
+            return;
+        }
 
-        Renderer2D::Initialize();
-        Renderer2D::SetClearColor(0.1f, 0.1f, 0.1f, 1.0f);
+        if (!StartRenderer()) {
+            std::cout << "Couldn't initialize renderer! Shutting down..." << std::endl;
+            return;
+        }
 
+        p_eventBufferPointer = (Event*)(m_eventBuffer);
+
+        m_initialized = true;
         LOG("\nWelcome To NigoziEngine!");
     }
 
@@ -31,21 +38,26 @@ namespace Nigozi
     {
         Test::Timer timer = Test::Timer();
         float timestep = 0.0f;
-
-        m_running = true;
-
-        while (m_running)
+        while (!p_window->ShouldClose())
         {
             timer.StartTimerAndReturnSeconds();
 
+            p_window->PollEvents();
+
+            OnEvent();
             OnUpdate(timestep);
             OnRender();
             OnImGuiRender();
 
-            p_window->OnUpdate();
+            p_window->Update();
 
             timestep = timer.EndTimerAndReturnSeconds();
         }
+    }
+
+    void Application::Close()
+    {
+        Window::Close();
     }
 
     void Application::PushLayer(Layer* layer)
@@ -68,25 +80,39 @@ namespace Nigozi
         m_layerStack.PopOverlay(layer);
     }
 
-    void Application::OnEvent(Event& event)
+    void Application::QueueEvent(std::function<void(Event*)>&& func)
     {
-        if (event.GetEventType() == EventType::WindowClose)
-        {
-            m_running = false;
-            return;
-        }
+        m_eventQueue.push(func);
+    }
 
-        for (auto it = m_layerStack.end(); it != m_layerStack.begin(); )
-        {
-            (*--it)->OnEvent(event);
-            if (event.Handled)
-                break;
+    void Application::OnEvent()
+    {
+        /*
+            The event pointer that is passed
+            in the queued functions will initialize
+            the buffer as the queued event
+            for ex.: WindowResizeEvent, KeyEvent, etc.
+        */
+        std::scoped_lock<std::mutex> lock(m_eventQueueMutex);
+        while (m_eventQueue.size() > 0) {
+            std::function<void(Event*)>& func = m_eventQueue.front();
+            func(p_eventBufferPointer);
+            if (p_eventBufferPointer->GetEventType() == EventType::WindowClose) {
+                Window::Close();
+            }
+            for (auto it = m_layerStack.end(); it != m_layerStack.begin(); )
+            {
+                (*--it)->OnEvent(*p_eventBufferPointer);
+                if (p_eventBufferPointer->m_Handled)
+                    break;
+            }
+            m_eventQueue.pop();
         }
     }
 
     void Application::OnUpdate(float timestep)
     {
-        m_input.OnUpdate();
+        Input::OnUpdate();
         for (Layer* layer : m_layerStack) {
             layer->OnUpdate(timestep);
         }
@@ -109,5 +135,41 @@ namespace Nigozi
             layer->OnImGuiRender();
         }
         m_imGuiLayer.End();
+    }
+
+    // Window class is used for initializing the context,
+    // handling GLFW functions (like vsync, fullscreen, etc.)
+    // and events
+    bool Application::CreateWindow(const ApplicationProps& props)
+    {
+        p_window = new Window();
+        if (!p_window->StartUp(props.Title, props.Width, props.Height, props.Fullscreen)) {
+            return false;
+        }
+        // Polled events will be sent to the OnEvent function in the application
+        // Because the application class handles the distribution of all occurred events
+        p_window->SetEventCallback(std::bind(&Application::QueueEvent, this, std::placeholders::_1));
+        p_window->SetVSync(props.VSync);
+
+        if (props.IconPath) {
+            p_window->SetIcon(props.IconPath);
+        }
+
+        return p_window;
+    }
+
+    bool Application::CreateGUILayer()
+    {
+        // ImGUI is an overlay, because we want to render UI last and for UI to
+        // get the events FIRST
+        PushOverlay(&m_imGuiLayer);
+        return &m_imGuiLayer;
+    }
+
+    bool Application::StartRenderer()
+    {
+        Renderer2D::Initialize();
+        Renderer2D::SetClearColor(0.1f, 0.1f, 0.1f, 1.0f);
+        return Renderer2D::GetData()->QuadVertexArray;
     }
 }

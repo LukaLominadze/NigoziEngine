@@ -5,11 +5,11 @@
 #include <functional>
 
 #include <string>
-#include <vector>
 #include <iterator>
 
 #include <typeinfo>
 #include <type_traits>
+#include <any>
 
 #include "imgui.h"
 #include "imgui_impl_glfw.h"
@@ -19,5 +19,12 @@
 #include "gtc/matrix_transform.hpp"
 
 #include "stb_image.h"
+#include <vector>
+
+#include <map>
+#include <unordered_map>
+
+#include <utility>
 
 #include "Nigozi/core/Log.h"
+#include "Nigozi/entt/entt.hpp"

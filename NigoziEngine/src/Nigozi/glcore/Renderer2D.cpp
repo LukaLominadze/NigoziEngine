@@ -37,7 +37,7 @@ namespace Nigozi
 		);
 		// Set up vertex buffer and it's layout, set up index buffer and bind to vao
 		VertexBufferLayout layout;
-		layout.Push<float>(3); // position
+		layout.Push<float>(2); // position
 		layout.Push<float>(2); // texCoords
 		layout.Push<float>(4); // color
 		layout.Push<float>(1); // textureSlot
@@ -65,7 +65,7 @@ namespace Nigozi
 		// Create shader and set up texture units
 		s_data->DefaultShader = std::make_shared<Shader>("src/Nigozi/res/shaders/Default.glsl");
 		
-		for (int i = 0; i < 16; i++) 
+		for (int i = 0; i < 16; i++)
 		{
 			s_data->TextureUnits[i] = i;
 		}
@@ -101,11 +101,11 @@ namespace Nigozi
 		GLCall(glClear(GL_COLOR_BUFFER_BIT));
 	}
 
-	void Renderer2D::DrawQuad(const glm::vec3& position, const glm::vec2& scale, std::shared_ptr<SubTexture>& texture, const glm::vec4& color) {
+	void Renderer2D::DrawQuad(const glm::vec2& position, const glm::vec2& scale, std::shared_ptr<SubTexture>& texture, const glm::vec4& color) {
 		DrawQuad(position, scale, texture->GetTexture(), color, texture->GetCoordMin(), texture->GetCoordMax());
 	}
 
-	void Renderer2D::DrawQuad(const glm::vec3& position, const glm::vec2& scale, const std::shared_ptr<Texture>& texture, const glm::vec4& color, const glm::vec2& coordMin, const glm::vec2& coordMax)
+	void Renderer2D::DrawQuad(const glm::vec2& position, const glm::vec2& scale, const std::shared_ptr<Texture>& texture, const glm::vec4& color, const glm::vec2& coordMin, const glm::vec2& coordMax)
 	{
 		FlushIfExceededMaxVertexCount();
 
@@ -114,10 +114,10 @@ namespace Nigozi
 		glm::vec2 halfSize = scale / 2.0f;
 
 		float quad[] = {
-			position.x - halfSize.x, position.y - halfSize.y, position.z, coordMin.x, coordMin.y, color.x, color.y, color.z, color.w, textureSlot,
-			position.x - halfSize.x, position.y + halfSize.y, position.z, coordMin.x, coordMax.y, color.x, color.y, color.z, color.w, textureSlot,
-			position.x + halfSize.x, position.y + halfSize.y, position.z, coordMax.x, coordMax.y, color.x, color.y, color.z, color.w, textureSlot,
-			position.x + halfSize.x, position.y - halfSize.y, position.z, coordMax.x, coordMin.y, color.x, color.y, color.z, color.w, textureSlot,
+			position.x - halfSize.x, position.y - halfSize.y, coordMin.x, coordMin.y, color.x, color.y, color.z, color.w, textureSlot,
+			position.x - halfSize.x, position.y + halfSize.y, coordMin.x, coordMax.y, color.x, color.y, color.z, color.w, textureSlot,
+			position.x + halfSize.x, position.y + halfSize.y, coordMax.x, coordMax.y, color.x, color.y, color.z, color.w, textureSlot,
+			position.x + halfSize.x, position.y - halfSize.y, coordMax.x, coordMin.y, color.x, color.y, color.z, color.w, textureSlot,
 		};
 		int vertexIndex = s_data->CurrentVertex / s_data->VertexElementCount;
 
@@ -130,12 +130,12 @@ namespace Nigozi
 		s_data->QuadCount++;
 	}
 
-	void Renderer2D::DrawRotatedQuad(const glm::vec3& position, const glm::vec2& scale, float rotation, std::shared_ptr<SubTexture>& texture, const glm::vec4& color)
+	void Renderer2D::DrawRotatedQuad(const glm::vec2& position, const glm::vec2& scale, float rotation, std::shared_ptr<SubTexture>& texture, const glm::vec4& color)
 	{
 		DrawRotatedQuad(position, scale, rotation, texture->GetTexture(), color, texture->GetCoordMin(), texture->GetCoordMax());
 	}
 
-	void Renderer2D::DrawRotatedQuad(const glm::vec3& position, const glm::vec2& scale, float rotation, const std::shared_ptr<Texture>& texture, const glm::vec4& color, const glm::vec2& coordMin, const glm::vec2& coordMax)
+	void Renderer2D::DrawRotatedQuad(const glm::vec2& position, const glm::vec2& scale, float rotation, const std::shared_ptr<Texture>& texture, const glm::vec4& color, const glm::vec2& coordMin, const glm::vec2& coordMax)
 	{
 		FlushIfExceededMaxVertexCount();
 
@@ -152,10 +152,10 @@ namespace Nigozi
 		glm::vec2 downRight = rotationMatrix * glm::vec2(halfSize.x, -halfSize.y);
 
 		float quad[] = {
-			position.x + downLeft.x, position.y + downLeft.y, position.z, coordMin.x, coordMin.y, color.x, color.y, color.z, color.w, textureSlot,
-			position.x + upLeft.x, position.y + upLeft.y, position.z, coordMin.x, coordMax.y, color.x, color.y, color.z, color.w, textureSlot,
-			position.x + upRight.x, position.y + upRight.y, position.z, coordMax.x, coordMax.y, color.x, color.y, color.z, color.w, textureSlot,
-			position.x + downRight.x, position.y + downRight.y, position.z, coordMax.x, coordMin.y, color.x, color.y, color.z, color.w, textureSlot,
+			position.x + downLeft.x, position.y + downLeft.y, coordMin.x, coordMin.y, color.x, color.y, color.z, color.w, textureSlot,
+			position.x + upLeft.x, position.y + upLeft.y, coordMin.x, coordMax.y, color.x, color.y, color.z, color.w, textureSlot,
+			position.x + upRight.x, position.y + upRight.y, coordMax.x, coordMax.y, color.x, color.y, color.z, color.w, textureSlot,
+			position.x + downRight.x, position.y + downRight.y, coordMax.x, coordMin.y, color.x, color.y, color.z, color.w, textureSlot,
 		};
 		int vertexIndex = s_data->CurrentVertex / s_data->VertexElementCount;
 
@@ -206,7 +206,7 @@ namespace Nigozi
 	uint32_t Renderer2D::SetTextureAndGetSlot(const std::shared_ptr<Texture>& texture)
 	{
 		if (texture) {
-			if (s_data->TextureSlot > 16) {
+			if (s_data->TextureSlot > 15) {
 				Flush();
 			}
 			s_data->Textures[s_data->TextureSlot] = texture;

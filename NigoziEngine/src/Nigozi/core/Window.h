@@ -8,42 +8,60 @@
 namespace Nigozi
 {
 	struct WindowData {
+		const char* Title;
 		uint32_t Width, Height;
-		bool Fullscreen = false;
+		uint32_t WindowedWidth, WindowedHeight;
+		bool Fullscreen, VSync;
+		bool ShouldClose;
 
-		std::function<void(Event&)> EventCallback;
-		std::function<void(bool)> SetFullscreen;
-
-		GLFWwindow* NativeWindow;
+		std::function<void(std::function<void(Event*)>&&)> EventQueueCallback;
 	};
 
-	namespace Global 
+	class Window
 	{
-		inline WindowData windowData;
-	}
-
-	class Window {
 	public:
 		Window() = default;
-		Window(const char* title, uint32_t width, uint32_t height, bool fullscreen);
 		~Window();
 
-		static bool IsFullscreen();
-		bool SetFullscreen(bool value);
+		bool StartUp(const char* title, uint32_t width, uint32_t height, bool fullscreen = false, bool vsync = false);
+		void SetIcon(const char* path);
 
-		inline void SetEventCallback(const std::function<void(Event&)>& function) {
-			Global::windowData.EventCallback = function;
+		inline void SetEventCallback(const std::function<void(std::function<void(Event*)>&&)>& callback) {
+			m_windowData.EventQueueCallback = callback;
 		}
 
+		void PollEvents();
+		void Update();
+
+		static void Close();
+
 		void SetVSync(bool value);
+		inline const bool IsVSync() const { return m_windowData.VSync; }
 
-		void OnUpdate();
+		void SetFullscreen(bool value);
+		inline const bool IsFullscreen() const { return m_windowData.Fullscreen; }
 
-		void Delete();
+		inline const bool ShouldClose() const { return m_windowData.ShouldClose; }
+
+		inline WindowData& GetWindowData() { return m_windowData; }
+	public:
+		static void SetGlobalVSync(bool value);
+		inline static bool IsGlobalVSync() { return (*(WindowData*)glfwGetWindowUserPointer(glfwGetCurrentContext())).VSync; }
+
+		static void SetGlobalFullscreen(bool value);
+		inline static bool IsGlobalFullscreen() { return (*(WindowData*)glfwGetWindowUserPointer(glfwGetCurrentContext())).Fullscreen; }
+
+		inline static WindowData& GetGlobalWindowData() { return (*(WindowData*)glfwGetWindowUserPointer(glfwGetCurrentContext())); }
 	private:
-		GLFWwindow* p_window;
-		GLFWmonitor* p_monitor;
+		bool StartGLFW();
+		bool CreateWindow();
+		bool SetupMonitor();
+		bool StartGLEW();
+		void CreateCallbacks();
+	private:
+		GLFWwindow* p_window = nullptr;
+		GLFWmonitor* p_monitor = nullptr;
 
-		bool m_isFullscreen = false;
+		WindowData m_windowData;
 	};
 }

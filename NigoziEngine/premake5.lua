@@ -27,17 +27,17 @@ project "NigoziEngine"
 
 	includedirs { "src",
 				  "src/Nigozi",
-				  "%{wks.location}/dependencies/glew/include",
-				  "%{wks.location}/dependencies/glfw/include",
-				  "%{wks.location}/dependencies/stb",
-				  "%{wks.location}/dependencies/imgui",
-				  "%{wks.location}/dependencies/glm" }
+				  "%{prj.location}/../dependencies/glew/include",
+				  "%{prj.location}/../dependencies/glfw/include",
+				  "%{prj.location}/../dependencies/stb",
+				  "%{prj.location}/../dependencies/imgui",
+				  "%{prj.location}/../dependencies/glm" }
 
-	libdirs { "%{wks.location}/dependencies/libs/GLFW",
-			  "%{wks.location}/dependencies/glew/lib/Release/x64",
-			  "%{wks.location}/dependencies/libs/STB",
-			  "%{wks.location}/dependencies/libs/ImGui",
-			  "%{wks.location}/dependencies/glew/lib" }
+	libdirs { "%{prj.location}/../dependencies/libs/GLFW",
+			  "%{prj.location}/../dependencies/glew/lib/Release/x64",
+			  "%{prj.location}/../dependencies/libs/STB",
+			  "%{prj.location}/../dependencies/libs/ImGui",
+			  "%{prj.location}/../dependencies/glew/lib" }
 			  
 	links { "GLEW",
 		"GLFW",

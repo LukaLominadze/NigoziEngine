@@ -2,35 +2,23 @@
 
 #include "Window.h"
 
-#include <unordered_map>
+#include "ngpch.h"
 
 namespace Nigozi
 {
-	class Input {
-	public:
-		Input();
-		~Input();
+	namespace Input 
+	{
+		inline std::pair<float, float> MouseStartPos = { 0, 0 };
+		inline std::pair<float, float> MousePosDelta = { 0, 0 };
 
-		static bool IsKeyJustPressed(int keycode);
-		static bool IsKeyPressed(int keycode);
-		static bool IsKeyReleased(int keycode);
-		static bool IsMouseButtonPressed(int button);
-		static std::pair<float, float> GetMousePosition();
-		inline static std::pair<float, float> GetMousePositionDelta() { return s_instance->GetMousePosDelta(); }
-		static float GetMouseX();
-		static float GetMouseY();
-
+		bool IsKeyPressed(int keycode);
+		bool IsKeyReleased(int keycode);
+		float GetAxis(int negativeKeycode, int positiveKeycode);
+		bool IsMouseButtonPressed(int button);
+		std::pair<float, float> GetMousePosition();
+		inline std::pair<float, float> GetMousePositionDelta() { return MousePosDelta; }
+		float GetMouseX();
+		float GetMouseY();
 		void OnUpdate();
-
-		std::unordered_map<int, uint16_t> m_keystates;
-		inline const std::pair<float, float>& GetMousePosDelta() { return m_mouseDeltaPos; }
-	private:
-		// Singleton for global and easy access
-		static Input* s_instance;
-
-
-		std::pair<float, float> m_mouseStartPos;
-		std::pair<float, float> m_mouseEndPos;
-		std::pair<float, float> m_mouseDeltaPos;
-	};
+	}
 }
