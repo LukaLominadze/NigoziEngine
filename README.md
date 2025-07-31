@@ -14,11 +14,17 @@ https://github.com/user-attachments/assets/e2313d77-cdcb-4b7f-a6dc-f41b61983543
 
 ***
 
+## Games made with Nigozi!
+
+### [Snake](https://github.com/LukaLominadze/Snake)
+
+![ezgif-69d3a97289b486](https://github.com/user-attachments/assets/b5d94891-0b45-4b71-8d2a-e476bc2d7916)
+
 ## Platform
 The engine primarly is supported on Windows and Linux.
 
 ## Getting Started
-Visual Studio 2020 (and above) is recommended.
+Visual Studio 2020 (and above) is recommended (If on Windows).
 
 <ins>**1. Downloading the repository:**</ins>
 
