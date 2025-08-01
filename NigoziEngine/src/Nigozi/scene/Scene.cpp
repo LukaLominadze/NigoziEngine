@@ -18,9 +18,11 @@ namespace Nigozi
     void Scene::OnEvent(Event& event)
     {
         auto scriptView = m_Registry.view<ScriptComponent>();
-        scriptView.each([pevent = &event](auto script) {
-            script.ScriptHandle->OnEvent(*event);
-            });
+        for (auto entity : scriptView)
+        {
+            auto& script = m_Registry.get<ScriptComponent>(entity);
+            script.ScriptHandle->OnEvent(event);
+        }
     }
 
     void Scene::OnUpdate(float timestep)
