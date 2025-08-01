@@ -18,8 +18,8 @@ namespace Nigozi
     void Scene::OnEvent(Event& event)
     {
         auto scriptView = m_Registry.view<ScriptComponent>();
-        scriptView.each([event](auto script) {
-            script.ScriptHandle->OnEvent(event);
+        scriptView.each([pevent = &event](auto script) {
+            script.ScriptHandle->OnEvent(*event);
             });
     }
 
