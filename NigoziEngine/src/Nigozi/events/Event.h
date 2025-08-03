@@ -11,10 +11,6 @@ namespace Nigozi
 
 	class Event {
 	public:
-		Event(EventType type)
-			:m_type(type)
-		{}
-
 		bool m_Handled = false;
 
 		inline EventType GetEventType() const { return m_type; }

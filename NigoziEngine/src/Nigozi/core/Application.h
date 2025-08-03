@@ -59,7 +59,7 @@ namespace Nigozi
 			in the same place in the duration of the
 			application
 		*/
-		char m_eventBuffer[64];
+		char m_eventBuffer[16];
 		Event* p_eventBufferPointer;
 	};
 }

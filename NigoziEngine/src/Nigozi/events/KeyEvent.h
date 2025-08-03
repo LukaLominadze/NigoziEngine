@@ -8,19 +8,11 @@ namespace Nigozi
 	public:
 		const int GetKeyCode() const { return m_keyCode; }
 	protected:
-		KeyEvent(EventType type, int keyCode)
-			:Event(type), m_keyCode(keyCode)
-		{}
-	protected:
 		int m_keyCode;
 	};
 
 	class KeyPressedEvent : public KeyEvent {
 	public:
-		KeyPressedEvent(int keyCode)
-			:KeyEvent(EventType::KeyPressed, keyCode)
-		{}
-
 		inline void Initialize(int keyCode) { m_type = EventType::KeyPressed; m_Handled = false; m_keyCode = keyCode; }
 
 		inline static EventType GetStaticType() { return EventType::KeyPressed; }
@@ -28,10 +20,6 @@ namespace Nigozi
 
 	class KeyReleasedEvent : public KeyEvent {
 	public:
-		KeyReleasedEvent(int keyCode)
-			:KeyEvent(EventType::KeyReleased, keyCode)
-		{}
-
 		inline void Initialize(int keyCode) { m_type = EventType::KeyReleased; m_Handled = false; m_keyCode = keyCode; }
 
 		inline static EventType GetStaticType() { return EventType::KeyReleased; }
@@ -39,10 +27,6 @@ namespace Nigozi
 
 	class KeyTypedEvent : public KeyEvent {
 	public:
-		KeyTypedEvent(int keyCode)
-			:KeyEvent(EventType::KeyTyped, keyCode)
-		{}
-
 		inline void Initialize(int keyCode) { m_type = EventType::KeyTyped; m_Handled = false; m_keyCode = keyCode; }
 
 		inline static EventType GetStaticType() { return EventType::KeyTyped; }
