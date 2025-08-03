@@ -45,7 +45,7 @@ namespace Nigozi
 		bool CreateGUILayer();
 		bool StartRenderer();
 	protected:
-		Window* p_window;
+		Window m_window;
 		LayerStack m_layerStack;
 		ImGuiLayer m_imGuiLayer;
 	private:

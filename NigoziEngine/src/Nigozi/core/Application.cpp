@@ -31,25 +31,24 @@ namespace Nigozi
     Application::~Application()
     {
         Renderer2D::Deinitialize();
-        delete p_window;
     }
 
     void Application::Run()
     {
         Test::Timer timer = Test::Timer();
         float timestep = 0.0f;
-        while (!p_window->ShouldClose())
+        while (!m_window.ShouldClose())
         {
             timer.StartTimerAndReturnSeconds();
 
-            p_window->PollEvents();
+            m_window.PollEvents();
 
             OnEvent();
             OnUpdate(timestep);
             OnRender();
             OnImGuiRender();
 
-            p_window->Update();
+            m_window.Update();
 
             timestep = timer.EndTimerAndReturnSeconds();
         }
@@ -142,20 +141,19 @@ namespace Nigozi
     // and events
     bool Application::CreateWindow(const ApplicationProps& props)
     {
-        p_window = new Window();
-        if (!p_window->StartUp(props.Title, props.Width, props.Height, props.Fullscreen)) {
+        if (!m_window.StartUp(props.Title, props.Width, props.Height, props.Fullscreen)) {
             return false;
         }
         // Polled events will be sent to the OnEvent function in the application
         // Because the application class handles the distribution of all occurred events
-        p_window->SetEventCallback(std::bind(&Application::QueueEvent, this, std::placeholders::_1));
-        p_window->SetVSync(props.VSync);
+        m_window.SetEventCallback(std::bind(&Application::QueueEvent, this, std::placeholders::_1));
+        m_window.SetVSync(props.VSync);
 
         if (props.IconPath) {
-            p_window->SetIcon(props.IconPath);
+            m_window.SetIcon(props.IconPath);
         }
 
-        return p_window;
+        return true;
     }
 
     bool Application::CreateGUILayer()
