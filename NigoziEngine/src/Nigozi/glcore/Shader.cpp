@@ -43,7 +43,7 @@ namespace Nigozi
         GLCall(glUniformMatrix4fv(GetUniformLocation(name), 1, GL_FALSE, &matrix[0][0]));
     }
 
-    void Shader::SetUniform1iv(const std::string& name, unsigned int count, int* value)
+    void Shader::SetUniform1iv(const std::string& name, uint32_t count, int* value)
     {
         GLCall(glUniform1iv(GetUniformLocation(name), count, value));
     }
@@ -87,11 +87,11 @@ namespace Nigozi
         return ShaderProgramSource{ ss[0].str(), ss[1].str() };
     }
 
-    unsigned int Shader::CreateShader(const std::string& vertexShader, const std::string& fragmentShader)
+    uint32_t Shader::CreateShader(const std::string& vertexShader, const std::string& fragmentShader)
     {
-        unsigned int program = glCreateProgram();
-        unsigned int _vertexShader = CompileShader(GL_VERTEX_SHADER, vertexShader);
-        unsigned int _fragmentShader = CompileShader(GL_FRAGMENT_SHADER, fragmentShader);
+        uint32_t program = glCreateProgram();
+        uint32_t _vertexShader = CompileShader(GL_VERTEX_SHADER, vertexShader);
+        uint32_t _fragmentShader = CompileShader(GL_FRAGMENT_SHADER, fragmentShader);
 
         GLCall(glAttachShader(program, _vertexShader));
         GLCall(glAttachShader(program, _fragmentShader));
@@ -121,9 +121,9 @@ namespace Nigozi
         return program;
     }
 
-    unsigned int Shader::CompileShader(unsigned int type, const std::string& source)
+    uint32_t Shader::CompileShader(uint32_t type, const std::string& source)
     {
-        unsigned int id = glCreateShader(type);
+        uint32_t id = glCreateShader(type);
         const char* src = source.c_str();
         GLCall(glShaderSource(id, 1, &src, nullptr));
         GLCall(glCompileShader(id));

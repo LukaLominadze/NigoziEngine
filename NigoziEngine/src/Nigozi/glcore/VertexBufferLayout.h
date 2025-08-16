@@ -25,7 +25,7 @@ namespace Nigozi
 	public:
 		template<typename T>
 		void Push(uint32_t count) {
-			unsigned int type;
+			uint32_t type;
 			char normalized;
 			if (std::is_same<T, float>::value) {
 				type = GL_FLOAT;
