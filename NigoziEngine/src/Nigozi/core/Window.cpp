@@ -8,38 +8,33 @@
 
 namespace Nigozi
 {
+	Window::Window(const char* title, uint32_t width, uint32_t height, bool fullscreen, bool vsync)
+		:m_windowData({ title, width, height, width, height, fullscreen, vsync })
+	{
+		if (!StartGLFW()) {
+			std::cout << "Couldn't initialize GLFW..." << std::endl;
+			return;
+		}
+		if (!CreateWindow()) {
+			std::cout << "Couldn't create window..." << std::endl;
+			return;
+		}
+		if (!SetupMonitor()) {
+			std::cout << "Couldn't initialize primary monitor..." << std::endl;
+			return;
+		}
+		if (!StartGLEW()) {
+			std::cout << "Couldn't initialize GLAD..." << std::endl;
+			return;
+		}
+		CreateCallbacks();
+		m_initialized = true;
+	}
+
 	Window::~Window()
 	{
 		glfwDestroyWindow(p_window);
 		glfwTerminate();
-	}
-
-	bool Window::StartUp(const char* title, uint32_t width, uint32_t height, bool fullscreen, bool vsync)
-	{
-		m_windowData = {
-			title,
-			width, height,
-			width, height,
-			fullscreen, vsync
-		};
-		if (!StartGLFW()) {
-			std::cout << "Couldn't initialize GLFW..." << std::endl;
-			return false;
-		}
-		if (!CreateWindow()) {
-			std::cout << "Couldn't create window..." << std::endl;
-			return false;
-		}
-		if (!SetupMonitor()) {
-			std::cout << "Couldn't initialize primary monitor..." << std::endl;
-			return false;
-		}
-		if (!StartGLEW()) {
-			std::cout << "Couldn't initialize GLAD..." << std::endl;
-			return false;
-		}
-		CreateCallbacks();
-		return true;
 	}
 
 	void Window::SetIcon(const char* path)

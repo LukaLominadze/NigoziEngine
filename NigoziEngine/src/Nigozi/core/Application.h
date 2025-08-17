@@ -41,7 +41,7 @@ namespace Nigozi
 		virtual void OnRender();
 		virtual void OnImGuiRender();
 	private:
-		bool CreateWindow(const ApplicationProps& props);
+		bool SetupWindow(const ApplicationProps& props);
 		bool CreateGUILayer();
 		bool StartRenderer();
 	protected:

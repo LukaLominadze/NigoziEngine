@@ -6,8 +6,9 @@
 namespace Nigozi
 {
     Application::Application(const ApplicationProps& props)
+        :m_window(props.Title, props.Width, props.Height, props.Fullscreen, props.VSync)
     {
-        if (!CreateWindow(props)) {
+        if (!SetupWindow(props)) {
             std::cout << "Couldn't create window! Shutting down..." << std::endl;
             return;
         }
@@ -139,9 +140,9 @@ namespace Nigozi
     // Window class is used for initializing the context,
     // handling GLFW functions (like vsync, fullscreen, etc.)
     // and events
-    bool Application::CreateWindow(const ApplicationProps& props)
+    bool Application::SetupWindow(const ApplicationProps& props)
     {
-        if (!m_window.StartUp(props.Title, props.Width, props.Height, props.Fullscreen)) {
+        if (!m_window.Initialized()) {
             return false;
         }
         // Polled events will be sent to the OnEvent function in the application

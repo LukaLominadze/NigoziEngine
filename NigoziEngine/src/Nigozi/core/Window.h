@@ -20,10 +20,11 @@ namespace Nigozi
 	class Window
 	{
 	public:
-		Window() = default;
+		Window(const char* title, uint32_t width, uint32_t height, bool fullscreen = false, bool vsync = false);
 		~Window();
 
-		bool StartUp(const char* title, uint32_t width, uint32_t height, bool fullscreen = false, bool vsync = false);
+		inline const bool Initialized() const { return m_initialized; }
+
 		void SetIcon(const char* path);
 
 		inline void SetEventCallback(const std::function<void(std::function<void(Event*)>&&)>& callback) {
@@ -63,5 +64,7 @@ namespace Nigozi
 		GLFWmonitor* p_monitor = nullptr;
 
 		WindowData m_windowData;
+
+		bool m_initialized = false;
 	};
 }
