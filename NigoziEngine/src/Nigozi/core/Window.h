@@ -26,30 +26,28 @@ namespace Nigozi
 		inline const bool Initialized() const { return m_initialized; }
 
 		void SetIcon(const char* path);
+		void SetVSync(bool value);
+		void SetFullscreen(bool value);
 
 		inline void SetEventCallback(const std::function<void(std::function<void(Event*)>&&)>& callback) {
 			m_windowData.EventQueueCallback = callback;
 		}
 
+		static void Close();
+
 		void PollEvents();
 		void Update();
 
-		static void Close();
-
-		void SetVSync(bool value);
 		inline const bool IsVSync() const { return m_windowData.VSync; }
-
-		void SetFullscreen(bool value);
 		inline const bool IsFullscreen() const { return m_windowData.Fullscreen; }
-
 		inline const bool ShouldClose() const { return m_windowData.ShouldClose; }
 
 		inline WindowData& GetWindowData() { return m_windowData; }
 	public:
 		static void SetGlobalVSync(bool value);
-		inline static bool IsGlobalVSync() { return (*(WindowData*)glfwGetWindowUserPointer(glfwGetCurrentContext())).VSync; }
-
 		static void SetGlobalFullscreen(bool value);
+
+		inline static bool IsGlobalVSync() { return (*(WindowData*)glfwGetWindowUserPointer(glfwGetCurrentContext())).VSync; }
 		inline static bool IsGlobalFullscreen() { return (*(WindowData*)glfwGetWindowUserPointer(glfwGetCurrentContext())).Fullscreen; }
 
 		inline static WindowData& GetGlobalWindowData() { return (*(WindowData*)glfwGetWindowUserPointer(glfwGetCurrentContext())); }
