@@ -121,9 +121,7 @@ namespace Nigozi
 		};
 		int vertexIndex = s_data->CurrentVertex / s_data->VertexElementCount;
 
-		for (int i = s_data->CurrentVertex; i < s_data->CurrentVertex + 4 * s_data->VertexElementCount; i++) {
-			s_data->Vertices[i] = quad[i - s_data->CurrentVertex];
-		}
+		memcpy(((uint32_t*)(s_data->Vertices) + s_data->CurrentVertex), quad, sizeof(quad));
 
 		s_data->CurrentVertex += 4 * s_data->VertexElementCount;
 		s_data->CurrentIndex += 6;
@@ -159,9 +157,7 @@ namespace Nigozi
 		};
 		int vertexIndex = s_data->CurrentVertex / s_data->VertexElementCount;
 
-		for (int i = s_data->CurrentVertex; i < s_data->CurrentVertex + 4 * s_data->VertexElementCount; i++) {
-			s_data->Vertices[i] = quad[i - s_data->CurrentVertex];
-		}
+		memcpy(((uint32_t*)(s_data->Vertices) + s_data->CurrentVertex), quad, sizeof(quad));
 
 		s_data->CurrentVertex += 4 * s_data->VertexElementCount;
 		s_data->CurrentIndex += 6;
