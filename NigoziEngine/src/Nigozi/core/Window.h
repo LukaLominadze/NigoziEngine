@@ -25,6 +25,8 @@ namespace Nigozi
 
 		inline const bool Initialized() const { return m_initialized; }
 
+		static void Close();
+
 		void SetIcon(const char* path);
 		void SetVSync(bool value);
 		void SetFullscreen(bool value);
@@ -32,8 +34,6 @@ namespace Nigozi
 		inline void SetEventCallback(const std::function<void(std::function<void(Event*)>&&)>& callback) {
 			m_windowData.EventQueueCallback = callback;
 		}
-
-		static void Close();
 
 		void PollEvents();
 		void Update();
