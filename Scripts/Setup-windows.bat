@@ -1,3 +1,3 @@
-@echo off
+pushd ..
 vendor\bin\scripts\Setup.py
-pause
+popd ..
