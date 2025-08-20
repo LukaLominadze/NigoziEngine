@@ -23,6 +23,7 @@ namespace Nigozi
 	class Application {
 	public:
 		Application(const ApplicationProps& props);
+		Application(const Application& other) = delete;
 		~Application();
 		const bool Initialized() const { return m_initialized; }
 
