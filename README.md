@@ -32,8 +32,7 @@ Start cloning the repository with ```git clone --recursive https://github.com/Lu
 
 <ins>**2. Building the project:**</ins>
 
-After cloning the repository, run the ```Setup-windows.bat``` file.
-or if you are on linux, run ```setup-linux.sh```, then build with ```sudo make```
+After cloning the repository, go to the ```Scripts``` directory and run the ```Setup.py``` file.
 
 The project is now ready.
 
