@@ -13,6 +13,7 @@ project "NigoziEngine"
 	files {
 		"src/**.h",
 		"src/**.cpp",
+		"src/**.c",
 		"src/ngpch.cpp",
 		"src/Nigozi.h"
 	}
