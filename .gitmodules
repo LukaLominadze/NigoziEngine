@@ -11,6 +11,3 @@
 [submodule "dependencies/glew"]
 	path = vendor/glew
 	url = https://github.com/LukaLominadze/glew
-[submodule "vendor/spdlog"]
-	path = vendor/spdlog
-	url = https://github.com/gabime/spdlog
