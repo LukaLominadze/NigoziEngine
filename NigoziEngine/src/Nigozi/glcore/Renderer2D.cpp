@@ -1,5 +1,7 @@
 #include "ngpch.h"
 
+#include "Nigozi/core/Assert.h"
+#include "Nigozi/core/Log.h"
 #include "Renderer2D.h"
 
 namespace Nigozi
@@ -17,14 +19,14 @@ namespace Nigozi
 		/*GLCall(glEnable(GL_DEPTH_TEST));
 		GLCall(glDepthFunc(GL_LESS));*/
 
-		LOG("OpenGL Info: ");
-		LOG("  Vendor: {0} " << glGetString(GL_VENDOR));
-		LOG("  Renderer: {0} " << glGetString(GL_RENDERER));
-		LOG("  Version: {0} " << glGetString(GL_VERSION));
+		NG_CORE_LOG_INFO("OpenGL Info: ");
+		NG_CORE_LOG_INFO("  Vendor: {0} " + std::string((const char*)glGetString(GL_VENDOR)));
+		NG_CORE_LOG_INFO("  Renderer: {0} " + std::string((const char*)glGetString(GL_RENDERER)));
+		NG_CORE_LOG_INFO("  Version: {0} " + std::string((const char*)glGetString(GL_VERSION)));
 
 		GLint maxTextures;
 		GLCall(glGetIntegerv(GL_MAX_TEXTURE_IMAGE_UNITS, &maxTextures));
-		LOG("Max Texture Units: " << maxTextures);
+		NG_CORE_LOG_INFO("Max Texture Units: " + maxTextures);
 
 		// Create renderer data object
 		s_data = new Renderer2DData();

@@ -5,6 +5,7 @@
 #include "events/ApplicationEvent.h"
 #include "events/KeyEvent.h"
 #include "events/MouseEvent.h"
+#include "Log.h"
 
 namespace Nigozi
 {
@@ -12,19 +13,19 @@ namespace Nigozi
 		:m_windowData({ title, width, height, width, height, fullscreen, vsync })
 	{
 		if (!StartGLFW()) {
-			std::cout << "Couldn't initialize GLFW..." << std::endl;
+			NG_CORE_LOG_CRITICAL("Couldn't initialize GLFW...");
 			return;
 		}
-		if (!CreateWindow()) {
-			std::cout << "Couldn't create window..." << std::endl;
+		if (!InitializeWindow()) {
+			NG_CORE_LOG_CRITICAL("Couldn't create window...");
 			return;
 		}
 		if (!SetupMonitor()) {
-			std::cout << "Couldn't initialize primary monitor..." << std::endl;
+			NG_CORE_LOG_CRITICAL("Couldn't initialize primary monitor...");
 			return;
 		}
 		if (!StartGLEW()) {
-			std::cout << "Couldn't initialize GLAD..." << std::endl;
+			NG_CORE_LOG_CRITICAL("Couldn't initialize GLAD...");
 			return;
 		}
 		CreateCallbacks();
@@ -115,7 +116,7 @@ namespace Nigozi
 		return glfwInit() == GLFW_TRUE;
 	}
 
-	bool Window::CreateWindow()
+	bool Window::InitializeWindow()
 	{
 		p_window = glfwCreateWindow(m_windowData.Width, m_windowData.Height, m_windowData.Title, NULL, NULL);
 		if (!p_window)

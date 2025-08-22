@@ -2,6 +2,9 @@
 
 #include "ngpch.h"
 
+#include "Nigozi/core/Assert.h"
+#include "Nigozi/core/Log.h"
+
 #include "Nigozi/Benchmarking/Timer.h"
 
 #include "Nigozi/layers/Layer.h"

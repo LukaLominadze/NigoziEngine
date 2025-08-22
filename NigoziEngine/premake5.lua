@@ -33,7 +33,7 @@ project "NigoziEngine"
 				  "%{prj.location}/../vendor/stb",
 				  "%{prj.location}/../vendor/imgui",
 				  "%{prj.location}/../vendor/glm",
-				  "%{prj.location}/../vendor/spdlog" }
+				  "%{prj.location}/../vendor/spdlog/include" }
 
 	links { "GLEW",
 		"GLFW",
@@ -45,6 +45,9 @@ project "NigoziEngine"
 		"Release",
 		"Distribution"
 	}
+
+	filter "toolset:msc*"
+  	buildoptions { "/utf-8" }
 
 	filter "system:windows"
 		systemversion "latest"

@@ -3,6 +3,8 @@
 #include "Application.h"
 #include "glcore/Renderer2D.h"
 #include "audio/AudioEngine.h"
+#include "Assert.h"
+#include "Log.h"
 
 namespace Nigozi
 {
@@ -10,29 +12,29 @@ namespace Nigozi
         :m_window(props.Title, props.Width, props.Height, props.Fullscreen, props.VSync)
     {
         if (!SetupWindow(props)) {
-            std::cout << "Couldn't create window! Shutting down..." << std::endl;
+            NG_CORE_LOG_CRITICAL("Couldn't create window! Shutting down...");
             return;
         }
 
         if (!CreateGUILayer()) {
-            std::cout << "Couldn't create GUI layer! Shutting down..." << std::endl;
+            NG_CORE_LOG_CRITICAL("Couldn't create GUI layer! Shutting down...");
             return;
         }
 
         if (!StartRenderer()) {
-            std::cout << "Couldn't initialize renderer! Shutting down..." << std::endl;
+            NG_CORE_LOG_CRITICAL("Couldn't initialize renderer! Shutting down...");
             return;
         }
 
         if (!StartAudioEngine()) {
-            std::cout << "Couldn't initialize audio engine! Shutting down..." << std::endl;
+            NG_CORE_LOG_CRITICAL("Couldn't initialize audio engine! Shutting down...");
             return;
         }
 
         p_eventBufferPointer = (Event*)(m_eventBuffer);
 
         m_initialized = true;
-        LOG("\nWelcome To NigoziEngine!");
+        NG_CORE_LOG_INFO("\nWelcome To NigoziEngine!");
     }
 
     Application::~Application()

@@ -27,7 +27,8 @@ project "Sandbox"
 				  "%{wks.location}/vendor/glfw/include",
 				  "%{wks.location}/vendor/stb",
 				  "%{wks.location}/vendor/imgui",
-				  "%{wks.location}/vendor/glm" }
+				  "%{wks.location}/vendor/glm",
+				  "%{prj.location}/../vendor/spdlog/include" }
 
 	links {
 		"NigoziEngine",
@@ -42,6 +43,9 @@ project "Sandbox"
 		"Release",
 		"Distribution"
 	}
+
+	filter "toolset:msc*"
+  	buildoptions { "/utf-8" }
 
 	postbuildcommands {
 		"{COPYDIR} %{wks.location}/NigoziEngine/src/Nigozi/res %{prj.location}/src/Nigozi/res",

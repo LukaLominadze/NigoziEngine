@@ -27,7 +27,8 @@ project "Kakali"
 				  "%{wks.location}/vendor/glfw/include",
 				  "%{wks.location}/vendor/stb",
 				  "%{wks.location}/vendor/imgui",
-				  "%{wks.location}/vendor/glm" }
+				  "%{wks.location}/vendor/glm",
+				  "%{prj.location}/../vendor/spdlog/include" }
 
 	links {
 		"NigoziEngine",
@@ -49,6 +50,9 @@ project "Kakali"
 		"{COPYDIR} %{prj.location}/src/Nigozi %{wks.location}/bin/" ..outputdir.. "/%{prj.name}/src/Nigozi",
 		"{COPYDIR} %{prj.location}/kakali-small.png %{wks.location}/bin/" ..outputdir.. "/%{prj.name}/" 
 	}
+
+	filter "toolset:msc*"
+  	buildoptions { "/utf-8" }
 
 	filter "system:windows"
 		cppdialect "C++20"

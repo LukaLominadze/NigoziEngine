@@ -1,5 +1,8 @@
 #pragma once
 
+#include <GL/glew.h>
+#include <GLFW/glfw3.h>
+
 #include "events/Event.h"
 #include "events/KeyEvent.h"
 
@@ -53,7 +56,7 @@ namespace Nigozi
 		inline static WindowData& GetGlobalWindowData() { return (*(WindowData*)glfwGetWindowUserPointer(glfwGetCurrentContext())); }
 	private:
 		bool StartGLFW();
-		bool CreateWindow();
+		bool InitializeWindow();
 		bool SetupMonitor();
 		bool StartGLEW();
 		void CreateCallbacks();

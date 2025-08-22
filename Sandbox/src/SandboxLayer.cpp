@@ -8,7 +8,7 @@ SandboxLayer::SandboxLayer(Nigozi::OrthographicCameraController* cameraLayer)
 }
 
 void SandboxLayer::OnAttach() {
-	LOG("Hey! it's wooorking!");
+	NG_CLIENT_LOG_INFO("Hey! it's wooorking!");
 	Nigozi::Renderer2D::SetClearColor(0.1f, 0.1f, 0.1f, 1.0f);
 	m_luigiTexture = std::make_shared<Nigozi::Texture>("src/Nigozi/res/textures/luigi.png");
 	std::shared_ptr<Nigozi::Texture> ref = std::make_shared<Nigozi::Texture>("src/res/Player.png");
@@ -142,7 +142,7 @@ void SandboxLayer::OnImGuiRender()
 bool SandboxLayer::OnMouseButtonPressed(Nigozi::MouseButtonPressedEvent& event)
 {
 	if (event.GetButton() == GLFW_MOUSE_BUTTON_1) {
-		LOG("Wow, you managed to click a button");
+		NG_CLIENT_LOG_INFO("Wow, you managed to click a button");
 		return true;
 	}
 	return false;

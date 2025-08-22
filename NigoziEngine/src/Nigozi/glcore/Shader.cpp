@@ -2,10 +2,16 @@
 
 #include "Shader.h"
 
+#include <GL/glew.h>
+#include <GLFW/glfw3.h>
+
 #include <iostream>
 #include <fstream>
 #include <string>
 #include <sstream>
+
+#include "core/Assert.h"
+#include "core/Log.h"
 
 namespace Nigozi
 {
@@ -13,11 +19,11 @@ namespace Nigozi
     {
         m_filePath = filePath;
         ShaderProgramSource shaderSource = ParseShader();
-        LOG("Creating shader at " + filePath);
-        LOG("SHADER VERTEX");
-        LOG(shaderSource.VertexShader);
-        LOG("SHADER FRAGMENT");
-        LOG(shaderSource.FragmentShader);
+        NG_CORE_LOG_INFO("Creating shader at " + filePath);
+        NG_CORE_LOG_INFO("SHADER VERTEX");
+        NG_CORE_LOG_INFO(shaderSource.VertexShader);
+        NG_CORE_LOG_INFO("SHADER FRAGMENT");
+        NG_CORE_LOG_INFO(shaderSource.FragmentShader);
         m_shader = CreateShader(shaderSource.VertexShader, shaderSource.FragmentShader);
         GLCall(glLinkProgram(m_shader));
         GLCall(glUseProgram(m_shader));
@@ -102,7 +108,7 @@ namespace Nigozi
         if (!success) {
             char infoLog[1024];
             GLCall(glGetProgramInfoLog(program, 1024, nullptr, infoLog));
-            LOG("[Shader Linking Error]:\n" << infoLog);
+            NG_CORE_LOG_ERROR("[Shader Linking Error]:\n" + std::string(infoLog));
         }
     
         GLCall(glValidateProgram(program));
@@ -112,7 +118,7 @@ namespace Nigozi
         if (!success) {
             char infoLog[1024];
             GLCall(glGetProgramInfoLog(program, 1024, nullptr, infoLog));
-            LOG("[Shader Validation Error]:\n" << infoLog);
+            NG_CORE_LOG_ERROR("[Shader Validation Error]:\n" + std::string(infoLog));
         }
 
         GLCall(glDeleteShader(_vertexShader));
@@ -134,7 +140,7 @@ namespace Nigozi
         {
             char infoLog[1024];
             GLCall(glGetShaderInfoLog(id, 1024, NULL, infoLog));
-            LOG("[Shader Compilation Error] (" << m_filePath << "):\n" << infoLog);
+            NG_CORE_LOG_ERROR("[Shader Compilation Error] (" + m_filePath + "):\n" + std::string(infoLog));
         }
 
         return id;
