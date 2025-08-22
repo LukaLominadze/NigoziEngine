@@ -45,6 +45,7 @@ namespace Nigozi
 		bool SetupWindow(const ApplicationProps& props);
 		bool CreateGUILayer();
 		bool StartRenderer();
+		bool StartAudioEngine();
 	protected:
 		Window m_window;
 		LayerStack m_layerStack;

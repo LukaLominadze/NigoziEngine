@@ -2,6 +2,7 @@
 
 #include "Application.h"
 #include "glcore/Renderer2D.h"
+#include "audio/AudioEngine.h"
 
 namespace Nigozi
 {
@@ -23,6 +24,11 @@ namespace Nigozi
             return;
         }
 
+        if (!StartAudioEngine()) {
+            std::cout << "Couldn't initialize audio engine! Shutting down..." << std::endl;
+            return;
+        }
+
         p_eventBufferPointer = (Event*)(m_eventBuffer);
 
         m_initialized = true;
@@ -32,6 +38,8 @@ namespace Nigozi
     Application::~Application()
     {
         Renderer2D::Deinitialize();
+        m_window.~Window();
+        AudioEngine::Deinitialize();
     }
 
     void Application::Run()
@@ -170,5 +178,11 @@ namespace Nigozi
         Renderer2D::Initialize();
         Renderer2D::SetClearColor(0.1f, 0.1f, 0.1f, 1.0f);
         return Renderer2D::GetData()->QuadVertexArray;
+    }
+
+    bool Application::StartAudioEngine()
+    {
+        AudioEngine::Init();
+        return AudioEngine::Initialized();
     }
 }

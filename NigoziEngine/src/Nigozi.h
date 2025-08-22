@@ -19,6 +19,10 @@
 #include "Nigozi/glcore/ParticleSystem.h"
 #include "Nigozi/glcore/FrameBuffer.h"
 
+#include "Nigozi/audio/AudioEngine.h"
+#include "Nigozi/audio/AudioGroup.h"
+#include "Nigozi/audio/Audio.h"
+
 #include "Nigozi/events/Event.h"
 #include "Nigozi/events/ApplicationEvent.h"
 #include "Nigozi/events/KeyEvent.h"

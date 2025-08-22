@@ -3,6 +3,8 @@
 SandboxLayer::SandboxLayer(Nigozi::OrthographicCameraController* cameraLayer)
 {
 	p_cameraLayer = cameraLayer;
+	p_audio = Nigozi::AudioEngine::LoadAudioFromFile("src/res/papyrus.mp3");
+	p_audio->SetVolume(m_audioVolume);
 }
 
 void SandboxLayer::OnAttach() {
@@ -22,6 +24,27 @@ void SandboxLayer::OnEvent(Nigozi::Event& event)
 
 void SandboxLayer::OnUpdate(float timestep)
 {
+	p_audio->Update();
+	if (Nigozi::Input::IsKeyPressed(GLFW_KEY_P)) {
+		if (!p_audio->IsPlaying()) {
+			p_audio->Play();
+		}
+	}
+	if (Nigozi::Input::IsKeyPressed(GLFW_KEY_EQUAL)) {
+		m_audioVolume += 12.0f * timestep;
+		p_audio->SetVolume(m_audioVolume);
+	}
+	if (Nigozi::Input::IsKeyPressed(GLFW_KEY_MINUS)) {
+		m_audioVolume -= 12.0f * timestep;
+		p_audio->SetVolume(m_audioVolume);
+	}
+
+	if (Nigozi::Input::IsKeyPressed(GLFW_KEY_P)) {
+		if (!p_audio->IsPlaying()) {
+			p_audio->Play();
+		}
+	}
+
 	if (Nigozi::Input::IsKeyPressed(GLFW_KEY_SPACE)) {
 		m_keystate = "GLFW_REPEAT";
 	}
@@ -103,6 +126,12 @@ void SandboxLayer::OnImGuiRender()
 	ImGui::Text(std::to_string(Nigozi::Renderer2D::GetData()->DrawCalls).c_str());
 	ImGui::Text("Quad Count");
 	ImGui::Text(std::to_string(Nigozi::Renderer2D::GetData()->QuadCount).c_str());
+
+	ImGui::Text("Audio Controls:");
+	ImGui::Text("P -> Play");
+	ImGui::Text("+ -> Volume Up");
+	ImGui::Text("- -> Volume Down");
+	ImGui::Text(("Volume: " + std::to_string(m_audioVolume)).c_str());
 
 	ImGui::End();
 
