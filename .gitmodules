@@ -1,15 +1,15 @@
 [submodule "dependencies/imgui"]
-	path = dependencies/imgui
+	path = vendor/imgui
 	url = https://github.com/LukaLominadze/imgui
 	branch = docking
 [submodule "dependencies/glfw"]
-	path = dependencies/glfw
+	path = vendor/glfw
 	url = https://github.com/LukaLominadze/glfw
 [submodule "dependencies/stb"]
-	path = dependencies/stb
+	path = vendor/stb
 	url = https://github.com/LukaLominadze/stb
 [submodule "dependencies/glew"]
-	path = dependencies/glew
+	path = vendor/glew
 	url = https://github.com/LukaLominadze/glew
 [submodule "vendor/spdlog"]
 	path = vendor/spdlog
