@@ -165,10 +165,10 @@ namespace Nigozi
         return true;
     }
 
+    // ImGUI is an overlay, because we want to render UI last and for UI to
+    // get the events FIRST
     bool Application::CreateGUILayer()
     {
-        // ImGUI is an overlay, because we want to render UI last and for UI to
-        // get the events FIRST
         PushOverlay(&m_imGuiLayer);
         return &m_imGuiLayer;
     }

@@ -32,12 +32,15 @@ namespace Nigozi
 		int TextureUnits[16];
 	};
 
+	class Application;
+
 	class Renderer2D
 	{
-	public:
+	private:
+		friend class Application;
 		static void Initialize();
 		static void Deinitialize();
-
+	public:
 		static void SetClearColor(float v0, float v1, float v2, float v3);
 		static void Clear();
 
