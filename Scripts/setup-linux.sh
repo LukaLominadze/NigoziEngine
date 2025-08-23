@@ -2,7 +2,5 @@
 
 set -e
 
-$ pushd ..
-./vendor/bin/scripts/premake/premake5 gmake
-$ popd
+../vendor/bin/scripts/premake/premake5 gmake --file=../premake5.lua
 
