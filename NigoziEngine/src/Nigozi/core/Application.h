@@ -13,11 +13,11 @@
 namespace Nigozi 
 {
 	struct ApplicationProps {
-		const char* Title;
-		uint32_t Width, Height;
-		bool VSync;
-		bool Fullscreen;
-		const char* IconPath;
+		const char* Title = "App";
+		uint32_t Width = 960, Height = 540;
+		bool VSync = false;
+		bool Fullscreen = false;
+		const char* IconPath; // No icon by default
 	};
 
 	class Application {
