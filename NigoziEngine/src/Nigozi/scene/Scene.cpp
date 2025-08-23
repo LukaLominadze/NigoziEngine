@@ -27,6 +27,11 @@ namespace Nigozi
 
     void Scene::OnUpdate(float timestep)
     {
+        auto audioView = m_Registry.view<AudioStreamPlayerComponent>();
+        audioView.each([](auto audio) {
+            audio.AudioHandle->Update();
+            });
+
         auto scriptView = m_Registry.view<ScriptComponent>();
         scriptView.each([timestep](auto script) {
             script.ScriptHandle->OnUpdate(timestep);

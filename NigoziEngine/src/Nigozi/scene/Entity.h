@@ -2,6 +2,8 @@
 
 #include "ngpch.h"
 #include "Scene.h"
+#include "Nigozi/core/Assert.h"
+#include "Nigozi/core/Log.h"
 
 namespace Nigozi
 {
@@ -15,7 +17,8 @@ namespace Nigozi
 		template<typename T, typename... Args>
 		T& AddComponent(Args&&... args) {
 			if (HasComponent<T>()) {
-				ERROR_LOG("Component already present!");
+				NG_CORE_LOG_CRITICAL("Component already present!");
+				assert(false);
 			}
 			return p_scene->m_Registry.emplace<T>(m_entityHandle, std::forward<Args>(args)...);
 		}
@@ -23,7 +26,7 @@ namespace Nigozi
 		template<typename T>
 		T& GetComponent() const {
 			if (!HasComponent<T>()) {
-				LOG("Component not present!");
+				NG_CORE_LOG_CRITICAL("Component not present!");
 				assert(false);
 			}
 			return p_scene->m_Registry.get<T>(m_entityHandle);

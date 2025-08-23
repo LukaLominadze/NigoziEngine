@@ -27,6 +27,10 @@ namespace Nigozi
 
 	void SceneManager::OnUpdate(float timestep)
 	{
+		if (m_sceneLoadEvent.Queued) {
+			m_sceneLoadEvent.Func();
+			m_sceneLoadEvent.Queued = false;
+		}
 		m_currentScene.second->OnUpdate(timestep);
 	}
 
@@ -48,14 +52,22 @@ namespace Nigozi
 		m_sceneInstantiators[name] = func;
 	}
 
-	void SceneManager::LoadScene(const std::string& name)
+	void SceneManager::QueueLoadScene(const std::string& name)
 	{
 		if (!m_sceneInstantiators.contains(name)) {
 			return;
 		}
 		if (m_currentScene.first == name) {
-			return;
+			m_sceneLoadEvent.Func = [this]() { LoadCurrentScene(); };
 		}
+		else {
+			m_sceneLoadEvent.Func = [this, name]() { LoadScene(name); };
+		}
+		m_sceneLoadEvent.Queued = true;
+	}
+
+	void SceneManager::LoadScene(const std::string& name)
+	{
 		m_currentScene.second.reset();
 		m_currentScene.first = name;
 		m_currentScene.second = m_sceneInstantiators.at(name)();

@@ -2,6 +2,9 @@
 
 #include "ngpch.h"
 
+#include "Nigozi/core/Assert.h"
+#include "Nigozi/core/Log.h"
+
 namespace Nigozi
 {
 	struct VertexBufferLayoutElement {
@@ -15,7 +18,7 @@ namespace Nigozi
 			case GL_UNSIGNED_INT: return 4;
 			case GL_UNSIGNED_BYTE: return 1;
 			}
-			ERROR_LOG("Wrong type used on function : VertexBufferLayout::GetTypeSize(uint32_t type)");
+			NG_CORE_LOG_WARN("Wrong type used on function : VertexBufferLayout::GetTypeSize(uint32_t type)");
 			return 0;
 		}
 	};
@@ -25,7 +28,7 @@ namespace Nigozi
 	public:
 		template<typename T>
 		void Push(uint32_t count) {
-			unsigned int type;
+			uint32_t type;
 			char normalized;
 			if (std::is_same<T, float>::value) {
 				type = GL_FLOAT;
@@ -40,7 +43,7 @@ namespace Nigozi
 				normalized = GL_TRUE;
 			}
 			else {
-				ERROR_LOG("Wrong type used on function template : VertexBufferLayout::Push(uint32_t count)");
+				NG_CORE_LOG_WARN("Wrong type used on function template : VertexBufferLayout::Push(uint32_t count)");
 			}
 
 			m_elements.push_back(VertexBufferLayoutElement{ type, count, normalized });

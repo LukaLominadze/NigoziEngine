@@ -17,6 +17,8 @@ private:
 	Nigozi::OrthographicCameraController* p_cameraLayer;
 	Nigozi::ParticleSystem m_particleSystem;
 
+	Nigozi::Audio* p_audio;
+
 	std::shared_ptr<Nigozi::Texture> m_luigiTexture;
 	std::shared_ptr<Nigozi::SubTexture> m_playerTexture;
 
@@ -26,6 +28,7 @@ private:
 
 	glm::vec3 m_luigiPosition;
 
+	float m_audioVolume = -6.0f;
 	float m_elapsedTime = 0.0f;
 	uint32_t m_slotX = 0;
 };
