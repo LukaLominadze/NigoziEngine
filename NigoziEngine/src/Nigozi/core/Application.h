@@ -12,12 +12,14 @@
 
 namespace Nigozi 
 {
+	constexpr const char NO_ICON[5] = "NONE";
+
 	struct ApplicationProps {
 		const char* Title = "App";
 		uint32_t Width = 960, Height = 540;
 		bool VSync = false;
 		bool Fullscreen = false;
-		const char* IconPath; // No icon by default
+		const char* IconPath = NO_ICON; // No icon by default
 	};
 
 	class Application {
