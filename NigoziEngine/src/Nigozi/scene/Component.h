@@ -92,20 +92,8 @@ namespace Nigozi {
 			ASSERT(AudioHandle, "Initializing audio...");
 		}
 
-		inline void Play() {
-			AudioHandle->Play();
+		Audio* operator->() {
+			return AudioHandle;
 		}
-		inline void Pause() {
-			AudioHandle->Pause();
-		}
-		inline void Resume() {
-			AudioHandle->Resume();
-		}
-		inline void Stop() {
-			AudioHandle->Stop();
-		}
-
-		inline const bool IsPlaying() { return AudioHandle->IsPlaying(); }
-		inline const bool IsPaused() { return AudioHandle->IsPaused(); }
 	};
 }

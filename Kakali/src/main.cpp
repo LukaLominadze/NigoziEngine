@@ -4,6 +4,13 @@
 #include "KakaliApplication.h"
 
 Nigozi::Application* CreateApplication() {
-	KakaliApplication* app = new KakaliApplication({ "Kakali Editor", 1600, 900, true, false, "kakali-small.png" });
+	Nigozi::ApplicationProps props;
+	props.Title = "Kakali Editor";
+	props.Width = 1600;
+	props.Height = 900;
+	props.VSync = true;
+	props.Fullscreen = false;
+	props.IconPath = "kakali-small.png";
+	KakaliApplication* app = new KakaliApplication(props);
 	return app;
 }

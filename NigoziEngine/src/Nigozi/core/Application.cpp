@@ -5,6 +5,7 @@
 #include "audio/AudioEngine.h"
 #include "Assert.h"
 #include "Log.h"
+#include <cstring>
 
 namespace Nigozi
 {
@@ -160,7 +161,7 @@ namespace Nigozi
         m_window.SetEventCallback(std::bind(&Application::QueueEvent, this, std::placeholders::_1));
         m_window.SetVSync(props.VSync);
 
-        if (props.IconPath) {
+        if (strcmp(props.IconPath, NO_ICON) != 0) {
             m_window.SetIcon(props.IconPath);
         }
 
