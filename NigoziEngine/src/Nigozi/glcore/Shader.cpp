@@ -2,10 +2,16 @@
 
 #include "Shader.h"
 
+#include <GL/glew.h>
+#include <GLFW/glfw3.h>
+
 #include <iostream>
 #include <fstream>
 #include <string>
 #include <sstream>
+
+#include "core/Assert.h"
+#include "core/Log.h"
 
 namespace Nigozi
 {
@@ -13,11 +19,11 @@ namespace Nigozi
     {
         m_filePath = filePath;
         ShaderProgramSource shaderSource = ParseShader();
-        LOG("Creating shader at " + filePath);
-        LOG("SHADER VERTEX");
-        LOG(shaderSource.VertexShader);
-        LOG("SHADER FRAGMENT");
-        LOG(shaderSource.FragmentShader);
+        NG_CORE_LOG_INFO("Creating shader at " + filePath);
+        NG_CORE_LOG_INFO("SHADER VERTEX");
+        NG_CORE_LOG_INFO(shaderSource.VertexShader);
+        NG_CORE_LOG_INFO("SHADER FRAGMENT");
+        NG_CORE_LOG_INFO(shaderSource.FragmentShader);
         m_shader = CreateShader(shaderSource.VertexShader, shaderSource.FragmentShader);
         GLCall(glLinkProgram(m_shader));
         GLCall(glUseProgram(m_shader));
@@ -43,7 +49,7 @@ namespace Nigozi
         GLCall(glUniformMatrix4fv(GetUniformLocation(name), 1, GL_FALSE, &matrix[0][0]));
     }
 
-    void Shader::SetUniform1iv(const std::string& name, unsigned int count, int* value)
+    void Shader::SetUniform1iv(const std::string& name, uint32_t count, int* value)
     {
         GLCall(glUniform1iv(GetUniformLocation(name), count, value));
     }
@@ -87,11 +93,11 @@ namespace Nigozi
         return ShaderProgramSource{ ss[0].str(), ss[1].str() };
     }
 
-    unsigned int Shader::CreateShader(const std::string& vertexShader, const std::string& fragmentShader)
+    uint32_t Shader::CreateShader(const std::string& vertexShader, const std::string& fragmentShader)
     {
-        unsigned int program = glCreateProgram();
-        unsigned int _vertexShader = CompileShader(GL_VERTEX_SHADER, vertexShader);
-        unsigned int _fragmentShader = CompileShader(GL_FRAGMENT_SHADER, fragmentShader);
+        uint32_t program = glCreateProgram();
+        uint32_t _vertexShader = CompileShader(GL_VERTEX_SHADER, vertexShader);
+        uint32_t _fragmentShader = CompileShader(GL_FRAGMENT_SHADER, fragmentShader);
 
         GLCall(glAttachShader(program, _vertexShader));
         GLCall(glAttachShader(program, _fragmentShader));
@@ -102,7 +108,7 @@ namespace Nigozi
         if (!success) {
             char infoLog[1024];
             GLCall(glGetProgramInfoLog(program, 1024, nullptr, infoLog));
-            LOG("[Shader Linking Error]:\n" << infoLog);
+            NG_CORE_LOG_ERROR("[Shader Linking Error]:\n" + std::string(infoLog));
         }
     
         GLCall(glValidateProgram(program));
@@ -112,7 +118,7 @@ namespace Nigozi
         if (!success) {
             char infoLog[1024];
             GLCall(glGetProgramInfoLog(program, 1024, nullptr, infoLog));
-            LOG("[Shader Validation Error]:\n" << infoLog);
+            NG_CORE_LOG_ERROR("[Shader Validation Error]:\n" + std::string(infoLog));
         }
 
         GLCall(glDeleteShader(_vertexShader));
@@ -121,9 +127,9 @@ namespace Nigozi
         return program;
     }
 
-    unsigned int Shader::CompileShader(unsigned int type, const std::string& source)
+    uint32_t Shader::CompileShader(uint32_t type, const std::string& source)
     {
-        unsigned int id = glCreateShader(type);
+        uint32_t id = glCreateShader(type);
         const char* src = source.c_str();
         GLCall(glShaderSource(id, 1, &src, nullptr));
         GLCall(glCompileShader(id));
@@ -134,7 +140,7 @@ namespace Nigozi
         {
             char infoLog[1024];
             GLCall(glGetShaderInfoLog(id, 1024, NULL, infoLog));
-            LOG("[Shader Compilation Error] (" << m_filePath << "):\n" << infoLog);
+            NG_CORE_LOG_ERROR("[Shader Compilation Error] (" + m_filePath + "):\n" + std::string(infoLog));
         }
 
         return id;

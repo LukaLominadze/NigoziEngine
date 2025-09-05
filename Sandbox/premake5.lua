@@ -23,17 +23,12 @@ project "Sandbox"
 	includedirs {  "src",
 				  "%{wks.location}/NigoziEngine/src",
 				  "%{wks.location}/NigoziEngine/src/Nigozi",
-				  "%{wks.location}/dependencies/glew/include",
-				  "%{wks.location}/dependencies/glfw/include",
-				  "%{wks.location}/dependencies/stb",
-				  "%{wks.location}/dependencies/imgui",
-				  "%{wks.location}/dependencies/glm" }
-
-	libdirs { "%{wks.location}/dependencies/libs/GLFW",
-			  "%{wks.location}/dependencies/glew/lib/Release/x64",
-			  "%{wks.location}/dependencies/libs/STB",
-			  "%{wks.location}/dependencies/libs/ImGui",
-			  "%{wks.location}/dependencies/glew/lib" }
+				  "%{wks.location}/vendor/glew/include",
+				  "%{wks.location}/vendor/glfw/include",
+				  "%{wks.location}/vendor/stb",
+				  "%{wks.location}/vendor/imgui",
+				  "%{wks.location}/vendor/glm",
+				  "%{prj.location}/../vendor/spdlog/include" }
 
 	links {
 		"NigoziEngine",
@@ -48,6 +43,9 @@ project "Sandbox"
 		"Release",
 		"Distribution"
 	}
+
+	filter "toolset:msc*"
+  	buildoptions { "/utf-8" }
 
 	postbuildcommands {
 		"{COPYDIR} %{wks.location}/NigoziEngine/src/Nigozi/res %{prj.location}/src/Nigozi/res",

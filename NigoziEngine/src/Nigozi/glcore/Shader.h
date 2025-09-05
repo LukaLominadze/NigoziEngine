@@ -22,12 +22,12 @@ namespace Nigozi
 		void SetUniform1i(const std::string& name, int value);
 		void SetUniform4f(const std::string& name, float v0, float v1, float v2, float v3);
 		void SetUniformMat4f(const std::string& name, const glm::mat4& matrix);
-		void SetUniform1iv(const std::string& name, unsigned int count, int* value);
+		void SetUniform1iv(const std::string& name, uint32_t count, int* value);
 
 		void Bind() const;
 		void Unbind() const;
 
-		unsigned int GetProgram() const { return m_shader; }
+		uint32_t GetProgram() const { return m_shader; }
 		const std::string& GetFilePath() const { return m_filePath; }
 
 		int GetUniformLocation(const std::string& uniform);
@@ -35,10 +35,10 @@ namespace Nigozi
 		void Delete();
 	private:
 		ShaderProgramSource ParseShader();
-		unsigned int CreateShader(const std::string& vertexShader, const std::string& fragmentShader);
-		unsigned int CompileShader(unsigned int type, const std::string& source);
+		uint32_t CreateShader(const std::string& vertexShader, const std::string& fragmentShader);
+		uint32_t CompileShader(uint32_t type, const std::string& source);
 	private:
 		std::string m_filePath;
-		unsigned int m_shader;
+		uint32_t m_shader;
 	};
 }

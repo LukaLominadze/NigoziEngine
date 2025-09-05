@@ -4,6 +4,7 @@
 #include "Nigozi/glcore/Texture.h"
 #include "Nigozi/glcore/SubTexture.h"
 #include "Script.h"
+#include "Nigozi/audio/AudioEngine.h"
 
 namespace Nigozi {
 	struct NameComponent {
@@ -74,6 +75,25 @@ namespace Nigozi {
 		ScriptComponent(const ScriptComponent& other) = default;
 		ScriptComponent(const std::shared_ptr<Script>& script) {
 			ScriptHandle = script;
+		}
+	};
+
+	struct AudioStreamPlayerComponent {
+		Audio* AudioHandle = nullptr;
+
+		AudioStreamPlayerComponent() = default;
+		AudioStreamPlayerComponent(const AudioStreamPlayerComponent& other) = default;
+		AudioStreamPlayerComponent(const std::filesystem::path& filePath) {
+			AudioHandle = AudioEngine::LoadAudioFromFile(filePath);
+			ASSERT(AudioHandle, "Initializing audio...");
+		}
+		AudioStreamPlayerComponent(const std::filesystem::path& filePath, const std::string_view& audioGroup) {
+			AudioHandle = AudioEngine::LoadAudioFromFile(filePath, audioGroup);
+			ASSERT(AudioHandle, "Initializing audio...");
+		}
+
+		Audio* operator->() {
+			return AudioHandle;
 		}
 	};
 }

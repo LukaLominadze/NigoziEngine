@@ -18,37 +18,6 @@ if platform.system() == 'Windows':
         insert_count = 0
         glcore_guid = ''
 
-        print('\nAttempting to retrieve "NigoziEngine" GUID...')
-        with open(vcxproj_nigozi, "r") as f:
-            lines = f.readlines()
-
-            for i, line in enumerate(lines):
-                if "<ProjectGuid>" in line:
-                    glcore_guid = line.strip().lstrip('<ProjectGuid>{').rstrip('}</ProjectGuid>').lower()
-                    print('Success! -> ' + glcore_guid)
-                    break
-
-        f.close()
-
-        print('\nAttempting to set reference to "NigoziEngine" in "Sandbox"...')
-        with open(vcxproj_sandbox, "r") as f1:
-            lines1 = f1.readlines()
-
-            for j, line in enumerate(lines1):
-                if '<Import Project="$(VCTargetsPath)\\Microsoft.Cpp.targets" />' in line:
-                    lines1.insert(j, """
-<ItemGroup>
-    <ProjectReference Include="..\\NigoziEngine\\NigoziEngine.vcxproj">
-      <Project>{""" + glcore_guid + """}</Project>
-    </ProjectReference>
-</ItemGroup>
-""")
-                    print('\nSuccess -> Added reference!')
-                    break
-
-        with open(vcxproj_sandbox, "w") as f1:
-            f1.writelines(lines1)
-
         print('Attempting to set pch source as ngpch.cpp...')
         with open(vcxproj_nigozi, "r") as f2:
             lines2 = f2.readlines()
@@ -81,5 +50,3 @@ if platform.system() == 'Windows':
 
     except subprocess.CalledProcessError as e:
         print("Script failed! --- ", e)
-
-input('Press press ENTER to end setup...')

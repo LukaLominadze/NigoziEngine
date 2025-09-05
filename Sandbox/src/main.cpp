@@ -4,6 +4,9 @@
 #include "Sandbox.h"
 
 Nigozi::Application* CreateApplication() {
-	Nigozi::Application* app = new Sandbox({ "Test App", 960, 540, true, false });
+	Nigozi::ApplicationProps props;
+	props.Title = "Test App";
+	props.VSync = true;
+	Nigozi::Application* app = new Sandbox(props);
 	return app;
 }

@@ -1,6 +1,7 @@
 #include "ngpch.h"
 
 #include "Texture.h"
+#include "Nigozi/core/Assert.h"
 
 namespace Nigozi
 {

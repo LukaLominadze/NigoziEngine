@@ -13,6 +13,7 @@ project "NigoziEngine"
 	files {
 		"src/**.h",
 		"src/**.cpp",
+		"src/**.c",
 		"src/ngpch.cpp",
 		"src/Nigozi.h"
 	}
@@ -27,18 +28,13 @@ project "NigoziEngine"
 
 	includedirs { "src",
 				  "src/Nigozi",
-				  "%{prj.location}/../dependencies/glew/include",
-				  "%{prj.location}/../dependencies/glfw/include",
-				  "%{prj.location}/../dependencies/stb",
-				  "%{prj.location}/../dependencies/imgui",
-				  "%{prj.location}/../dependencies/glm" }
+				  "%{prj.location}/../vendor/glew/include",
+				  "%{prj.location}/../vendor/glfw/include",
+				  "%{prj.location}/../vendor/stb",
+				  "%{prj.location}/../vendor/imgui",
+				  "%{prj.location}/../vendor/glm",
+				  "%{prj.location}/../vendor/spdlog/include" }
 
-	libdirs { "%{prj.location}/../dependencies/libs/GLFW",
-			  "%{prj.location}/../dependencies/glew/lib/Release/x64",
-			  "%{prj.location}/../dependencies/libs/STB",
-			  "%{prj.location}/../dependencies/libs/ImGui",
-			  "%{prj.location}/../dependencies/glew/lib" }
-			  
 	links { "GLEW",
 		"GLFW",
 		"STB",
@@ -49,6 +45,9 @@ project "NigoziEngine"
 		"Release",
 		"Distribution"
 	}
+
+	filter "toolset:msc*"
+  	buildoptions { "/utf-8" }
 
 	filter "system:windows"
 		systemversion "latest"

@@ -12,17 +12,20 @@
 
 namespace Nigozi 
 {
+	constexpr const char NO_ICON[5] = "NONE";
+
 	struct ApplicationProps {
-		const char* Title;
-		uint32_t Width, Height;
-		bool VSync;
-		bool Fullscreen;
-		const char* IconPath;
+		const char* Title = "App";
+		uint32_t Width = 960, Height = 540;
+		bool VSync = false;
+		bool Fullscreen = false;
+		const char* IconPath = NO_ICON; // No icon by default
 	};
 
 	class Application {
 	public:
 		Application(const ApplicationProps& props);
+		Application(const Application& other) = delete;
 		~Application();
 		const bool Initialized() const { return m_initialized; }
 
@@ -41,11 +44,12 @@ namespace Nigozi
 		virtual void OnRender();
 		virtual void OnImGuiRender();
 	private:
-		bool CreateWindow(const ApplicationProps& props);
+		bool SetupWindow(const ApplicationProps& props);
 		bool CreateGUILayer();
 		bool StartRenderer();
+		bool StartAudioEngine();
 	protected:
-		Window* p_window;
+		Window m_window;
 		LayerStack m_layerStack;
 		ImGuiLayer m_imGuiLayer;
 	private:
@@ -59,7 +63,7 @@ namespace Nigozi
 			in the same place in the duration of the
 			application
 		*/
-		char m_eventBuffer[64];
+		char m_eventBuffer[16];
 		Event* p_eventBufferPointer;
 	};
 }

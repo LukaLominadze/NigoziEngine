@@ -1,6 +1,8 @@
 #include "ngpch.h"
 #include "FrameBuffer.h"
 
+#include "Nigozi/core/Assert.h"
+
 namespace Nigozi
 {
 	FrameBuffer::FrameBuffer(const FrameBufferSpecification& props)

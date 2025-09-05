@@ -1,6 +1,7 @@
 #include "ngpch.h"
 
 #include "IndexBuffer.h"
+#include "Nigozi/core/Assert.h"
 
 namespace Nigozi
 {

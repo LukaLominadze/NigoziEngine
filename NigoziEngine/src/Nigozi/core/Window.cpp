@@ -5,41 +5,37 @@
 #include "events/ApplicationEvent.h"
 #include "events/KeyEvent.h"
 #include "events/MouseEvent.h"
+#include "Log.h"
 
 namespace Nigozi
 {
+	Window::Window(const char* title, uint32_t width, uint32_t height, bool fullscreen, bool vsync)
+		:m_windowData({ title, width, height, width, height, fullscreen, vsync })
+	{
+		if (!StartGLFW()) {
+			NG_CORE_LOG_CRITICAL("Couldn't initialize GLFW...");
+			return;
+		}
+		if (!InitializeWindow()) {
+			NG_CORE_LOG_CRITICAL("Couldn't create window...");
+			return;
+		}
+		if (!SetupMonitor()) {
+			NG_CORE_LOG_CRITICAL("Couldn't initialize primary monitor...");
+			return;
+		}
+		if (!StartGLEW()) {
+			NG_CORE_LOG_CRITICAL("Couldn't initialize GLAD...");
+			return;
+		}
+		CreateCallbacks();
+		m_initialized = true;
+	}
+
 	Window::~Window()
 	{
 		glfwDestroyWindow(p_window);
 		glfwTerminate();
-	}
-
-	bool Window::StartUp(const char* title, uint32_t width, uint32_t height, bool fullscreen, bool vsync)
-	{
-		m_windowData = {
-			title,
-			width, height,
-			width, height,
-			fullscreen, vsync
-		};
-		if (!StartGLFW()) {
-			std::cout << "Couldn't initialize GLFW..." << std::endl;
-			return false;
-		}
-		if (!CreateWindow()) {
-			std::cout << "Couldn't create window..." << std::endl;
-			return false;
-		}
-		if (!SetupMonitor()) {
-			std::cout << "Couldn't initialize primary monitor..." << std::endl;
-			return false;
-		}
-		if (!StartGLEW()) {
-			std::cout << "Couldn't initialize GLAD..." << std::endl;
-			return false;
-		}
-		CreateCallbacks();
-		return true;
 	}
 
 	void Window::SetIcon(const char* path)
@@ -120,7 +116,7 @@ namespace Nigozi
 		return glfwInit() == GLFW_TRUE;
 	}
 
-	bool Window::CreateWindow()
+	bool Window::InitializeWindow()
 	{
 		p_window = glfwCreateWindow(m_windowData.Width, m_windowData.Height, m_windowData.Title, NULL, NULL);
 		if (!p_window)

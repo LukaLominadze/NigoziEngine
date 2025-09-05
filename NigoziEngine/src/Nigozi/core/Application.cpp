@@ -2,54 +2,65 @@
 
 #include "Application.h"
 #include "glcore/Renderer2D.h"
+#include "audio/AudioEngine.h"
+#include "Assert.h"
+#include "Log.h"
+#include <cstring>
 
 namespace Nigozi
 {
     Application::Application(const ApplicationProps& props)
+        :m_window(props.Title, props.Width, props.Height, props.Fullscreen, props.VSync)
     {
-        if (!CreateWindow(props)) {
-            std::cout << "Couldn't create window! Shutting down..." << std::endl;
+        if (!SetupWindow(props)) {
+            NG_CORE_LOG_CRITICAL("Couldn't create window! Shutting down...");
             return;
         }
 
         if (!CreateGUILayer()) {
-            std::cout << "Couldn't create GUI layer! Shutting down..." << std::endl;
+            NG_CORE_LOG_CRITICAL("Couldn't create GUI layer! Shutting down...");
             return;
         }
 
         if (!StartRenderer()) {
-            std::cout << "Couldn't initialize renderer! Shutting down..." << std::endl;
+            NG_CORE_LOG_CRITICAL("Couldn't initialize renderer! Shutting down...");
+            return;
+        }
+
+        if (!StartAudioEngine()) {
+            NG_CORE_LOG_CRITICAL("Couldn't initialize audio engine! Shutting down...");
             return;
         }
 
         p_eventBufferPointer = (Event*)(m_eventBuffer);
 
         m_initialized = true;
-        LOG("\nWelcome To NigoziEngine!");
+        NG_CORE_LOG_INFO("\nWelcome To NigoziEngine!");
     }
 
     Application::~Application()
     {
         Renderer2D::Deinitialize();
-        delete p_window;
+        m_window.~Window();
+        AudioEngine::Deinitialize();
     }
 
     void Application::Run()
     {
         Test::Timer timer = Test::Timer();
         float timestep = 0.0f;
-        while (!p_window->ShouldClose())
+        while (!m_window.ShouldClose())
         {
             timer.StartTimerAndReturnSeconds();
 
-            p_window->PollEvents();
+            m_window.PollEvents();
 
             OnEvent();
             OnUpdate(timestep);
             OnRender();
             OnImGuiRender();
 
-            p_window->Update();
+            m_window.Update();
 
             timestep = timer.EndTimerAndReturnSeconds();
         }
@@ -140,28 +151,27 @@ namespace Nigozi
     // Window class is used for initializing the context,
     // handling GLFW functions (like vsync, fullscreen, etc.)
     // and events
-    bool Application::CreateWindow(const ApplicationProps& props)
+    bool Application::SetupWindow(const ApplicationProps& props)
     {
-        p_window = new Window();
-        if (!p_window->StartUp(props.Title, props.Width, props.Height, props.Fullscreen)) {
+        if (!m_window.Initialized()) {
             return false;
         }
         // Polled events will be sent to the OnEvent function in the application
         // Because the application class handles the distribution of all occurred events
-        p_window->SetEventCallback(std::bind(&Application::QueueEvent, this, std::placeholders::_1));
-        p_window->SetVSync(props.VSync);
+        m_window.SetEventCallback(std::bind(&Application::QueueEvent, this, std::placeholders::_1));
+        m_window.SetVSync(props.VSync);
 
-        if (props.IconPath) {
-            p_window->SetIcon(props.IconPath);
+        if (strcmp(props.IconPath, NO_ICON) != 0) {
+            m_window.SetIcon(props.IconPath);
         }
 
-        return p_window;
+        return true;
     }
 
+    // ImGUI is an overlay, because we want to render UI last and for UI to
+    // get the events FIRST
     bool Application::CreateGUILayer()
     {
-        // ImGUI is an overlay, because we want to render UI last and for UI to
-        // get the events FIRST
         PushOverlay(&m_imGuiLayer);
         return &m_imGuiLayer;
     }
@@ -171,5 +181,11 @@ namespace Nigozi
         Renderer2D::Initialize();
         Renderer2D::SetClearColor(0.1f, 0.1f, 0.1f, 1.0f);
         return Renderer2D::GetData()->QuadVertexArray;
+    }
+
+    bool Application::StartAudioEngine()
+    {
+        AudioEngine::Init();
+        return AudioEngine::Initialized();
     }
 }

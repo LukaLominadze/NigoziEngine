@@ -1,32 +1,62 @@
 #pragma once
 
-#include <GL/glew.h>
-#include <GLFW/glfw3.h>
+#include <memory>
+#include "spdlog/spdlog.h"
 
-#include <iostream>
+namespace Nigozi
+{
+	class Application;
+
+	class Log
+	{
+	public:
+		static void Initialize();
+
+		static std::shared_ptr<spdlog::logger> CreateLogger(const std::string& name);
+
+		inline static std::shared_ptr<spdlog::logger> GetLogger(const std::string& name) { return spdlog::get(name); }
+		inline static std::shared_ptr<spdlog::logger>& GetCoreLogger() { return s_coreLogger; }
+		inline static std::shared_ptr<spdlog::logger>& GetClientLogger() { return s_clientLogger; }
+	private:
+		static std::shared_ptr<spdlog::logger> s_coreLogger;
+		static std::shared_ptr<spdlog::logger> s_clientLogger;
+	};
+}
 
 #ifndef DISTRIBUTION
-#define LOG(x) std::cout << x << std::endl
-#define ERROR_LOG(x) LOG(x);
-#define ASSERT(x, message) if ((x)) LOG(message << " Success! " << __FILE__ << "; " << __LINE__ << "; " << #x); \
-								else LOG(message << " Failed! " << __FILE__ << "; " << __LINE__ << "; " << #x);
-#define ASSERT_ERROR(x) if (!(x)) LOG("Failed! " << __FILE__ << "; " << __LINE__ << "; " << #x);
-#define GLCall(x) x; ASSERT_ERROR(GLLogCall(#x, __FILE__, __LINE__));
+#define NG_CORE_LOG_TRACE(...) Nigozi::Log::GetCoreLogger()->trace(__VA_ARGS__)
+#define NG_CORE_LOG_INFO(...) Nigozi::Log::GetCoreLogger()->info(__VA_ARGS__)
+#define NG_CORE_LOG_WARN(...) Nigozi::Log::GetCoreLogger()->warn(__VA_ARGS__)
+#define NG_CORE_LOG_ERROR(...) Nigozi::Log::GetCoreLogger()->error(__VA_ARGS__)
+#define NG_CORE_LOG_CRITICAL(...) Nigozi::Log::GetCoreLogger()->critical(__VA_ARGS__)
 
-inline void GLClearError() {
-    while (GLenum error = glGetError());
-}
+#define NG_CLIENT_LOG_TRACE(...) Nigozi::Log::GetClientLogger()->trace(__VA_ARGS__)
+#define NG_CLIENT_LOG_INFO(...) Nigozi::Log::GetClientLogger()->info(__VA_ARGS__)
+#define NG_CLIENT_LOG_WARN(...) Nigozi::Log::GetClientLogger()->warn(__VA_ARGS__)
+#define NG_CLIENT_LOG_ERROR(...) Nigozi::Log::GetClientLogger()->error(__VA_ARGS__)
+#define NG_CLIENT_LOG_CRITICAL(...) Nigozi::Log::GetClientLogger()->critical(__VA_ARGS__)
 
-inline bool GLLogCall(const char* function, const char* file, int line) {
-    while (GLenum error = glGetError()) {
-        std::cout << "{OpenGL Error} (" << error << "): " << function << " " << file << std::endl;
-        return false;
-    }
-    return true;
-}
+#define NG_CUSTOM_LOG_TRACE(name, ...) Nigozi::Log::GetLogger(name)->trace(__VA_ARGS__)
+#define NG_CUSTOM_LOG_INFO(name, ...) Nigozi::Log::GetLogger(name)->info(__VA_ARGS__)
+#define NG_CUSTOM_LOG_WARN(name, ...) Nigozi::Log::GetLogger(name)->warn(__VA_ARGS__)
+#define NG_CUSTOM_LOG_ERROR(name, ...) Nigozi::Log::GetLogger(name)->error(__VA_ARGS__)
+#define NG_CUSTOM_LOG_CRITICAL(name, ...) Nigozi::Log::GetLogger(name)->critical(__VA_ARGS__)
 #else
-#define LOG(x)
-#define ERROR_LOG(x)
-#define ASSERT(x, message)
-#define GLCall(x) x;
+#define NG_CORE_LOG_TRACE(...)
+#define NG_CORE_LOG_INFO(...)
+#define NG_CORE_LOG_WARN(...)
+#define NG_CORE_LOG_ERROR(...)
+#define NG_CORE_LOG_CRITICAL(...) Nigozi::Log::GetCoreLogger()->critical(__VA_ARGS__)
+
+#define NG_CLIENT_LOG_TRACE(...)
+#define NG_CLIENT_LOG_INFO(...)
+#define NG_CLIENT_LOG_WARN(...)
+#define NG_CLIENT_LOG_ERROR(...)
+#define NG_CLIENT_LOG_CRITICAL(...) Nigozi::Log::GetClientLogger()->critical(__VA_ARGS__)
+
+#define NG_CUSTOM_LOG_TRACE(name, ...)
+#define NG_CUSTOM_LOG_INFO(name, ...)
+#define NG_CUSTOM_LOG_WARN(name, ...)
+#define NG_CUSTOM_LOG_ERROR(name, ...)
+#define NG_CUSTOM_LOG_CRITICAL(name, ...) Nigozi::Log::GetLogger(name)->critical(__VA_ARGS__)
 #endif
