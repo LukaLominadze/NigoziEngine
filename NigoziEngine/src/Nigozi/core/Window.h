@@ -23,7 +23,8 @@ namespace Nigozi
 	class Window
 	{
 	public:
-		Window(const char* title, uint32_t width, uint32_t height, bool fullscreen = false, bool vsync = false);
+		explicit Window(const char* title, uint32_t width, uint32_t height, bool fullscreen = false, bool vsync = false);
+		Window(const Window& other) = delete;
 		~Window();
 
 		inline const bool Initialized() const { return m_initialized; }

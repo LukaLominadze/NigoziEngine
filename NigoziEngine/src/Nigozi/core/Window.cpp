@@ -16,18 +16,22 @@ namespace Nigozi
 			NG_CORE_LOG_CRITICAL("Couldn't initialize GLFW...");
 			return;
 		}
+
 		if (!InitializeWindow()) {
 			NG_CORE_LOG_CRITICAL("Couldn't create window...");
 			return;
 		}
+
 		if (!SetupMonitor()) {
 			NG_CORE_LOG_CRITICAL("Couldn't initialize primary monitor...");
 			return;
 		}
+
 		if (!StartGLEW()) {
 			NG_CORE_LOG_CRITICAL("Couldn't initialize GLAD...");
 			return;
 		}
+
 		CreateCallbacks();
 		m_initialized = true;
 	}
