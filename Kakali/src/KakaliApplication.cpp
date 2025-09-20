@@ -8,7 +8,7 @@ KakaliApplication::KakaliApplication(const Nigozi::ApplicationProps& props)
 	PushOverlay(&m_editorLayer);
 	PushLayer(&m_cameraLayer);
 
-	LOG("Welcome to the Kakali editor!");
+	NG_CLIENT_LOG_INFO("Welcome to the Kakali editor!");
 }
 
 KakaliApplication::~KakaliApplication()

@@ -16,6 +16,7 @@ namespace Nigozi
 
 		inline int GetWidth() const { return m_width; }
 		inline int GetHeight() const { return m_height; }
+		inline glm::vec2 GetSize() { return glm::vec2(m_width, m_height); }
 
 		inline const std::string& GetPath() const { return m_filePath; }
 	private:

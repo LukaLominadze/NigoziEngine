@@ -10,10 +10,13 @@ namespace Nigozi {
 	struct NameComponent {
 		std::string Name{ "" };
 
-		NameComponent() = default;
+		NameComponent() {
+			Name.reserve(128);
+		}
 		NameComponent(const NameComponent& other) = default;
 		NameComponent(const std::string& name)
 			:Name(name) {
+			Name.reserve(128);
 		}
 
 		operator std::string& () { return Name; }
@@ -23,10 +26,13 @@ namespace Nigozi {
 	struct TagComponent {
 		std::string Tag{ "" };
 
-		TagComponent() = default;
+		TagComponent() {
+			Tag.reserve(128);
+		}
 		TagComponent(const TagComponent& other) = default;
 		TagComponent(const std::string& tag)
 			:Tag(tag) {
+			Tag.reserve(128);
 		}
 
 		operator std::string& () { return Tag; }
@@ -52,9 +58,11 @@ namespace Nigozi {
 		std::shared_ptr<Texture> SpriteTexture;
 		std::shared_ptr<SubTexture> Sprite;
 		glm::vec4 Color{ 1.0f };
-		int8_t ZOrder = 0;
+		int16_t ZOrder = 0;
 
-		SpriteRendererComponent() = default;
+		SpriteRendererComponent()
+			:SpriteTexture(std::make_shared<Texture>("src/Nigozi/res/textures/flatQuad.png")),
+			 Sprite(std::make_shared<SubTexture>(SpriteTexture, SpriteTexture->GetSize())) { }
 		SpriteRendererComponent(const SpriteRendererComponent& other) = default;
 		SpriteRendererComponent(const std::shared_ptr<Texture>& texture, const std::shared_ptr<SubTexture> sprite, int8_t zOrder = 0) {
 			SpriteTexture = texture;
