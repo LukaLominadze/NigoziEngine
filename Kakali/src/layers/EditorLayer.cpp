@@ -1,6 +1,7 @@
 #include "EditorLayer.h"
 
 EditorLayer::EditorLayer(Nigozi::FrameBuffer* viewportBuffer)
+    :m_editorCamera(viewportBuffer->GetWidth() / (float)viewportBuffer->GetHeight())
 {
     p_viewportBuffer = viewportBuffer;
     m_sceneManager = Nigozi::SceneManager("Sample", [this]() { return std::make_shared<Nigozi::Scene>(&m_sceneManager); });
@@ -16,15 +17,36 @@ EditorLayer::EditorLayer(Nigozi::FrameBuffer* viewportBuffer)
     //entity2.AddComponent<Nigozi::SpriteRendererComponent>("src/Nigozi/res/textures/logo.png", glm::vec2{ 0, 0 });
 }
 
+void EditorLayer::OnEvent(Nigozi::Event& event)
+{
+    Nigozi::EventDispatcher dispatcher(event);
+    if (m_viewportHovered) {
+        m_editorCamera.OnEvent(event);
+        dispatcher.Dispatch<Nigozi::MouseButtonPressedEvent>(std::bind(&EditorLayer::OnMouseButtonPressed, this, std::placeholders::_1));
+    }
+    dispatcher.Dispatch<Nigozi::MouseMovedEvent>(std::bind(&EditorLayer::OnMouseMoved, this, std::placeholders::_1));
+    dispatcher.Dispatch<Nigozi::MouseButtonReleasedEvent>(std::bind(&EditorLayer::OnMouseButtonReleased, this, std::placeholders::_1));
+}
+
 void EditorLayer::OnUpdate(float timestep)
 {
+    if (m_viewportHovered) {
+        m_editorCamera.OnUpdate(timestep);
+    }
     m_scene->OnUpdate(timestep);
 }
 
 void EditorLayer::OnRender()
 {
-    // A test square
-    //Nigozi::Renderer2D::DrawQuad(glm::vec3(0, 0, -1), glm::vec2(1, 1), nullptr, glm::vec4(0.1f, 0.3f, 0.8f, 1.0f));
+    Nigozi::Renderer2D::Flush();
+    GLCall(glPolygonMode(GL_FRONT_AND_BACK, GL_LINE));
+    Nigozi::Renderer2D::DrawQuad(glm::vec2(0.0f), glm::vec2(1.0f), Nigozi::Renderer2D::GetData()->Textures[0],
+                                 glm::vec4(0.6f));
+    Nigozi::Renderer2D::Flush();
+    GLCall(glPolygonMode(GL_FRONT_AND_BACK, GL_FILL));
+
+    m_editorCamera.OnResize(m_viewportSize.x, m_viewportSize.y);
+    m_editorCamera.OnRender();
     m_scene->OnRender();
 }
 
@@ -34,10 +56,105 @@ void EditorLayer::OnImGuiRender()
     ShowSceneHierarchy();
     ShowInspector();
 
+    // TODO: Make multiple tools: Select, Move, Rotate
     ImGui::Begin("Viewport");
+    if (ImGui::Button("Select Tool")) {
+    
+    }
+    ImGui::SameLine();
+    if (ImGui::Button("Move Tool")) {
+    
+    }
+    
     m_viewportSize = ImGui::GetContentRegionAvail();
+
+    ImVec2 viewportFrameSize = ImGui::GetContentRegionMax();
+    ImVec2 padding{ viewportFrameSize.x - m_viewportSize.x, viewportFrameSize.y - m_viewportSize.y };
+    padding.y += ImGui::GetFrameHeight();
+
+    m_viewportPosition = glm::vec2(ImGui::GetWindowPos().x + padding.x, ImGui::GetWindowPos().y + padding.y);
+
     ImGui::Image((uint64_t)(p_viewportBuffer->GetColorAttachment()), m_viewportSize, ImVec2(0, 1), ImVec2(1, 0));
+    m_viewportHovered = ImGui::IsWindowHovered();
     ImGui::End();
+}
+
+bool EditorLayer::OnMouseButtonPressed(Nigozi::MouseButtonPressedEvent& event)
+{
+    // TODO: Optimize the iteration, would be perfect if you reverse iterate and break after selection
+    // FIX: Selection is not perfectly calculated
+    if (event.GetButton() == GLFW_MOUSE_BUTTON_1) {
+
+        glm::vec2 viewportRelPos = m_viewportPosition - m_windowPosition;
+        glm::vec2 mousePosition = m_editorCamera.GetCamera().GetMousePositionWorldSpace(Nigozi::Input::GetMousePosition() - viewportRelPos, *(glm::vec2*)&m_viewportSize);
+
+        Nigozi::Renderer2D::DrawQuad(mousePosition, glm::vec2(0.1f), Nigozi::Renderer2D::GetData()->Textures[0], glm::vec4(0.0f, 1.0f, 1.0f, 1.0f));
+
+        //m_scene->m_Registry.sort<Nigozi::SpriteRendererComponent>([](const Nigozi::SpriteRendererComponent& a, const Nigozi::SpriteRendererComponent& b) {
+        //    return a.ZOrder > b.ZOrder;
+        //    });
+        auto view = m_scene->m_Registry.view<Nigozi::TransformComponent, Nigozi::SpriteRendererComponent>();
+        view.use<Nigozi::SpriteRendererComponent>();
+
+        bool selected = false;
+        for (auto [entityHandle, transform, sprite] : view.each()) {
+            glm::vec2 delta = mousePosition - transform.Position;
+
+            float rotation = glm::radians(-transform.Rotation);
+            glm::vec2 normal(glm::cos(rotation), glm::sin(rotation));
+            glm::vec2 rotated(delta.x * normal.x - delta.y * normal.y,
+                delta.x * normal.y + delta.y * normal.x);
+
+            Nigozi::Renderer2D::DrawRotatedQuad(transform.Position + rotated, glm::vec2(0.1f), rotation, Nigozi::Renderer2D::GetData()->Textures[0], glm::vec4(0.0f, 0.0f, 1.0f, 1.0f));
+
+            glm::vec2 halfSize = transform.Scale / 2.0f;
+            bool pointInRect = (glm::abs(rotated.x) <= halfSize.x) &&
+                               (glm::abs(rotated.y) <= halfSize.y);
+
+            if (pointInRect) {
+                m_selectionContext = entityHandle;
+                m_movingSelectionContext = entityHandle;
+                selected = true;
+                //break;
+            }
+        }
+
+        if (!selected) {
+            m_selectionContext = entt::null;
+        }
+    }
+    return false;
+}
+
+bool EditorLayer::OnMouseButtonReleased(Nigozi::MouseButtonReleasedEvent& event)
+{
+    if (event.GetButton() == GLFW_MOUSE_BUTTON_1) {
+        m_movingSelectionContext = entt::null;
+    }
+    return false;
+}
+
+bool EditorLayer::OnMouseMoved(Nigozi::MouseMovedEvent& event)
+{
+    if (m_movingSelectionContext == entt::null) {
+        m_mouseOldPosition = glm::vec2(event.GetX(), event.GetY());
+        return false;
+    }
+    auto& transform = Nigozi::Entity(m_movingSelectionContext, m_scene.get()).GetComponent<Nigozi::TransformComponent>();
+
+    glm::vec2 viewportRelPos = m_viewportPosition - m_windowPosition;
+    glm::vec2 mouseScreenPosition = glm::vec2(event.GetX(), event.GetY());
+    glm::vec2 mousePosition = m_editorCamera.GetCamera().GetMousePositionWorldSpace(glm::vec2(event.GetX(), event.GetY()) - viewportRelPos, *(glm::vec2*)&m_viewportSize);
+
+    glm::vec2 mouseOldPosition = m_editorCamera.GetCamera().GetMousePositionWorldSpace(m_mouseOldPosition - viewportRelPos, *(glm::vec2*)&m_viewportSize);
+
+    glm::vec2 mouseDelta = mousePosition - mouseOldPosition;
+
+    transform.Position += mouseDelta;
+
+    m_mouseOldPosition = mouseScreenPosition;
+
+    return false;
 }
 
 void EditorLayer::DockViewportWithMenuBar()
@@ -148,17 +265,24 @@ void EditorLayer::DockViewportWithMenuBar()
 void EditorLayer::ShowSceneHierarchy()
 {
     ImGui::Begin("Scene Hierarchy");
-    auto view = m_scene->m_Registry.view<Nigozi::NameComponent>();
+    m_windowPosition = glm::vec2(ImGui::GetWindowPos().x, ImGui::GetWindowPos().y);
     if (ImGui::Button("+")) {
         Nigozi::Entity newEntity = m_scene->CreateEntity("New Object", "Empty");
     }
+    ImGui::SameLine();
+    if (ImGui::Button("X") && m_selectionContext != entt::null) {
+        Nigozi::Entity entity(m_selectionContext, m_scene.get());
+        entity.Destroy();
+        m_selectionContext = entt::null;
+    }
+    auto view = m_scene->m_Registry.view<Nigozi::NameComponent>();
     for (const auto entityHandle : view) {
         Nigozi::Entity entity(entityHandle, m_scene.get());
         auto& nameComponent = entity.GetComponent<Nigozi::NameComponent>();
         ImGuiTreeNodeFlags flags = ((m_selectionContext == entityHandle) ? ImGuiTreeNodeFlags_Selected : 0)
             | ImGuiTreeNodeFlags_OpenOnArrow;
         bool opened = ImGui::TreeNodeEx((void*)(uint64_t)(uint32_t)entity.GetHandle(), flags, nameComponent.Name.c_str());
-        if (ImGui::IsItemClicked()) {
+        if (ImGui::IsItemClicked() && !ImGui::IsItemToggledOpen()) {
             if (m_selectionContext == entityHandle) {
                 m_selectionContext = entt::null;
             }

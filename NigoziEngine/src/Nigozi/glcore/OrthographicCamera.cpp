@@ -24,7 +24,7 @@ namespace Nigozi
 	void OrthographicCamera::SetProjection(float left, float right, float bottom, float top)
 	{
 		m_projectionMatrix = glm::ortho(left, right, bottom, top, -1.0f, 1.0f);
-		m_viewProjectionMatrix = m_viewMatrix * m_projectionMatrix;
+		m_viewProjectionMatrix = m_projectionMatrix * m_viewMatrix;
 
 		m_zoom = top;
 		m_aspect = right / top;
@@ -49,11 +49,65 @@ namespace Nigozi
 
 	const glm::vec2 OrthographicCamera::GetMousePositionWorldSpace() const
 	{
-		std::pair<float, float> mousePosition = Input::GetMousePosition();
-		mousePosition.second = Window::GetGlobalWindowData().Height - mousePosition.second;
+		glm::vec2 mousePosition = Input::GetMousePosition();
+		mousePosition.y = Window::GetGlobalWindowData().Height - mousePosition.y;
 		float normalWidth = m_aspect;
-		float transformedPositionX = (mousePosition.first / Window::GetGlobalWindowData().Width) * normalWidth - 0.5f * normalWidth;
-		float transformedPositionY = mousePosition.second / Window::GetGlobalWindowData().Height - 0.5f;
+		float transformedPositionX = (mousePosition.x / Window::GetGlobalWindowData().Width) * normalWidth - 0.5f * normalWidth;
+		float transformedPositionY = mousePosition.y / Window::GetGlobalWindowData().Height - 0.5f;
+		if (m_rotation != 0) {
+			float radians = glm::radians(m_rotation);
+
+			float cosTheta = cos(radians);
+			float sinTheta = sin(radians);
+			if (cosTheta == 0) {
+				cosTheta = 1;
+			}
+			if (sinTheta == 0) {
+				sinTheta = 1;
+			}
+
+			float rotatedX = cosTheta * transformedPositionX - sinTheta * transformedPositionY;
+			float rotatedY = sinTheta * transformedPositionX + cosTheta * transformedPositionY;
+
+			transformedPositionX = rotatedX;
+			transformedPositionY = rotatedY;
+		}
+		return { transformedPositionX * 2 * m_zoom + m_position.x, transformedPositionY * 2 * m_zoom + m_position.y };
+	}
+
+	const glm::vec2 OrthographicCamera::GetMousePositionWorldSpace(glm::vec2 mousePosition) const
+	{
+		mousePosition.y = Window::GetGlobalWindowData().Height - mousePosition.y;
+		float normalWidth = m_aspect;
+		float transformedPositionX = (mousePosition.x / Window::GetGlobalWindowData().Width) * normalWidth - 0.5f * normalWidth;
+		float transformedPositionY = mousePosition.y / Window::GetGlobalWindowData().Height - 0.5f;
+		if (m_rotation != 0) {
+			float radians = glm::radians(m_rotation);
+
+			float cosTheta = cos(radians);
+			float sinTheta = sin(radians);
+			if (cosTheta == 0) {
+				cosTheta = 1;
+			}
+			if (sinTheta == 0) {
+				sinTheta = 1;
+			}
+
+			float rotatedX = cosTheta * transformedPositionX - sinTheta * transformedPositionY;
+			float rotatedY = sinTheta * transformedPositionX + cosTheta * transformedPositionY;
+
+			transformedPositionX = rotatedX;
+			transformedPositionY = rotatedY;
+		}
+		return { transformedPositionX * 2 * m_zoom + m_position.x, transformedPositionY * 2 * m_zoom + m_position.y };
+	}
+
+	const glm::vec2 OrthographicCamera::GetMousePositionWorldSpace(glm::vec2 mousePosition, glm::vec2 viewportSize) const
+	{
+		mousePosition.y = viewportSize.y - mousePosition.y;
+		float normalWidth = m_aspect;
+		float transformedPositionX = (mousePosition.x / viewportSize.x) * normalWidth - 0.5f * normalWidth;
+		float transformedPositionY = mousePosition.y / viewportSize.y - 0.5f;
 		if (m_rotation != 0) {
 			float radians = glm::radians(m_rotation);
 

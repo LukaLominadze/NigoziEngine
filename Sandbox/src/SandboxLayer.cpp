@@ -115,9 +115,9 @@ void SandboxLayer::OnImGuiRender()
 
 	ImGui::Text("Congratulations! Yo balls!");
 	ImGui::Text("Mouse Delta");
-	ImGui::Text((std::to_string(m_mouseDelta.first) + ", " + std::to_string(m_mouseDelta.second)).c_str());
+	ImGui::Text((std::to_string(m_mouseDelta.x) + ", " + std::to_string(m_mouseDelta.y)).c_str());
 	ImGui::Text("Mouse Position");
-	ImGui::Text((std::to_string(m_mousePosition.first) + ", " + std::to_string(m_mousePosition.second)).c_str());
+	ImGui::Text((std::to_string(m_mousePosition.x) + ", " + std::to_string(m_mousePosition.y)).c_str());
 	ImGui::Text("Mouse Position World Space");
 	ImGui::Text((std::to_string(mousePosition.x) + ", " + std::to_string(mousePosition.y)).c_str());
 	ImGui::Text("Space key state");

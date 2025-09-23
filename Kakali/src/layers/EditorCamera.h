@@ -2,26 +2,30 @@
 
 #include <Nigozi.h>
 
-class CameraControllerLayer : public Nigozi::Layer {
+class EditorCamera {
 public:
-	CameraControllerLayer(float aspectRatio, bool rotation = false);
-	~CameraControllerLayer();
+	EditorCamera(float aspectRatio, bool rotation = false);
+	~EditorCamera();
 
 	inline const Nigozi::OrthographicCamera& GetCamera() const { return m_camera; }
 
-	void OnEvent(Nigozi::Event& event) override;
-	void OnUpdate(float timestep) override;
-	void OnRender() override;
+	void OnEvent(Nigozi::Event& event);
+	void OnUpdate(float timestep);
+	void OnRender();
 	void OnResize(uint32_t width, uint32_t height);
 private:
 	bool OnMouseScrolled(Nigozi::MouseScrolledEvent& e);
+	bool OnMouseMoved(Nigozi::MouseMovedEvent& e);
 private:
 	float m_aspectRatio;
 	float m_zoom = 1.0f;
-	Nigozi::OrthographicCamera m_camera;
 
 	bool m_rotation = false;
 
 	float m_cameraTranslationSpeed = 3.0f, m_cameraRotationSpeed = 180.0f;
+
+	glm::vec2 m_viewportSize;
+	
+	Nigozi::OrthographicCamera m_camera;
 };
 

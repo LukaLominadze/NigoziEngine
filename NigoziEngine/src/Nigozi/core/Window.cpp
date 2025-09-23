@@ -246,5 +246,14 @@ namespace Nigozi
 					((MouseScrolledEvent*)(ref))->Initialize((float)xOffset, (float)yOffset);
 					});
 			});
+
+		glfwSetCursorPosCallback(p_window, [](GLFWwindow* window, double xpos, double ypos) 
+			{
+				WindowData& data = *(WindowData*)glfwGetWindowUserPointer(window);
+
+				data.EventQueueCallback([xpos, ypos](Event* ref) {
+					((MouseMovedEvent*)(ref))->Initialize((float)xpos, (float)ypos);
+					});
+			});
 	}
 }

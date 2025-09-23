@@ -30,28 +30,28 @@ namespace Nigozi
             return state == GLFW_PRESS;
         }
 
-        std::pair<float, float> GetMousePosition()
+        glm::vec2 GetMousePosition()
         {
             double xpos, ypos;
             glfwGetCursorPos(glfwGetCurrentContext(), &xpos, &ypos);
-            return std::pair<float, float>((float)xpos, (float)ypos);
+            return glm::vec2((float)xpos, (float)ypos);
         }
 
         float GetMouseX()
         {
-            return GetMousePosition().first;
+            return GetMousePosition().x;
         }
 
         float GetMouseY()
         {
-            return GetMousePosition().second;
+            return GetMousePosition().y;
         }
 
         void OnUpdate()
         {
-            std::pair<float, float> endPos = GetMousePosition();
-            MousePosDelta = std::pair<float, float>(endPos.first - MouseStartPos.first,
-                                                    endPos.second - MouseStartPos.second);
+            glm::vec2 endPos = GetMousePosition();
+            MousePosDelta = glm::vec2(endPos.x - MouseStartPos.x,
+                                      endPos.y - MouseStartPos.y);
             MouseStartPos = endPos;
         }
     }
