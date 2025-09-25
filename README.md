@@ -10,7 +10,7 @@ https://github.com/user-attachments/assets/eba49d67-91fa-48c7-a1f6-ef870e182ad0
 
 ## ___The editor (in development) to be used for game development with Nigozi!___
 
-https://github.com/user-attachments/assets/e2313d77-cdcb-4b7f-a6dc-f41b61983543
+https://github.com/user-attachments/assets/57fed5ae-51dc-428c-83d1-19f0d0ef4719
 
 ***
 
