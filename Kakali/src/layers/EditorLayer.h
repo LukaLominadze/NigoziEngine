@@ -3,6 +3,14 @@
 #include <Nigozi.h>
 #include "EditorCamera.h"
 
+enum class Tool
+{
+	NONE = 0,
+	SELECT,
+	MOVE,
+	ROTATE
+};
+
 class EditorLayer : public Nigozi::Layer
 {
 public:
@@ -15,14 +23,17 @@ public:
 
 	inline ImVec2& GetViewportSize() { return m_viewportSize; }
 private:
-	bool OnMouseButtonPressed(Nigozi::MouseButtonPressedEvent& event);
-	bool OnMouseButtonReleased(Nigozi::MouseButtonReleasedEvent& event);
+	bool OnSelectMouseButtonPressed(Nigozi::MouseButtonPressedEvent& event);
 	bool OnMouseMoved(Nigozi::MouseMovedEvent& event);
+	bool OnRotateMouseMoved(Nigozi::MouseMovedEvent& event);
+	bool OnMouseButtonReleased(Nigozi::MouseButtonReleasedEvent& event);
+	bool OnMoveMouseButtonPressed(Nigozi::MouseButtonPressedEvent& event);
 private:
 	void DockViewportWithMenuBar();
 	void ShowSceneHierarchy();
 	void ShowInspector();
 	void ShowAddComponentModal();
+	void ShowViewport();
 
 	template<typename T>
 	void AddComponent(Nigozi::Entity& entity, bool selectedComponent) {
@@ -36,6 +47,8 @@ private:
 	Nigozi::FrameBuffer* p_viewportBuffer;
 	std::shared_ptr<Nigozi::Scene> m_scene;
 	EditorCamera m_editorCamera;
+
+	Tool m_tool = Tool::SELECT;
 
 	ImVec2 m_viewportSize;
 	glm::vec2 m_windowPosition;

@@ -8,6 +8,7 @@ namespace Nigozi
 	{
 		class ScopedTimer {
 		public:
+			[[nodiscard]]
 			ScopedTimer();
 			~ScopedTimer();
 		private:
@@ -16,6 +17,7 @@ namespace Nigozi
 
 		class Timer {
 		public:
+			[[nodiscard]]
 			Timer() = default;
 			~Timer() = default;
 

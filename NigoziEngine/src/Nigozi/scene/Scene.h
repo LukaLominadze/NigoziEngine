@@ -29,6 +29,10 @@ namespace Nigozi
 		void OnUpdate(float timestep) override;
 		void OnRender() override;
 		void OnImGuiRender() override;
+		void OnEditorEvent(Event& event);
+		void OnEditorUpdate(float timestep);
+		void OnEditorRender();
+		void OnEditorImGuiRender();
 
 		Entity CreateEntity(const std::string& name, const std::string& tag);
 		Entity TryGetEntityByTag(const std::string& tag = "");

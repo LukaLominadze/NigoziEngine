@@ -103,11 +103,16 @@ namespace Nigozi
             in the queued functions will initialize
             the buffer as the queued event
             for ex.: WindowResizeEvent, KeyEvent, etc.
+                --  See the Window::CreateCallbacks() function to 
+                    understand the implementation.
         */
         std::scoped_lock<std::mutex> lock(m_eventQueueMutex);
         while (m_eventQueue.size() > 0) {
+
+            // Initialize event
             std::function<void(Event*)>& func = m_eventQueue.front();
             func(p_eventBufferPointer);
+
             if (p_eventBufferPointer->GetEventType() == EventType::WindowClose) {
                 Window::Close();
             }
