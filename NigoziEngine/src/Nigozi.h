@@ -39,4 +39,6 @@
 #include "Nigozi/scene/Entity.h"
 #include "Nigozi/scene/Component.h"
 
+#include "Nigozi/audio/AudioEngine.h"
+
 #include "Nigozi/core/EntryPoint.h"

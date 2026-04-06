@@ -73,12 +73,16 @@ endSelectionGizmoRender:
     auto cameraView = m_scene->m_Registry.view<Nigozi::TransformComponent, Nigozi::CameraComponent>();
     for (auto [entityHandle, transform, camera] : cameraView.each()) {
         float aspect = m_editorCamera.GetCamera().GetAspect();
+        glm::vec4 color(0.4f, 0.6f, 1.0f, 1.0f);
+        if (!camera.Current) {
+            color = glm::vec4(0.4f, 0.4f, 0.4f, 1.0f);
+        }
         Nigozi::Renderer2D::DrawRotatedQuad(
             transform.Position,
             glm::vec2(camera.Zoom * aspect, camera.Zoom),
             glm::radians(transform.Rotation),
             Nigozi::Renderer2D::GetData()->Textures[0],
-            glm::vec4(0.4f, 0.6f, 1.0f, 1.0f)
+            color
         );
     }
     Nigozi::Renderer2D::Flush();
@@ -398,9 +402,22 @@ void EditorLayer::ShowInspector()
         if (entity.HasComponent<Nigozi::CameraComponent>() &&
             ImGui::TreeNodeEx((void*)(typeid(Nigozi::CameraComponent).hash_code() + (size_t)m_selectionContext),
                 ImGuiTreeNodeFlags_DefaultOpen, "Camera")) {
-            auto& camera = entity.GetComponent<Nigozi::CameraComponent>();
-            ImGui::DragFloat("Zoom", &camera.Zoom, 0.05f, 0.01f);
-            ImGui::Checkbox("Current", &camera.Current);
+            if (ImGui::Button("X")) {
+                entity.RemoveComponent<Nigozi::CameraComponent>();
+            }
+            else {
+                auto& camera = entity.GetComponent<Nigozi::CameraComponent>();
+                ImGui::DragFloat("Zoom", &camera.Zoom, 0.05f, 0.01f);
+                if (ImGui::Checkbox("Current", &camera.Current)) {
+                    auto cameraView = m_scene->m_Registry.view<Nigozi::CameraComponent>();
+                    for (auto [entityHandle, otherCamera] : cameraView.each()) {
+                        if (entityHandle == entity.GetHandle()) {
+                            continue;
+                        }
+                        otherCamera.Current = false;
+                    }
+                }
+            }
 
             ImGui::TreePop();
         }
@@ -408,11 +425,39 @@ void EditorLayer::ShowInspector()
         if (entity.HasComponent<Nigozi::SpriteRendererComponent>() &&
             ImGui::TreeNodeEx((void*)(typeid(Nigozi::SpriteRendererComponent).hash_code() + (size_t)m_selectionContext),
                 ImGuiTreeNodeFlags_DefaultOpen, "Sprite Renderer")) {
-            auto& sprite = entity.GetComponent<Nigozi::SpriteRendererComponent>();
-            ImGui::ColorEdit4("Color", (float*)&sprite.Color);
-            int zorder = sprite.ZOrder;
-            ImGui::SliderInt("Z Order", &zorder, -127, 127);
-            sprite.ZOrder = (int16_t)zorder;
+            if (ImGui::Button("X")) {
+                entity.RemoveComponent<Nigozi::SpriteRendererComponent>();
+            }
+            else {
+                auto& sprite = entity.GetComponent<Nigozi::SpriteRendererComponent>();
+
+                // UV coordinates are often (0.0f, 0.0f) and (1.0f, 1.0f) to display an entire textures.
+                // Here are trying to display only a 32x32 pixels area of the texture, hence the UV computation.
+                // Read about UV coordinates here: https://github.com/ocornut/imgui/wiki/Image-Loading-and-Displaying-Examples
+                ImGui::PushID((void*)(typeid(Nigozi::Texture).hash_code() + (size_t)m_selectionContext));
+                ImVec2 size = ImVec2(96.0f, 96.0f);                     // Size of the image we want to make visible
+                ImVec2 uv0 = ImVec2(0.0f, 1.0f);                            // UV coordinates for lower-left
+                ImVec2 uv1 = ImVec2(1.0f, 0.0f);    
+                ImVec4 bg_col = ImVec4(0.0f, 0.0f, 0.0f, 1.0f);             // Black background
+                ImVec4 tint_col = ImVec4(1.0f, 1.0f, 1.0f, 1.0f);           // No tint
+                if (ImGui::ImageButton("Sprite", sprite.SpriteTexture->GetRendererID(), size, uv0, uv1, bg_col, tint_col)) {
+                    std::filesystem::path result = FileDialogue::OpenFileDialog("png;jpg;jpeg");
+                    if (!result.empty()) {
+                        std::string path = result.string();
+
+                        sprite.Sprite.reset();
+                        sprite.SpriteTexture.reset();
+                        sprite.SpriteTexture = std::make_shared<Nigozi::Texture>(path);
+                        sprite.Sprite = std::make_shared<Nigozi::SubTexture>(sprite.SpriteTexture, sprite.SpriteTexture->GetSize());
+                    }
+                }
+                ImGui::PopID();
+
+                ImGui::ColorEdit4("Color", (float*)&sprite.Color);
+                int zorder = sprite.ZOrder;
+                ImGui::SliderInt("Z Order", &zorder, -127, 127);
+                sprite.ZOrder = (int16_t)zorder;
+            }
 
             ImGui::TreePop();
         }
@@ -420,7 +465,68 @@ void EditorLayer::ShowInspector()
         if (entity.HasComponent<Nigozi::AudioStreamPlayerComponent>() &&
             ImGui::TreeNodeEx((void*)(typeid(Nigozi::AudioStreamPlayerComponent).hash_code() + (size_t)m_selectionContext),
                 ImGuiTreeNodeFlags_DefaultOpen, "Audio Stream Player")) {
-            auto& audio = entity.GetComponent<Nigozi::AudioStreamPlayerComponent>();
+            if (ImGui::Button("X")) {
+                entity.RemoveComponent<Nigozi::AudioStreamPlayerComponent>();
+            }
+            else {
+                auto& audio = entity.GetComponent<Nigozi::AudioStreamPlayerComponent>();
+
+                if (ImGui::Button("Choose")) {
+                    std::filesystem::path result = FileDialogue::OpenFileDialog("wav,mp3,flac");
+                    NG_CORE_LOG_INFO("New audio path: {}", result.string());
+                    if (!result.empty()) {
+                        Nigozi::Audio* newAudio = nullptr;
+                        if (audio.AudioHandle) {
+                            newAudio = Nigozi::AudioEngine::LoadAudioFromFile(result, audio.AudioHandle->GetAudioGroupName());
+                        }
+                        else {
+                            newAudio = Nigozi::AudioEngine::LoadAudioFromFile(result);
+                        }
+                        NG_CORE_LOG_INFO("New audio: {}", (size_t)newAudio);
+                        if (newAudio) {
+                            if (audio.AudioHandle) {
+                                Nigozi::AudioEngine::UnloadAudio(audio.AudioHandle);
+                            }
+                            audio.AudioHandle = newAudio;
+                            audio.AudioHandle->SetVolume(audio.Volume);
+                            NG_CORE_LOG_INFO("Set audio: {}", (size_t)audio.AudioHandle);
+                        }
+                        else {
+                            NG_CORE_LOG_ERROR("Audio with path: {} couldn't load!", result.string());
+                        }
+                    }
+                    else {
+                        NG_CORE_LOG_ERROR("Couldn't get audio path: {}", result.string());
+                    }
+                }
+                std::filesystem::path audioPath("empty");
+                if (audio.AudioHandle) {
+                    NG_CORE_LOG_INFO(audio.AudioHandle->GetFilePath().string());
+                    audioPath = audio.AudioHandle->GetFilePath();
+                }
+                std::string audioPathString = audioPath.string();
+                if (audioPathString.size() > 32) {
+                    audioPathString = audioPathString.substr(audioPathString.size() - 32);
+                }
+                ImGui::Text(audioPathString.c_str());
+                if (audio.AudioHandle) {
+                    if (ImGui::DragFloat("Volume", &audio.Volume, 0.2f)) {
+                        audio.AudioHandle->SetVolume(audio.Volume);
+                    }
+                    bool lastPlayingVal = audio.AudioHandle->IsPlaying();
+                    bool playingVal = lastPlayingVal;
+                    if (ImGui::Checkbox("Playing", &playingVal)) {
+                        if (playingVal != lastPlayingVal) {
+                            if (playingVal) {
+                                audio.AudioHandle->Play();
+                            }
+                            else {
+                                audio.AudioHandle->Stop();
+                            }
+                        }
+                    }
+                }
+            }
 
             ImGui::TreePop();
         }
@@ -483,6 +589,15 @@ void EditorLayer::ShowAddComponentModal()
                 AddComponent<Nigozi::SpriteRendererComponent>(entity, itemSelectedIndex == SPRITE_RENDERER);
                 AddComponent<Nigozi::AudioStreamPlayerComponent>(entity, itemSelectedIndex == AUDIO_STREAM_PLAYER);
                 AddComponent<Nigozi::CameraComponent>(entity, itemSelectedIndex == CAMERA);
+                if (itemSelectedIndex == CAMERA) {
+                    auto cameraView = m_scene->m_Registry.view<Nigozi::CameraComponent>();
+                    for (auto [entityHandle, otherCamera] : cameraView.each()) {
+                        if (entityHandle == m_selectionContext) {
+                            continue;
+                        }
+                        otherCamera.Current = false;
+                    }
+                }
             }
             ImGui::CloseCurrentPopup();
         }

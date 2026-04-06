@@ -98,6 +98,7 @@ namespace Nigozi {
 	};
 
 	struct AudioStreamPlayerComponent {
+		float Volume = 0.0f;
 		Audio* AudioHandle = nullptr;
 
 		AudioStreamPlayerComponent() = default;

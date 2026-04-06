@@ -22,11 +22,20 @@ std::filesystem::path FileDialogue::OpenFileDialog(const char* filterList, const
 		}
 		auto filterTokens = StringUtils::SplitString(filterList, ";");
 		for (auto filter : filterTokens) {
+			if (filter.find(',') != std::string::npos) {
+				auto subTokens = StringUtils::SplitString(filter, ",");
+				for (auto _filter : subTokens) {
+					if (fileTokens[1] == _filter) {
+						return result;
+					}
+				}
+				continue;
+			}
 			if (fileTokens[1] == filter) {
-				free(outPath);
 				return result;
 			}
 		}
+		free(outPath);
 		return std::filesystem::path{};
 	}
 	else if (result == NFD_CANCEL)

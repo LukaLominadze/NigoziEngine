@@ -35,7 +35,7 @@ namespace Nigozi
         p_eventBufferPointer = (Event*)(m_eventBuffer);
 
         m_initialized = true;
-        NG_CORE_LOG_INFO("\nWelcome To NigoziEngine!");
+        NG_CORE_LOG_INFO("Welcome To NigoziEngine!");
     }
 
     Application::~Application()
@@ -43,6 +43,7 @@ namespace Nigozi
         Renderer2D::Deinitialize();
         m_window.~Window();
         AudioEngine::Deinitialize();
+        NG_CORE_LOG_INFO("App deinitialized");
     }
 
     void Application::Run()
@@ -69,6 +70,7 @@ namespace Nigozi
     void Application::Close()
     {
         Window::Close();
+        NG_CORE_LOG_INFO("Closing app!");
     }
 
     void Application::PushLayer(Layer* layer)

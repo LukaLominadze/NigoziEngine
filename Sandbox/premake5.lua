@@ -32,6 +32,7 @@ project "Sandbox"
 				  "%{prj.location}/../vendor/spdlog/include" }
 
 	links {
+		"nfd",
 		"NigoziEngine",
 		"GLEW",
 		"GLFW",

@@ -36,7 +36,9 @@ project "NigoziEngine"
 				  "%{wks.location}/vendor/nfd/src/include",
 				  "%{prj.location}/../vendor/spdlog/include" }
 
-	links { "GLEW",
+	links {
+		"nfd",
+		"GLEW",
 		"GLFW",
 		"STB",
 		"ImGui" }

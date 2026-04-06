@@ -34,12 +34,14 @@ namespace Nigozi
 
 		CreateCallbacks();
 		m_initialized = true;
+		NG_CORE_LOG_INFO("Window initialized");
 	}
 
 	Window::~Window()
 	{
 		glfwDestroyWindow(p_window);
 		glfwTerminate();
+		NG_CORE_LOG_INFO("Window deinitialized");
 	}
 
 	void Window::SetIcon(const char* path)
@@ -64,6 +66,7 @@ namespace Nigozi
 	void Window::Close()
 	{
 		(*(WindowData*)glfwGetWindowUserPointer(glfwGetCurrentContext())).ShouldClose = true;
+		NG_CORE_LOG_INFO("Set window 'ShouldClose' flag");
 	}
 
 	void Window::SetVSync(bool value)

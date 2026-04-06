@@ -19,6 +19,8 @@ namespace Nigozi
 		inline glm::vec2 GetSize() { return glm::vec2(m_width, m_height); }
 
 		inline const std::string& GetPath() const { return m_filePath; }
+
+		inline const uint32_t GetRendererID() const { return m_rendererID; }
 	private:
 		uint32_t m_rendererID;
 		std::string m_filePath;
