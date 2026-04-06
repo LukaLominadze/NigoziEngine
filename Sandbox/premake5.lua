@@ -49,15 +49,6 @@ project "Sandbox"
 	filter "toolset:msc*"
   	buildoptions { "/utf-8" }
 
-	postbuildcommands {
-		"{COPYDIR} %{wks.location}/NigoziEngine/src/Nigozi/res %{prj.location}/src/Nigozi/res",
-		"{MKDIR} %{wks.location}/bin/" .. outputdir .. "/%{prj.name}/src/Nigozi",
-		"{COPYDIR} %{prj.location}/src/Nigozi %{wks.location}/bin/" ..outputdir.. "/%{prj.name}/src/Nigozi",
-		"{MKDIR} %{wks.location}/bin/" .. outputdir .. "/%{prj.name}/src/res",
-		"{COPYDIR} %{prj.location}/src/res %{wks.location}/bin/" ..outputdir.. "/%{prj.name}/src/res",
-		"{MKDIR} %{wks.location}/bin/" .. outputdir .. "/%{prj.name}/src", 
-	}
-
 	filter "system:windows"
 		cppdialect "C++20"
 		systemversion "latest"
@@ -65,6 +56,15 @@ project "Sandbox"
 		defines { "NG_PLATFORM_WINDOWS" }
 		
 		links { "opengl32.lib" }
+
+		postbuildcommands {
+			"{COPYDIR} %{wks.location}/NigoziEngine/src/Nigozi/res %{prj.location}/src/Nigozi/res",
+			"{MKDIR} %{wks.location}/bin/" .. outputdir .. "/%{prj.name}/src/Nigozi",
+			"{COPYDIR} %{prj.location}/src/Nigozi %{wks.location}/bin/" ..outputdir.. "/%{prj.name}/src/Nigozi",
+			"{MKDIR} %{wks.location}/bin/" .. outputdir .. "/%{prj.name}/src/res",
+			"{COPYDIR} %{prj.location}/src/res %{wks.location}/bin/" ..outputdir.. "/%{prj.name}/src/res",
+			"{MKDIR} %{wks.location}/bin/" .. outputdir .. "/%{prj.name}/src"
+		}
 
 		filter "configurations:Distribution"
 
@@ -79,6 +79,14 @@ project "Sandbox"
 		links { "GL",
 			"pthread",
         		"dl" }
+		
+		postbuildcommands {
+			"{COPYDIR} %{wks.location}/NigoziEngine/src/Nigozi/res %{prj.location}/src/Nigozi",
+			"{MKDIR} %{wks.location}/bin/" .. outputdir .. "/%{prj.name}/src",
+			"{COPYDIR} %{prj.location}/src/Nigozi %{wks.location}/bin/" ..outputdir.. "/%{prj.name}/src",
+			"{MKDIR} %{wks.location}/bin/" .. outputdir .. "/%{prj.name}/src/res",
+			"{COPYDIR} %{prj.location}/src/res %{wks.location}/bin/" ..outputdir.. "/%{prj.name}/src"
+		}
 
 	filter {"system:linux", "options:linux_backend=gtk3"}
 

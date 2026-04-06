@@ -21,3 +21,6 @@
 **.ini
 
 *.log
+
+!Kakali
+!Kakali/imgui.ini
