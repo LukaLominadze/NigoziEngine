@@ -24,7 +24,8 @@ https://github.com/user-attachments/assets/57fed5ae-51dc-428c-83d1-19f0d0ef4719
 The engine primarly is supported on Windows and Linux.
 
 ## Getting Started
-Visual Studio 2020 (and above) is recommended (If on Windows).
+### Windows
+Visual Studio 2020 (and above) is recommended.
 
 <ins>**1. Downloading the repository:**</ins>
 
@@ -35,6 +36,28 @@ Start cloning the repository with ```git clone --recursive https://github.com/Lu
 After cloning the repository, go to the ```Scripts``` directory and run the ```Setup.py``` file.
 
 The project is now ready.
+<hr>
+
+### Linux GTK (For Ubuntu based systems)
+To build with gtk, install ```apt-get libgtk-3-dev```. This is for the file dialogue library (```nativefiledialogue```)
+<hr>
+
+### Linux
+<ins>**1. Installing dependencies:**</ins>
+The engine requires opengl dev and X11 (Wayland not supported as of now) packages. Install with
+```sudo apt update && sudo apt install libgl1-mesa-dev libglu1-mesa-dev mesa-common-dev libx11-dev```
+
+<ins>**2. Downloading the repository:**</ins>
+
+Start cloning the repository with ```git clone --recursive https://github.com/LukaLominadze/NigoziEngine```
+
+<ins>**3. Building the project:**</ins>
+
+After cloning the repository, go to the ```Scripts``` directory and run the ```Setup.py``` file.
+To build, from the parent directory, run ```make config={CONFIG}```, config can be ```debug```/```release```/```distribution```
+
+The project is now ready.
+<hr>
 
 # Dependencies
 - GLFW - For window creation and event polling
@@ -43,6 +66,8 @@ The project is now ready.
 - StbImage - For handling/loading images
 - DearImGui - For UI
 - ENTT - For implementing game objects and components
+- nativefiledialogue - For using os native file dialogue
+- nolhmannjson - For using json
 
 # The plan
 The plan for Nigozi Engine is to make a 2D framework that makes the development process simple and clear and to provide core functionality and features many games have.
