@@ -32,8 +32,8 @@ project "Kakali"
 				  "%{prj.location}/../vendor/spdlog/include" }
 
 	links {
-		"nfd",
 		"NigoziEngine",
+		"nfd",
 		"GLEW",
 		"GLFW",
 		"STB",
@@ -44,13 +44,6 @@ project "Kakali"
 		"Debug",
 		"Release",
 		"Distribution"
-	}
-
-	postbuildcommands {
-		"{COPYDIR} %{wks.location}/NigoziEngine/src/Nigozi/res %{prj.location}/src/Nigozi/res",
-		"{MKDIR} %{wks.location}/bin/" .. outputdir .. "/%{prj.name}/src/Nigozi",
-		"{COPYDIR} %{prj.location}/src/Nigozi %{wks.location}/bin/" ..outputdir.. "/%{prj.name}/src/Nigozi",
-		"{COPYDIR} %{prj.location}/kakali-small.png %{wks.location}/bin/" ..outputdir.. "/%{prj.name}/" 
 	}
 
 	filter "toolset:msc*"
@@ -64,6 +57,15 @@ project "Kakali"
 		
 		links { "opengl32.lib" }
 
+		postbuildcommands {
+			"{COPYDIR} %{wks.location}/NigoziEngine/src/Nigozi/res %{prj.location}/src/Nigozi/res",
+			"{MKDIR} %{wks.location}/bin/" .. outputdir .. "/%{prj.name}/src/Nigozi",
+			"{COPYDIR} %{prj.location}/src/Nigozi %{wks.location}/bin/" ..outputdir.. "/%{prj.name}/src/Nigozi",
+			"{COPYDIR} %{prj.location}/src/res %{wks.location}/bin/" ..outputdir.. "/%{prj.name}/src/res",
+			"{COPYDIR} %{prj.location}/kakali-small.png %{wks.location}/bin/" ..outputdir.. "/%{prj.name}/",
+			"{COPYDIR} %{prj.location}/imgui.ini %{wks.location}/bin/" .. outputdir .. "/%{prj.name}/"
+		}
+
 		filter "configurations:Distribution"
 		
 			kind "WindowedApp"
@@ -76,7 +78,16 @@ project "Kakali"
 		
 		links { "GL",
 			"pthread",
-        		"dl" }
+        	"dl" }
+		
+		postbuildcommands {
+			"{COPYDIR} %{wks.location}/NigoziEngine/src/Nigozi/res %{prj.location}/src/Nigozi",
+			"{MKDIR} %{wks.location}/bin/" .. outputdir .. "/%{prj.name}/src",
+			"{COPYDIR} %{prj.location}/src/Nigozi %{wks.location}/bin/" ..outputdir.. "/%{prj.name}/src",
+			"{COPYDIR} %{prj.location}/src/res %{wks.location}/bin/" ..outputdir.. "/%{prj.name}/src",
+			"{COPYDIR} %{prj.location}/kakali-small.png %{wks.location}/bin/" ..outputdir.. "/%{prj.name}/",
+			"{COPYDIR} %{prj.location}/imgui.ini %{wks.location}/bin/" .. outputdir .. "/%{prj.name}/"
+		}
 
 	filter {"system:linux", "options:linux_backend=gtk3"}
 
