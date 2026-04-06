@@ -12,6 +12,7 @@ project "NigoziEngine"
 	
 	files {
 		"src/**.h",
+		"src/**.hpp",
 		"src/**.cpp",
 		"src/**.c",
 		"src/ngpch.cpp",
@@ -20,7 +21,7 @@ project "NigoziEngine"
 
 	vpaths {
 		["Source Files"] = "src/**.cpp",
-		["Header Files"] = "src/**.h"
+		["Header Files"] = { "src/**.h", "src/**.hpp" }
 	}
 
 	pchheader "ngpch.h"
