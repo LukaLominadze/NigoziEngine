@@ -28,6 +28,8 @@ namespace Nigozi
 
 		m_zoom = top;
 		m_aspect = right / top;
+
+		RecalculateViewMatrix();
 	}
 
 	void OrthographicCamera::SetMVPMatrix()
@@ -38,6 +40,15 @@ namespace Nigozi
 	void OrthographicCamera::SetPosition(const glm::vec3& position)
 	{
 		m_position = position;
+		RecalculateViewMatrix();
+	}
+
+	void OrthographicCamera::SetAspect(const glm::vec2& size) {
+		SetProjection(-size.x / 2.0f, size.x / 2.0f, -size.y / 2.0f, size.y * 2.0f);
+	}
+
+	void OrthographicCamera::SetZoom(float zoom) {
+		m_zoom = zoom;
 		RecalculateViewMatrix();
 	}
 

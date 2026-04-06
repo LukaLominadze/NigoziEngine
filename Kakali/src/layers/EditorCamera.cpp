@@ -1,7 +1,7 @@
 #include "EditorCamera.h"
 
-EditorCamera::EditorCamera(float aspectRatio, bool rotation)
-	:m_aspectRatio(aspectRatio), m_rotation(rotation), m_camera(-m_aspectRatio * m_zoom, m_aspectRatio* m_zoom, -m_zoom, m_zoom)
+EditorCamera::EditorCamera(float aspectRatio, float zoom, bool rotation)
+	:m_aspectRatio(aspectRatio), m_rotation(rotation), m_zoom(zoom), m_camera(-m_aspectRatio * m_zoom, m_aspectRatio* m_zoom, -m_zoom, m_zoom)
 {
 }
 

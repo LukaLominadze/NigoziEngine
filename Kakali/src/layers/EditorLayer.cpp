@@ -1,7 +1,7 @@
 #include "EditorLayer.h"
 
 EditorLayer::EditorLayer(Nigozi::FrameBuffer* viewportBuffer)
-    :m_editorCamera(viewportBuffer->GetWidth() / (float)viewportBuffer->GetHeight())
+    :m_editorCamera(viewportBuffer->GetWidth() / (float)viewportBuffer->GetHeight(), 5.0f)
 {
     p_viewportBuffer = viewportBuffer;
     m_sceneManager = Nigozi::SceneManager("Sample", [this]() { return std::make_shared<Nigozi::Scene>(&m_sceneManager); });
@@ -14,7 +14,7 @@ EditorLayer::EditorLayer(Nigozi::FrameBuffer* viewportBuffer)
     entity1.AddComponent<Nigozi::SpriteRendererComponent>("src/Nigozi/res/textures/luigi.png", glm::vec2{ 0, 0 });
 
     Nigozi::Entity entity2 = m_scene->CreateEntity("Nigozi", "Entity");
-    //entity2.AddComponent<Nigozi::SpriteRendererComponent>("src/Nigozi/res/textures/logo.png", glm::vec2{ 0, 0 });
+    entity2.AddComponent<Nigozi::SpriteRendererComponent>("src/res/textures/Player.png", glm::vec2{ 0, 0 });
 }
 
 void EditorLayer::OnEvent(Nigozi::Event& event)
@@ -40,16 +40,49 @@ void EditorLayer::OnUpdate(float timestep)
 
 void EditorLayer::OnRender()
 {
-    Nigozi::Renderer2D::Flush();
-    GLCall(glPolygonMode(GL_FRONT_AND_BACK, GL_LINE));
-    Nigozi::Renderer2D::DrawQuad(glm::vec2(0.0f), glm::vec2(1.0f), Nigozi::Renderer2D::GetData()->Textures[0],
-                                 glm::vec4(0.6f));
-    Nigozi::Renderer2D::Flush();
-    GLCall(glPolygonMode(GL_FRONT_AND_BACK, GL_FILL));
-
     m_editorCamera.OnResize(m_viewportSize.x, m_viewportSize.y);
     m_editorCamera.OnRender();
     m_scene->OnEditorRender();
+
+    Nigozi::Renderer2D::Flush();
+    GLCall(glPolygonMode(GL_FRONT_AND_BACK, GL_LINE));
+    if (m_selectionContext != entt::null) {
+        auto entity = Nigozi::Entity(m_selectionContext, m_scene.get());
+        if (!entity.HasComponent<Nigozi::SpriteRendererComponent>()) {
+            goto endSelectionGizmoRender;
+        }
+
+        auto& transform = entity.GetComponent<Nigozi::TransformComponent>();
+        auto& sprite = entity.GetComponent<Nigozi::SpriteRendererComponent>();
+
+        glm::vec2 spriteSize = sprite.Sprite->GetTextureSize();
+        float aspectX = spriteSize.x / spriteSize.y;
+
+        glm::vec2 scaleWithSprite = glm::vec2(transform.Scale.x * aspectX, transform.Scale.y);
+
+        Nigozi::Renderer2D::DrawRotatedQuad(
+            transform.Position, 
+            scaleWithSprite,
+            glm::radians(transform.Rotation),
+            Nigozi::Renderer2D::GetData()->Textures[0],
+            glm::vec4(1.0f)
+        );
+    }
+endSelectionGizmoRender:
+
+    auto cameraView = m_scene->m_Registry.view<Nigozi::TransformComponent, Nigozi::CameraComponent>();
+    for (auto [entityHandle, transform, camera] : cameraView.each()) {
+        float aspect = m_editorCamera.GetCamera().GetAspect();
+        Nigozi::Renderer2D::DrawRotatedQuad(
+            transform.Position,
+            glm::vec2(camera.Zoom * aspect, camera.Zoom),
+            glm::radians(transform.Rotation),
+            Nigozi::Renderer2D::GetData()->Textures[0],
+            glm::vec4(0.4f, 0.6f, 1.0f, 1.0f)
+        );
+    }
+    Nigozi::Renderer2D::Flush();
+    GLCall(glPolygonMode(GL_FRONT_AND_BACK, GL_FILL));
 }
 
 void EditorLayer::OnImGuiRender()
@@ -68,18 +101,10 @@ bool EditorLayer::OnSelectMouseButtonPressed(Nigozi::MouseButtonPressedEvent& ev
     }
     // TODO: Selection is not perfectly calculated
     if (event.GetButton() == GLFW_MOUSE_BUTTON_1) {
-
-        // Reverse sort for reverse iteration
-        // Currently, it is not possible to reverse iterate an entt::view
-        // We do this so that the frontmost visible object will be selected
-        m_scene->m_Registry.sort<Nigozi::SpriteRendererComponent>([](const Nigozi::SpriteRendererComponent& a, const Nigozi::SpriteRendererComponent& b) {
-            return b.ZOrder <= a.ZOrder;
-            });
-
         glm::vec2 viewportRelPos = m_viewportPosition - m_windowPosition;
         glm::vec2 mousePosition = m_editorCamera.GetCamera().GetMousePositionWorldSpace(Nigozi::Input::GetMousePosition() - viewportRelPos, *(glm::vec2*)&m_viewportSize);
 
-        Nigozi::Renderer2D::DrawQuad(mousePosition, glm::vec2(0.1f), Nigozi::Renderer2D::GetData()->Textures[0], glm::vec4(0.0f, 1.0f, 1.0f, 1.0f));
+        // Nigozi::Renderer2D::DrawQuad(mousePosition, glm::vec2(0.1f), Nigozi::Renderer2D::GetData()->Textures[0], glm::vec4(0.0f, 1.0f, 1.0f, 1.0f));
 
         auto view = m_scene->m_Registry.view<Nigozi::TransformComponent, Nigozi::SpriteRendererComponent>();
         view.use<Nigozi::SpriteRendererComponent>();
@@ -88,16 +113,23 @@ bool EditorLayer::OnSelectMouseButtonPressed(Nigozi::MouseButtonPressedEvent& ev
         for (auto [entityHandle, transform, sprite] : view.each()) {
             glm::vec2 delta = mousePosition - transform.Position;
 
+            // Scale along with the sprite size to ensure we can
+            // click on anywhere on the visible sprite to select
+            glm::vec2 absScale = glm::abs(transform.Scale);
+            glm::vec2 spriteSize = sprite.Sprite->GetTextureSize();
+            float aspectX = spriteSize.x / spriteSize.y;
+            glm::vec2 scaleWithSprite = glm::vec2(absScale.x * aspectX, absScale.y);
+
             // Transform the point into rectangle space
             float rotation = glm::radians(-transform.Rotation);
-            glm::vec2 normal(glm::cos(rotation), glm::sin(rotation));
+            glm::vec2 normal(glm::cos(rotation), glm::sin(-rotation));
             glm::vec2 rotated(delta.x * normal.x - delta.y * normal.y,
                 delta.x * normal.y + delta.y * normal.x);
 
-            Nigozi::Renderer2D::DrawRotatedQuad(transform.Position + rotated, glm::vec2(0.1f), rotation, Nigozi::Renderer2D::GetData()->Textures[0], glm::vec4(0.0f, 0.0f, 1.0f, 1.0f));
+            // Nigozi::Renderer2D::DrawRotatedQuad(transform.Position + rotated, glm::vec2(0.1f), rotation, Nigozi::Renderer2D::GetData()->Textures[0], glm::vec4(0.0f, 0.0f, 1.0f, 1.0f));
 
             // Check collision in rectangle local space
-            glm::vec2 halfSize = transform.Scale / 2.0f;
+            glm::vec2 halfSize = scaleWithSprite / 2.0f;
             bool pointInRect = (glm::abs(rotated.x) <= halfSize.x) &&
                                (glm::abs(rotated.y) <= halfSize.y);
 
@@ -105,14 +137,8 @@ bool EditorLayer::OnSelectMouseButtonPressed(Nigozi::MouseButtonPressedEvent& ev
                 m_selectionContext = entityHandle;
                 m_movingSelectionContext = entityHandle;
                 selected = true;
-                break;
             }
         }
-
-        // Reverse sort again, it messes up the sorting if we don't do this
-        m_scene->m_Registry.sort<Nigozi::SpriteRendererComponent>([](const Nigozi::SpriteRendererComponent& a, const Nigozi::SpriteRendererComponent& b) {
-            return a.ZOrder <= b.ZOrder;
-            });
 
         if (!selected) {
             m_selectionContext = entt::null;
@@ -369,6 +395,16 @@ void EditorLayer::ShowInspector()
             ImGui::TreePop();
         }
 
+        if (entity.HasComponent<Nigozi::CameraComponent>() &&
+            ImGui::TreeNodeEx((void*)(typeid(Nigozi::CameraComponent).hash_code() + (size_t)m_selectionContext),
+                ImGuiTreeNodeFlags_DefaultOpen, "Camera")) {
+            auto& camera = entity.GetComponent<Nigozi::CameraComponent>();
+            ImGui::DragFloat("Zoom", &camera.Zoom, 0.05f, 0.01f);
+            ImGui::Checkbox("Current", &camera.Current);
+
+            ImGui::TreePop();
+        }
+
         if (entity.HasComponent<Nigozi::SpriteRendererComponent>() &&
             ImGui::TreeNodeEx((void*)(typeid(Nigozi::SpriteRendererComponent).hash_code() + (size_t)m_selectionContext),
                 ImGuiTreeNodeFlags_DefaultOpen, "Sprite Renderer")) {
@@ -408,9 +444,11 @@ void EditorLayer::ShowAddComponentModal()
 
         constexpr size_t SPRITE_RENDERER = 0;
         constexpr size_t AUDIO_STREAM_PLAYER = 1;
-        static std::array<std::string, 2> items = {
+        constexpr size_t CAMERA = 2;
+        static std::array<std::string, 3> items = {
             "Sprite Renderer",
-            "Audio Stream Player"
+            "Audio Stream Player",
+            "Camera"
         };
         static size_t itemSelectedIndex = -1;
 
@@ -444,6 +482,7 @@ void EditorLayer::ShowAddComponentModal()
                 Nigozi::Entity entity(m_selectionContext, m_scene.get());
                 AddComponent<Nigozi::SpriteRendererComponent>(entity, itemSelectedIndex == SPRITE_RENDERER);
                 AddComponent<Nigozi::AudioStreamPlayerComponent>(entity, itemSelectedIndex == AUDIO_STREAM_PLAYER);
+                AddComponent<Nigozi::CameraComponent>(entity, itemSelectedIndex == CAMERA);
             }
             ImGui::CloseCurrentPopup();
         }

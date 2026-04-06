@@ -5,6 +5,7 @@
 #include "Nigozi/glcore/SubTexture.h"
 #include "Script.h"
 #include "Nigozi/audio/AudioEngine.h"
+#include "Nigozi/glcore/OrthographicCamera.h"
 
 namespace Nigozi {
 	struct NameComponent {
@@ -48,6 +49,16 @@ namespace Nigozi {
 		TransformComponent(const TransformComponent& other) = default;
 		TransformComponent(glm::vec2 position, glm::vec2 scale = glm::vec2(1.0f), float rotation = 0.0f)
 			:Position(position), Scale(scale), Rotation(rotation) { }
+	};
+
+	struct CameraComponent {
+		bool Current = true;
+		float Zoom = 5.0f;
+
+		CameraComponent() = default;
+		CameraComponent(const CameraComponent& other) = default;
+		CameraComponent(bool current, float zoom)
+			:Current(current), Zoom(zoom) { }
 	};
 
 	/*

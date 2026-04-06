@@ -4,10 +4,10 @@
 
 class EditorCamera {
 public:
-	EditorCamera(float aspectRatio, bool rotation = false);
+	EditorCamera(float aspectRatio, float zoom = 5.0f, bool rotation = false);
 	~EditorCamera();
 
-	inline const Nigozi::OrthographicCamera& GetCamera() const { return m_camera; }
+	inline Nigozi::OrthographicCamera& GetCamera() { return m_camera; }
 
 	void OnEvent(Nigozi::Event& event);
 	void OnUpdate(float timestep);
@@ -17,7 +17,7 @@ private:
 	bool OnMouseScrolled(Nigozi::MouseScrolledEvent& e);
 	bool OnMouseMoved(Nigozi::MouseMovedEvent& e);
 private:
-	float m_aspectRatio;
+	float m_aspectRatio = 1.0f;
 	float m_zoom = 1.0f;
 
 	bool m_rotation = false;

@@ -13,6 +13,8 @@ namespace Nigozi
 		void SetMVPMatrix();
 
 		void SetPosition(const glm::vec3& position);
+		void SetAspect(const glm::vec2& size);
+		void SetZoom(float zoom);
 		void SetRotation(float rotation);
 
 		inline const glm::vec3& GetPosition() const { return m_position; }

@@ -33,6 +33,7 @@ project "NigoziEngine"
 				  "%{prj.location}/../vendor/stb",
 				  "%{prj.location}/../vendor/imgui",
 				  "%{prj.location}/../vendor/glm",
+				  "%{wks.location}/vendor/nfd/src/include",
 				  "%{prj.location}/../vendor/spdlog/include" }
 
 	links { "GLEW",
