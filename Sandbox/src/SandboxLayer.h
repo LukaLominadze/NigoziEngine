@@ -23,8 +23,8 @@ private:
 	std::shared_ptr<Nigozi::SubTexture> m_playerTexture;
 
 	std::string m_keystate;
-	std::pair<int, int> m_mouseDelta;
-	std::pair<int, int> m_mousePosition;
+	glm::vec2 m_mouseDelta;
+	glm::vec2 m_mousePosition;
 
 	glm::vec3 m_luigiPosition;
 

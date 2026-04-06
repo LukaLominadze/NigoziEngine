@@ -17,15 +17,17 @@ namespace Nigozi
 	struct ApplicationProps {
 		const char* Title = "App";
 		uint32_t Width = 960, Height = 540;
+		const char* IconPath = NO_ICON; // No icon by default
 		bool VSync = false;
 		bool Fullscreen = false;
-		const char* IconPath = NO_ICON; // No icon by default
 	};
 
 	class Application {
 	public:
-		Application(const ApplicationProps& props);
+		[[nodiscard]]
+		explicit Application(const ApplicationProps& props);
 		Application(const Application& other) = delete;
+		Application(Application&& other) = delete;
 		~Application();
 		const bool Initialized() const { return m_initialized; }
 

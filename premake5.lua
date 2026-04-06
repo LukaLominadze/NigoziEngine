@@ -21,6 +21,7 @@ group "Dependencies"
 	include "vendor/glew"
 	include "vendor/stb"
 	include "vendor/imgui"
+	include "vendor/nfd/build/Build-nfd-Only.lua"
 group ""
 
 group "Core"

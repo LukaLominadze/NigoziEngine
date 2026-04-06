@@ -28,9 +28,11 @@ project "Sandbox"
 				  "%{wks.location}/vendor/stb",
 				  "%{wks.location}/vendor/imgui",
 				  "%{wks.location}/vendor/glm",
+				  "%{wks.location}/vendor/nfd/src/include",
 				  "%{prj.location}/../vendor/spdlog/include" }
 
 	links {
+		"nfd",
 		"NigoziEngine",
 		"GLEW",
 		"GLFW",
@@ -78,6 +80,11 @@ project "Sandbox"
 			"pthread",
         		"dl" }
 
+	filter {"system:linux", "options:linux_backend=gtk3"}
+
+		buildoptions {"`pkg-config --cflags gtk+-3.0`"}
+		linkoptions  { "`pkg-config --libs gtk+-3.0`" }
+		links { "gtk-3", "gobject-2.0", "glib-2.0" }
 
 	filter "configurations:Debug"
 		

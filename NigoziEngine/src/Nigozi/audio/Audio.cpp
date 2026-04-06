@@ -1,12 +1,13 @@
 #include "ngpch.h"
 #include "Audio.h"
+#include "AudioGroup.h"
 #include "Nigozi/core/Assert.h"
 #include "Nigozi/core/Log.h"
 
 namespace Nigozi
 {
 	Audio::Audio(ma_engine& engine, const std::filesystem::path& filePath, AudioGroup& audioGroup)
-		:m_audioGroupName(audioGroup.GetName()), m_name(filePath.filename().string())
+		:m_audioGroupName(audioGroup.GetName()), m_filePath(filePath), m_name(filePath.filename().string())
 	{
 		ma_result result = ma_sound_init_from_file(&engine, filePath.string().c_str(), NULL, &audioGroup.GetNativeAudioGroup(), NULL, &m_audio);
 		if (result != MA_SUCCESS) {
@@ -24,8 +25,9 @@ namespace Nigozi
 		ma_sound_set_volume(&m_audio, ma_volume_db_to_linear(decibels));
 	}
 
-	void Audio::SetAudioGroup(const std::string_view& name)
+	void Audio::SetAudioGroup(AudioGroup& audioGroup)
 	{
+		ma_node_attach_output_bus(&m_audio, 0, &audioGroup.GetNativeAudioGroup(), 0);
 	}
 
 	void Audio::Play()
