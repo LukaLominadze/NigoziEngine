@@ -89,7 +89,7 @@ The plan for Nigozi Engine is to make a 2D framework that makes the development 
 ## Writing Code
 Once a project is set up with NigoziEngine, you can go ahead and create a main file. This is where the entry point of the application will be.
 
-Firs you will need to define "MAIN" before including Nigozi to indicate where the entry point is.
+First you will need to define "MAIN" before including Nigozi to indicate where the entry point is.
 
 Then, you will need to define a function for creating the application:
 ```cpp

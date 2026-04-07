@@ -1,7 +1,8 @@
 #include "EditorLayer.h"
 
 EditorLayer::EditorLayer(Nigozi::FrameBuffer* viewportBuffer)
-    :m_editorCamera(viewportBuffer->GetWidth() / (float)viewportBuffer->GetHeight(), 5.0f)
+    :m_mouseOldPosition(0.0f), m_viewportPosition(0.0f), m_windowPosition(0.0f),
+    m_editorCamera(viewportBuffer->GetWidth() / (float)viewportBuffer->GetHeight(), 5.0f)
 {
     p_viewportBuffer = viewportBuffer;
     m_sceneManager = Nigozi::SceneManager("Sample", [this]() { return std::make_shared<Nigozi::Scene>(&m_sceneManager); });
@@ -331,9 +332,7 @@ void EditorLayer::ShowSceneHierarchy()
 {
     ImGui::Begin("Scene Hierarchy");
     m_windowPosition = glm::vec2(ImGui::GetWindowPos().x, ImGui::GetWindowPos().y);
-    if (ImGui::Button("+")) {
-        Nigozi::Entity newEntity = m_scene->CreateEntity("New Object", "Empty");
-    }
+    ShowAddNodeModal();
     ImGui::SameLine();
     if (ImGui::Button("X") && m_selectionContext != entt::null) {
         Nigozi::Entity entity(m_selectionContext, m_scene.get());
@@ -377,28 +376,6 @@ void EditorLayer::ShowInspector()
         ImGui::InputText("Name", nameComponent.Name.data(), nameComponent.Name.capacity());
         ImGui::InputText("Tag", tagComponent.Tag.data(), tagComponent.Tag.capacity());
 
-        if (ImGui::TreeNodeEx((void*)(typeid(Nigozi::TransformComponent).hash_code() + (size_t)m_selectionContext),
-            ImGuiTreeNodeFlags_DefaultOpen, "Transform")) {
-            auto& transform = entity.GetComponent<Nigozi::TransformComponent>();
-            ImGui::Text("Position");
-            ImGui::PushID(&transform.Position);
-            ImGui::DragFloat("X", &transform.Position.x, 0.1f);
-            //ImGui::SameLine();
-            ImGui::DragFloat("Y", &transform.Position.y, 0.1f);
-            ImGui::PopID();
-
-            ImGui::Text("Scale");
-            ImGui::PushID(&transform.Scale);
-            ImGui::DragFloat("X", &transform.Scale.x, 0.1f);
-            //ImGui::SameLine();
-            ImGui::DragFloat("Y", &transform.Scale.y, 0.1f);
-            ImGui::PopID();
-
-            ImGui::DragFloat("Rotation", &transform.Rotation);
-
-            ImGui::TreePop();
-        }
-
         if (entity.HasComponent<Nigozi::CameraComponent>() &&
             ImGui::TreeNodeEx((void*)(typeid(Nigozi::CameraComponent).hash_code() + (size_t)m_selectionContext),
                 ImGuiTreeNodeFlags_DefaultOpen, "Camera")) {
@@ -441,7 +418,7 @@ void EditorLayer::ShowInspector()
                 ImVec4 bg_col = ImVec4(0.0f, 0.0f, 0.0f, 1.0f);             // Black background
                 ImVec4 tint_col = ImVec4(1.0f, 1.0f, 1.0f, 1.0f);           // No tint
                 if (ImGui::ImageButton("Sprite", sprite.SpriteTexture->GetRendererID(), size, uv0, uv1, bg_col, tint_col)) {
-                    std::filesystem::path result = FileDialogue::OpenFileDialog("png;jpg;jpeg");
+                    std::filesystem::path result = Nigozi::FileDialogue::OpenFileDialog("png;jpg;jpeg");
                     if (!result.empty()) {
                         std::string path = result.string();
 
@@ -472,7 +449,7 @@ void EditorLayer::ShowInspector()
                 auto& audio = entity.GetComponent<Nigozi::AudioStreamPlayerComponent>();
 
                 if (ImGui::Button("Choose")) {
-                    std::filesystem::path result = FileDialogue::OpenFileDialog("wav,mp3,flac");
+                    std::filesystem::path result = Nigozi::FileDialogue::OpenFileDialog("wav,mp3,flac");
                     NG_CORE_LOG_INFO("New audio path: {}", result.string());
                     if (!result.empty()) {
                         Nigozi::Audio* newAudio = nullptr;
@@ -531,22 +508,42 @@ void EditorLayer::ShowInspector()
             ImGui::TreePop();
         }
 
-        ShowAddComponentModal();
+        if (ImGui::TreeNodeEx((void*)(typeid(Nigozi::TransformComponent).hash_code() + (size_t)m_selectionContext),
+            ImGuiTreeNodeFlags_DefaultOpen, "Transform")) {
+            auto& transform = entity.GetComponent<Nigozi::TransformComponent>();
+            ImGui::Text("Position");
+            ImGui::PushID(&transform.Position);
+            ImGui::DragFloat("X", &transform.Position.x, 0.1f);
+            //ImGui::SameLine();
+            ImGui::DragFloat("Y", &transform.Position.y, 0.1f);
+            ImGui::PopID();
+
+            ImGui::Text("Scale");
+            ImGui::PushID(&transform.Scale);
+            ImGui::DragFloat("X", &transform.Scale.x, 0.1f);
+            //ImGui::SameLine();
+            ImGui::DragFloat("Y", &transform.Scale.y, 0.1f);
+            ImGui::PopID();
+
+            ImGui::DragFloat("Rotation", &transform.Rotation);
+
+            ImGui::TreePop();
+        }
     }
     ImGui::End();
 }
 
-void EditorLayer::ShowAddComponentModal()
+void EditorLayer::ShowAddNodeModal()
 {
-    if (ImGui::Button("Add Component")) {
-        ImGui::OpenPopup("Add Component...");
+    if (ImGui::Button("Add Node")) {
+        ImGui::OpenPopup("Add Node...");
     }
 
     ImVec2 center = ImGui::GetMainViewport()->GetCenter();
     ImGui::SetNextWindowPos(center, ImGuiCond_Appearing, ImVec2(0.5f, 0.5f));
 
-    if (ImGui::BeginPopupModal("Add Component...", NULL, ImGuiWindowFlags_AlwaysAutoResize)) {
-        ImGui::Text("This is where you can add components");
+    if (ImGui::BeginPopupModal("Add Node...", NULL, ImGuiWindowFlags_AlwaysAutoResize)) {
+        ImGui::Text("This is where you can add nodes");
 
         constexpr size_t SPRITE_RENDERER = 0;
         constexpr size_t AUDIO_STREAM_PLAYER = 1;
@@ -564,7 +561,7 @@ void EditorLayer::ShowAddComponentModal()
             preview = (char*)empty;
         }
 
-        if (ImGui::BeginCombo("Components", preview, 0)) {
+        if (ImGui::BeginCombo("Nodes", preview, 0)) {
             for (size_t i = 0; i < items.size(); i++) {
                 const bool isSelected = (itemSelectedIndex == i);
                 if (ImGui::Selectable(items[i].c_str(), isSelected)) {
@@ -585,7 +582,7 @@ void EditorLayer::ShowAddComponentModal()
         ImGui::SameLine();
         if (ImGui::Button("Add")) {
             if (itemSelectedIndex != -1) {
-                Nigozi::Entity entity(m_selectionContext, m_scene.get());
+                Nigozi::Entity entity = m_scene->CreateEntity("New Node", "Empty");
                 AddComponent<Nigozi::SpriteRendererComponent>(entity, itemSelectedIndex == SPRITE_RENDERER);
                 AddComponent<Nigozi::AudioStreamPlayerComponent>(entity, itemSelectedIndex == AUDIO_STREAM_PLAYER);
                 AddComponent<Nigozi::CameraComponent>(entity, itemSelectedIndex == CAMERA);
@@ -598,6 +595,7 @@ void EditorLayer::ShowAddComponentModal()
                         otherCamera.Current = false;
                     }
                 }
+                m_selectionContext = entity.GetHandle();
             }
             ImGui::CloseCurrentPopup();
         }
