@@ -32,7 +32,7 @@ private:
 	void DockViewportWithMenuBar();
 	void ShowSceneHierarchy();
 	void ShowInspector();
-	void ShowAddComponentModal();
+	void ShowAddNodeModal();
 	void ShowViewport();
 
 	template<typename T>
