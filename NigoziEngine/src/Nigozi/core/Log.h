@@ -5,8 +5,6 @@
 
 namespace Nigozi
 {
-	class Application;
-
 	class Log
 	{
 	public:

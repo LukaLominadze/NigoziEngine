@@ -52,7 +52,7 @@ namespace Nigozi
 			cameraPosition -= m_camera.GetUp() * m_cameraTranslationSpeed * timestep;
 		}
 
-		std::pair<float, float> delta = Input::GetMousePositionDelta();
+		glm::vec2 delta = Input::GetMousePositionDelta();
 
 		if (m_mouseLocked) {
 			float sensitivity = 0.1f;
@@ -61,8 +61,8 @@ namespace Nigozi
 			float yaw = m_camera.GetYaw();
 			float pitch = m_camera.GetPitch();
 
-			yaw += delta.first * sensitivity;
-			pitch -= delta.second * sensitivity;
+			yaw += delta.x * sensitivity;
+			pitch -= delta.y * sensitivity;
 
 			if (pitch > 89.0f)
 				pitch = 89.0f;

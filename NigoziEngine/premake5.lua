@@ -12,6 +12,7 @@ project "NigoziEngine"
 	
 	files {
 		"src/**.h",
+		"src/**.hpp",
 		"src/**.cpp",
 		"src/**.c",
 		"src/ngpch.cpp",
@@ -20,7 +21,7 @@ project "NigoziEngine"
 
 	vpaths {
 		["Source Files"] = "src/**.cpp",
-		["Header Files"] = "src/**.h"
+		["Header Files"] = { "src/**.h", "src/**.hpp" }
 	}
 
 	pchheader "ngpch.h"
@@ -33,9 +34,12 @@ project "NigoziEngine"
 				  "%{prj.location}/../vendor/stb",
 				  "%{prj.location}/../vendor/imgui",
 				  "%{prj.location}/../vendor/glm",
+				  "%{wks.location}/vendor/nfd/src/include",
 				  "%{prj.location}/../vendor/spdlog/include" }
 
-	links { "GLEW",
+	links {
+		"nfd",
+		"GLEW",
 		"GLFW",
 		"STB",
 		"ImGui" }

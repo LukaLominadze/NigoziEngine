@@ -8,7 +8,7 @@
 
 extern Nigozi::Application* CreateApplication();
 
-#ifdef DISTRIBUTION and NG_PLATFORM_WINDOWS
+#if defined(DISTRIBUTION) && defined(NG_PLATFORM_WINDOWS)
 #include <windows.h>
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow) {
 	Nigozi::Log::Initialize();

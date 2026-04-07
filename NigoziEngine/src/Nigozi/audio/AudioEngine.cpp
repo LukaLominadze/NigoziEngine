@@ -1,5 +1,6 @@
 #include "ngpch.h"
 #include "AudioEngine.h"
+#include "Nigozi/core/Log.h"
 
 namespace Nigozi
 {
@@ -26,6 +27,8 @@ namespace Nigozi
 		s_audioGroups.reserve(MAX_AUDIO_GROUPS);
 		s_audioGroups.emplace_back(s_engine, "Master");
 		s_initialized = true;
+
+		NG_CORE_LOG_INFO("Audio Engine initialized!");
 	}
 
 	void AudioEngine::Deinitialize()
@@ -36,6 +39,7 @@ namespace Nigozi
 		s_audios.clear();
 		s_audioGroups.clear();
 		ma_engine_uninit(&s_engine);
+		NG_CORE_LOG_INFO("Audio Engine deinitialized");
 	}
 
 	bool AudioEngine::Initialized()
@@ -98,6 +102,18 @@ namespace Nigozi
 		return &s_audioGroups[MASTER_AUDIO_GROUP_INDEX];
 	}
 
+	void AudioEngine::AttachAudioToAudioGroup(Audio* audio, const std::string_view audioGroup)
+	{
+		auto it = std::find_if(s_audioGroups.begin(), s_audioGroups.end(), [audioGroup](AudioGroup& group) {
+			return audioGroup == group.GetName();
+			});
+		if (it == s_audioGroups.end()) {
+			NG_CORE_LOG_WARN("Audio group with name: {} doesn't exist!", audioGroup);
+			return;
+		}
+		audio->SetAudioGroup(*it);
+	}
+
 
 	Audio* AudioEngine::LoadAudioFromFile(const std::filesystem::path& filePath)
 	{
@@ -114,7 +130,7 @@ namespace Nigozi
 		return (*--s_audios.end());
 	}
 
-	Audio* AudioEngine::LoadAudioFromFile(const std::filesystem::path& filePath, const std::string_view& audioGroup)
+	Audio* AudioEngine::LoadAudioFromFile(const std::filesystem::path& filePath, const std::string_view audioGroup)
 	{
 		if (!std::filesystem::exists(filePath)) {
 			nullptr;
@@ -129,10 +145,17 @@ namespace Nigozi
 			return audioGroup == group.GetName();
 			});
 		if (_it == s_audioGroups.end()) {
-			s_audios.push_back(new Audio(s_engine, filePath, s_audioGroups[MASTER_AUDIO_GROUP_INDEX]));
+			NG_CORE_LOG_WARN("Audio group with name: {} doesn't exist!", audioGroup);
+			Audio* audio = new Audio(s_engine, filePath, s_audioGroups[MASTER_AUDIO_GROUP_INDEX]);
+			s_audios.push_back(audio);
+			return audio;
 		}
-		s_audios.push_back(new Audio(s_engine, filePath, (*_it)));
-		return (*--s_audios.end());
+		else {
+			Audio* audio = new Audio(s_engine, filePath, (*_it));
+			s_audios.push_back(audio);
+			return audio;
+		}
+		return nullptr;
 	}
 
 	void AudioEngine::UnloadAudio(Audio* audio)
@@ -141,6 +164,7 @@ namespace Nigozi
 			return audio == _audio;
 			});
 		if (it == s_audios.end()) {
+			NG_CORE_LOG_ERROR("Audio with name: {} not found in engine repository!", audio->GetName());
 			return;
 		}
 		s_audios.erase(it);

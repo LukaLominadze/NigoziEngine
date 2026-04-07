@@ -24,8 +24,10 @@ namespace Nigozi
 		static AudioGroup* GetAudioGroup(const std::string_view& name);
 		static AudioGroup* GetMasterAudioGroup();
 
+		static void AttachAudioToAudioGroup(Audio* audio, const std::string_view audioGroup);
+
 		static Audio* LoadAudioFromFile(const std::filesystem::path& filePath);
-		static Audio* LoadAudioFromFile(const std::filesystem::path& filePath, const std::string_view& audioGroup);
+		static Audio* LoadAudioFromFile(const std::filesystem::path& filePath, const std::string_view audioGroup);
 		static void UnloadAudio(Audio* audio);
 	private:
 		static ma_engine s_engine;

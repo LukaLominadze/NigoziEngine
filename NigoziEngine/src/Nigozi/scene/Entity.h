@@ -46,8 +46,12 @@ namespace Nigozi
 			p_scene->m_Registry.destroy(m_entityHandle);
 		}
 
+		inline entt::entity GetHandle() const { return m_entityHandle; }
 		inline Scene* GetScene() { return p_scene; }
 
+		inline bool operator==(const Entity& other) const {
+			return m_entityHandle == other.m_entityHandle;
+		}
 	private:
 		entt::entity m_entityHandle;
 

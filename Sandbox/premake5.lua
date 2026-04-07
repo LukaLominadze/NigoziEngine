@@ -28,9 +28,11 @@ project "Sandbox"
 				  "%{wks.location}/vendor/stb",
 				  "%{wks.location}/vendor/imgui",
 				  "%{wks.location}/vendor/glm",
+				  "%{wks.location}/vendor/nfd/src/include",
 				  "%{prj.location}/../vendor/spdlog/include" }
 
 	links {
+		"nfd",
 		"NigoziEngine",
 		"GLEW",
 		"GLFW",
@@ -47,15 +49,6 @@ project "Sandbox"
 	filter "toolset:msc*"
   	buildoptions { "/utf-8" }
 
-	postbuildcommands {
-		"{COPYDIR} %{wks.location}/NigoziEngine/src/Nigozi/res %{prj.location}/src/Nigozi/res",
-		"{MKDIR} %{wks.location}/bin/" .. outputdir .. "/%{prj.name}/src/Nigozi",
-		"{COPYDIR} %{prj.location}/src/Nigozi %{wks.location}/bin/" ..outputdir.. "/%{prj.name}/src/Nigozi",
-		"{MKDIR} %{wks.location}/bin/" .. outputdir .. "/%{prj.name}/src/res",
-		"{COPYDIR} %{prj.location}/src/res %{wks.location}/bin/" ..outputdir.. "/%{prj.name}/src/res",
-		"{MKDIR} %{wks.location}/bin/" .. outputdir .. "/%{prj.name}/src", 
-	}
-
 	filter "system:windows"
 		cppdialect "C++20"
 		systemversion "latest"
@@ -63,6 +56,15 @@ project "Sandbox"
 		defines { "NG_PLATFORM_WINDOWS" }
 		
 		links { "opengl32.lib" }
+
+		postbuildcommands {
+			"{COPYDIR} %{wks.location}/NigoziEngine/src/Nigozi/res %{prj.location}/src/Nigozi/res",
+			"{MKDIR} %{wks.location}/bin/" .. outputdir .. "/%{prj.name}/src/Nigozi",
+			"{COPYDIR} %{prj.location}/src/Nigozi %{wks.location}/bin/" ..outputdir.. "/%{prj.name}/src/Nigozi",
+			"{MKDIR} %{wks.location}/bin/" .. outputdir .. "/%{prj.name}/src/res",
+			"{COPYDIR} %{prj.location}/src/res %{wks.location}/bin/" ..outputdir.. "/%{prj.name}/src/res",
+			"{MKDIR} %{wks.location}/bin/" .. outputdir .. "/%{prj.name}/src"
+		}
 
 		filter "configurations:Distribution"
 
@@ -77,7 +79,20 @@ project "Sandbox"
 		links { "GL",
 			"pthread",
         		"dl" }
+		
+		postbuildcommands {
+			"{COPYDIR} %{wks.location}/NigoziEngine/src/Nigozi/res %{prj.location}/src/Nigozi",
+			"{MKDIR} %{wks.location}/bin/" .. outputdir .. "/%{prj.name}/src",
+			"{COPYDIR} %{prj.location}/src/Nigozi %{wks.location}/bin/" ..outputdir.. "/%{prj.name}/src",
+			"{MKDIR} %{wks.location}/bin/" .. outputdir .. "/%{prj.name}/src/res",
+			"{COPYDIR} %{prj.location}/src/res %{wks.location}/bin/" ..outputdir.. "/%{prj.name}/src"
+		}
 
+	filter {"system:linux", "options:linux_backend=gtk3"}
+
+		buildoptions {"`pkg-config --cflags gtk+-3.0`"}
+		linkoptions  { "`pkg-config --libs gtk+-3.0`" }
+		links { "gtk-3", "gobject-2.0", "glib-2.0" }
 
 	filter "configurations:Debug"
 		

@@ -31,9 +31,14 @@
 #include "Nigozi/events/KeyEvent.h"
 #include "Nigozi/events/MouseEvent.h"
 
+#include "Nigozi/utils/StringUtils.h"
+#include "Nigozi/utils/FileDialogue.h"
+
 #include "Nigozi/scene/Scene.h"
 #include "Nigozi/scene/SceneManager.h"
 #include "Nigozi/scene/Entity.h"
 #include "Nigozi/scene/Component.h"
+
+#include "Nigozi/audio/AudioEngine.h"
 
 #include "Nigozi/core/EntryPoint.h"

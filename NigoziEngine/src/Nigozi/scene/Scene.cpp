@@ -52,7 +52,10 @@ namespace Nigozi
         auto view = m_Registry.view<TransformComponent, SpriteRendererComponent>();
         view.use<SpriteRendererComponent>();
         view.each([](auto entity, auto& transform, auto& sprite) {
-            Renderer2D::DrawRotatedQuad(transform.Position, transform.Scale, glm::radians(transform.Rotation), sprite.Sprite, sprite.Color);
+            glm::vec2 spriteSize = sprite.Sprite->GetTextureSize();
+            float aspectX = spriteSize.x / spriteSize.y;
+            glm::vec2 scale(transform.Scale.x * aspectX, transform.Scale.y);
+            Renderer2D::DrawRotatedQuad(transform.Position, scale, glm::radians(transform.Rotation), sprite.Sprite, sprite.Color);
             });
     }
 
@@ -62,6 +65,40 @@ namespace Nigozi
         scriptView.each([](auto script) {
             script.ScriptHandle->OnImGuiRender();
             });
+    }
+
+    void Scene::OnEditorEvent(Event& event)
+    {
+
+    }
+
+    void Scene::OnEditorUpdate(float timestep)
+    {
+        auto audioView = m_Registry.view<AudioStreamPlayerComponent>();
+        audioView.each([](auto audio) {
+            audio.AudioHandle->Update();
+            });
+    }
+
+    void Scene::OnEditorRender()
+    {
+        m_Registry.sort<SpriteRendererComponent>([](const SpriteRendererComponent& a, const SpriteRendererComponent& b) {
+            return a.ZOrder < b.ZOrder;
+            });
+
+        auto view = m_Registry.view<TransformComponent, SpriteRendererComponent>();
+        view.use<SpriteRendererComponent>();
+        view.each([](auto entity, auto& transform, auto& sprite) {
+            glm::vec2 spriteSize = sprite.Sprite->GetTextureSize();
+            float aspectX = spriteSize.x / spriteSize.y;
+            glm::vec2 scale(transform.Scale.x * aspectX, transform.Scale.y);
+            Renderer2D::DrawRotatedQuad(transform.Position, scale, glm::radians(transform.Rotation), sprite.Sprite, sprite.Color);
+            });
+    }
+
+    void Scene::OnEditorImGuiRender()
+    {
+
     }
 
     Entity Scene::CreateEntity(const std::string& name, const std::string& tag)

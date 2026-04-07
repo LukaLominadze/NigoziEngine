@@ -12,7 +12,7 @@ namespace Nigozi
 		~Audio();
 
 		void SetVolume(float decibels);
-		void SetAudioGroup(const std::string_view& name);
+		void SetAudioGroup(AudioGroup& audioGroup);
 
 		void Play();
 		void Pause();
@@ -25,11 +25,13 @@ namespace Nigozi
 		inline const bool IsPaused() const { return m_isPaused; }
 
 		inline ma_sound& GetNativeAudio() { return m_audio; }
-		inline const std::string_view& GetAudioGroupName() { return m_audioGroupName; }
+		inline const std::string_view GetAudioGroupName() { return m_audioGroupName; }
 		inline const std::string& GetName() const { return m_name; }
+		inline const std::filesystem::path GetFilePath() const { return m_filePath; }
 	private:
 		ma_sound m_audio;
 		std::string_view m_audioGroupName;
+		std::filesystem::path m_filePath;
 		std::string m_name;
 
 		bool m_isPlaying = false, m_isPaused = false;

@@ -76,6 +76,8 @@ namespace Nigozi
 
 		s_data->Textures[0] = std::make_shared<Texture>("src/Nigozi/res/textures/flatQuad.png");
 		s_data->Textures[s_data->TextureSlot++]->Bind(0);
+
+		NG_CORE_LOG_INFO("Renderer initialized");
 	}
 
 	void Renderer2D::Deinitialize()
@@ -91,6 +93,8 @@ namespace Nigozi
 		s_data->DefaultShader->Delete();
 		delete s_data->QuadVertexArray;
 		delete s_data;
+
+		NG_CORE_LOG_INFO("Renderer deinitialized");
 	}
 
 	void Renderer2D::SetClearColor(float v0, float v1, float v2, float v3)

@@ -21,9 +21,9 @@ namespace Nigozi
         ShaderProgramSource shaderSource = ParseShader();
         NG_CORE_LOG_INFO("Creating shader at " + filePath);
         NG_CORE_LOG_INFO("SHADER VERTEX");
-        NG_CORE_LOG_INFO(shaderSource.VertexShader);
+        NG_CORE_LOG_INFO("\n{}", shaderSource.VertexShader);
         NG_CORE_LOG_INFO("SHADER FRAGMENT");
-        NG_CORE_LOG_INFO(shaderSource.FragmentShader);
+        NG_CORE_LOG_INFO("\n{}", shaderSource.FragmentShader);
         m_shader = CreateShader(shaderSource.VertexShader, shaderSource.FragmentShader);
         GLCall(glLinkProgram(m_shader));
         GLCall(glUseProgram(m_shader));
