@@ -43,6 +43,8 @@ private:
 		}
 	}
 private:
+	static bool s_showDemoWindow;
+private:
 	Nigozi::SceneManager m_sceneManager;
 	Nigozi::FrameBuffer* p_viewportBuffer;
 	std::shared_ptr<Nigozi::Scene> m_scene;

@@ -1,5 +1,7 @@
 #include "EditorLayer.h"
 
+bool EditorLayer::s_showDemoWindow = false;
+
 EditorLayer::EditorLayer(Nigozi::FrameBuffer* viewportBuffer)
     :m_mouseOldPosition(0.0f), m_viewportPosition(0.0f), m_windowPosition(0.0f),
     m_editorCamera(viewportBuffer->GetWidth() / (float)viewportBuffer->GetHeight(), 5.0f)
@@ -56,7 +58,7 @@ void EditorLayer::OnRender()
         auto& transform = entity.GetComponent<Nigozi::TransformComponent>();
         auto& sprite = entity.GetComponent<Nigozi::SpriteRendererComponent>();
 
-        glm::vec2 spriteSize = sprite.Sprite->GetTextureSize();
+        glm::vec2 spriteSize = sprite.Sprite->GetSize();
         float aspectX = spriteSize.x / spriteSize.y;
 
         glm::vec2 scaleWithSprite = glm::vec2(transform.Scale.x * aspectX, transform.Scale.y);
@@ -97,6 +99,9 @@ void EditorLayer::OnImGuiRender()
     ShowInspector();
     ShowViewport();
     m_scene->OnEditorImGuiRender();
+    if (s_showDemoWindow) {
+        ImGui::ShowDemoWindow(&s_showDemoWindow);
+    }
 }
 
 bool EditorLayer::OnSelectMouseButtonPressed(Nigozi::MouseButtonPressedEvent& event)
@@ -104,7 +109,6 @@ bool EditorLayer::OnSelectMouseButtonPressed(Nigozi::MouseButtonPressedEvent& ev
     if (m_tool != Tool::SELECT || !m_viewportHovered) {
         return false;
     }
-    // TODO: Selection is not perfectly calculated
     if (event.GetButton() == GLFW_MOUSE_BUTTON_1) {
         glm::vec2 viewportRelPos = m_viewportPosition - m_windowPosition;
         glm::vec2 mousePosition = m_editorCamera.GetCamera().GetMousePositionWorldSpace(Nigozi::Input::GetMousePosition() - viewportRelPos, *(glm::vec2*)&m_viewportSize);
@@ -121,7 +125,7 @@ bool EditorLayer::OnSelectMouseButtonPressed(Nigozi::MouseButtonPressedEvent& ev
             // Scale along with the sprite size to ensure we can
             // click on anywhere on the visible sprite to select
             glm::vec2 absScale = glm::abs(transform.Scale);
-            glm::vec2 spriteSize = sprite.Sprite->GetTextureSize();
+            glm::vec2 spriteSize = sprite.Sprite->GetSize();
             float aspectX = spriteSize.x / spriteSize.y;
             glm::vec2 scaleWithSprite = glm::vec2(absScale.x * aspectX, absScale.y);
 
@@ -321,6 +325,10 @@ void EditorLayer::DockViewportWithMenuBar()
                 open = false;
             ImGui::EndMenu();
         }
+        if (ImGui::BeginMenu("View")) {
+            ImGui::MenuItem("Demo Window", NULL, &s_showDemoWindow);
+            ImGui::EndMenu();
+        }
 
         ImGui::EndMenuBar();
     }
@@ -335,10 +343,32 @@ void EditorLayer::ShowSceneHierarchy()
     ShowAddNodeModal();
     ImGui::SameLine();
     if (ImGui::Button("X") && m_selectionContext != entt::null) {
-        Nigozi::Entity entity(m_selectionContext, m_scene.get());
-        entity.Destroy();
-        m_selectionContext = entt::null;
+        ImGui::OpenPopup("Delete?");
     }
+
+    // Always center this window when appearing
+    ImVec2 center = ImGui::GetMainViewport()->GetCenter();
+    ImGui::SetNextWindowPos(center, ImGuiCond_Appearing, ImVec2(0.5f, 0.5f));
+
+    if (ImGui::BeginPopupModal("Delete?", NULL, ImGuiWindowFlags_AlwaysAutoResize))
+    {
+        ImGui::Text("Are you sure you want to delete this node?");
+        ImGui::Separator();
+
+        if (ImGui::Button("OK", ImVec2(120, 0))) {
+            Nigozi::Entity entity(m_selectionContext, m_scene.get());
+            entity.Destroy();
+            m_selectionContext = entt::null;
+            ImGui::CloseCurrentPopup();
+        }
+        ImGui::SetItemDefaultFocus();
+        ImGui::SameLine();
+        if (ImGui::Button("Cancel", ImVec2(120, 0))) {
+            ImGui::CloseCurrentPopup();
+        }
+        ImGui::EndPopup();
+    }
+
     auto view = m_scene->m_Registry.view<Nigozi::NameComponent>();
     for (const auto entityHandle : view) {
         Nigozi::Entity entity(entityHandle, m_scene.get());
@@ -379,155 +409,275 @@ void EditorLayer::ShowInspector()
         if (entity.HasComponent<Nigozi::CameraComponent>() &&
             ImGui::TreeNodeEx((void*)(typeid(Nigozi::CameraComponent).hash_code() + (size_t)m_selectionContext),
                 ImGuiTreeNodeFlags_DefaultOpen, "Camera")) {
-            if (ImGui::Button("X")) {
-                entity.RemoveComponent<Nigozi::CameraComponent>();
-            }
-            else {
-                auto& camera = entity.GetComponent<Nigozi::CameraComponent>();
-                ImGui::DragFloat("Zoom", &camera.Zoom, 0.05f, 0.01f);
-                if (ImGui::Checkbox("Current", &camera.Current)) {
-                    auto cameraView = m_scene->m_Registry.view<Nigozi::CameraComponent>();
-                    for (auto [entityHandle, otherCamera] : cameraView.each()) {
-                        if (entityHandle == entity.GetHandle()) {
-                            continue;
-                        }
-                        otherCamera.Current = false;
+            auto& camera = entity.GetComponent<Nigozi::CameraComponent>();
+            ImGui::DragFloat("Zoom", &camera.Zoom, 0.05f, 0.01f);
+            if (ImGui::Checkbox("Current", &camera.Current)) {
+                auto cameraView = m_scene->m_Registry.view<Nigozi::CameraComponent>();
+                for (auto [entityHandle, otherCamera] : cameraView.each()) {
+                    if (entityHandle == entity.GetHandle()) {
+                        continue;
                     }
+                    otherCamera.Current = false;
                 }
             }
 
             ImGui::TreePop();
+            ImGui::Separator();
         }
 
         if (entity.HasComponent<Nigozi::SpriteRendererComponent>() &&
             ImGui::TreeNodeEx((void*)(typeid(Nigozi::SpriteRendererComponent).hash_code() + (size_t)m_selectionContext),
                 ImGuiTreeNodeFlags_DefaultOpen, "Sprite Renderer")) {
-            if (ImGui::Button("X")) {
-                entity.RemoveComponent<Nigozi::SpriteRendererComponent>();
-            }
-            else {
-                auto& sprite = entity.GetComponent<Nigozi::SpriteRendererComponent>();
+            auto& sprite = entity.GetComponent<Nigozi::SpriteRendererComponent>();
 
-                // UV coordinates are often (0.0f, 0.0f) and (1.0f, 1.0f) to display an entire textures.
-                // Here are trying to display only a 32x32 pixels area of the texture, hence the UV computation.
-                // Read about UV coordinates here: https://github.com/ocornut/imgui/wiki/Image-Loading-and-Displaying-Examples
-                ImGui::PushID((void*)(typeid(Nigozi::Texture).hash_code() + (size_t)m_selectionContext));
-                ImVec2 size = ImVec2(96.0f, 96.0f);                     // Size of the image we want to make visible
-                ImVec2 uv0 = ImVec2(0.0f, 1.0f);                            // UV coordinates for lower-left
-                ImVec2 uv1 = ImVec2(1.0f, 0.0f);    
-                ImVec4 bg_col = ImVec4(0.0f, 0.0f, 0.0f, 1.0f);             // Black background
-                ImVec4 tint_col = ImVec4(1.0f, 1.0f, 1.0f, 1.0f);           // No tint
-                if (ImGui::ImageButton("Sprite", sprite.SpriteTexture->GetRendererID(), size, uv0, uv1, bg_col, tint_col)) {
-                    std::filesystem::path result = Nigozi::FileDialogue::OpenFileDialog("png;jpg;jpeg");
-                    if (!result.empty()) {
-                        std::string path = result.string();
+            ImGuiTableFlags flags =
+                ImGuiTableFlags_SizingFixedFit |
+                ImGuiTableFlags_Hideable;
 
-                        sprite.Sprite.reset();
-                        sprite.SpriteTexture.reset();
-                        sprite.SpriteTexture = std::make_shared<Nigozi::Texture>(path);
-                        sprite.Sprite = std::make_shared<Nigozi::SubTexture>(sprite.SpriteTexture, sprite.SpriteTexture->GetSize());
-                    }
+            // TRANSFORM TABLE
+            float availableSizeX = ImGui::GetContentRegionAvail().x;
+            // UV coordinates are often (0.0f, 0.0f) and (1.0f, 1.0f) to display an entire textures.
+            // Here are trying to display only a 32x32 pixels area of the texture, hence the UV computation.
+            // Read about UV coordinates here: https://github.com/ocornut/imgui/wiki/Image-Loading-and-Displaying-Examples
+            ImGui::PushID((void*)(typeid(Nigozi::Texture).hash_code() + (size_t)m_selectionContext));
+            ImVec2 size = ImVec2(availableSizeX / 2.0f - 10.0f, availableSizeX / 2.0f - 10.0f);                     // Size of the image we want to make visible
+            ImVec2 uv0 = ImVec2(0.0f, 1.0f);                            // UV coordinates for lower-left
+            ImVec2 uv1 = ImVec2(1.0f, 0.0f);    
+            ImVec4 bg_col = ImVec4(0.0f, 0.0f, 0.0f, 1.0f);             // Black background
+            ImVec4 tint_col = ImVec4(1.0f, 1.0f, 1.0f, 1.0f);           // No tint
+            if (ImGui::ImageButton("Sprite", sprite.SpriteTexture->GetRendererID(), size, uv0, uv1, bg_col, tint_col)) {
+                std::filesystem::path result = Nigozi::FileDialogue::OpenFileDialog("png;jpg;jpeg");
+                if (!result.empty()) {
+                    std::string path = result.string();
+
+                    sprite.Sprite.reset();
+                    sprite.SpriteTexture.reset();
+                    sprite.SpriteTexture = std::make_shared<Nigozi::Texture>(path);
+                    sprite.Sprite = std::make_shared<Nigozi::SubTexture>(sprite.SpriteTexture, sprite.SpriteTexture->GetSize());
                 }
-                ImGui::PopID();
-
-                ImGui::ColorEdit4("Color", (float*)&sprite.Color);
-                int zorder = sprite.ZOrder;
-                ImGui::SliderInt("Z Order", &zorder, -127, 127);
-                sprite.ZOrder = (int16_t)zorder;
             }
 
+            ImGui::ColorEdit4("Color", (float*)&sprite.Color);
+            int zorder = sprite.ZOrder;
+            ImGui::SliderInt("Z Order", &zorder, -127, 127);
+            sprite.ZOrder = (int16_t)zorder;
+            
+            ImGui::PopID();
+            glm::vec2 seperatorFloats = sprite.Sprite->GetTextureSize() / sprite.Sprite->GetSize();
+            uint32_t seperators[2] = { (uint32_t)seperatorFloats.x, (uint32_t)seperatorFloats.y };
+            uint32_t lastSeperators[2] = { seperators[0], seperators[1] };
+            ImGui::DragInt2("Seperators", (int*)seperators, 1.0f, 1, 0x7fffffff);
+            if (seperators[0] != lastSeperators[0] || seperators[1] != lastSeperators[1]) {
+                glm::vec2& texSize = sprite.Sprite->GetTextureSize();
+                glm::vec2 size(texSize.x / seperators[0], texSize.y / seperators[1]);
+                sprite.Sprite->SetSubTexture(size, 0, 0);
+            }
+            uint32_t slots[2] = { sprite.Sprite->GetSlotX(), sprite.Sprite->GetSlotY() };
+            uint32_t lastSlots[2] = { slots[0], slots[1] };
+            ImGui::DragInt2("Slot", (int*)&slots, 1.0f, 0, 0x7fffffff);
+            if (slots[0] != lastSlots[0] || slots[1] != lastSlots[1]) {
+                sprite.Sprite->SetSlot(slots[0], slots[1]);
+            }
             ImGui::TreePop();
+            ImGui::Separator();
         }
 
         if (entity.HasComponent<Nigozi::AudioStreamPlayerComponent>() &&
             ImGui::TreeNodeEx((void*)(typeid(Nigozi::AudioStreamPlayerComponent).hash_code() + (size_t)m_selectionContext),
                 ImGuiTreeNodeFlags_DefaultOpen, "Audio Stream Player")) {
-            if (ImGui::Button("X")) {
-                entity.RemoveComponent<Nigozi::AudioStreamPlayerComponent>();
-            }
-            else {
-                auto& audio = entity.GetComponent<Nigozi::AudioStreamPlayerComponent>();
+            auto& audio = entity.GetComponent<Nigozi::AudioStreamPlayerComponent>();
 
-                if (ImGui::Button("Choose")) {
-                    std::filesystem::path result = Nigozi::FileDialogue::OpenFileDialog("wav,mp3,flac");
-                    NG_CORE_LOG_INFO("New audio path: {}", result.string());
-                    if (!result.empty()) {
-                        Nigozi::Audio* newAudio = nullptr;
-                        if (audio.AudioHandle) {
-                            newAudio = Nigozi::AudioEngine::LoadAudioFromFile(result, audio.AudioHandle->GetAudioGroupName());
-                        }
-                        else {
-                            newAudio = Nigozi::AudioEngine::LoadAudioFromFile(result);
-                        }
-                        NG_CORE_LOG_INFO("New audio: {}", (size_t)newAudio);
-                        if (newAudio) {
-                            if (audio.AudioHandle) {
-                                Nigozi::AudioEngine::UnloadAudio(audio.AudioHandle);
-                            }
-                            audio.AudioHandle = newAudio;
-                            audio.AudioHandle->SetVolume(audio.Volume);
-                            NG_CORE_LOG_INFO("Set audio: {}", (size_t)audio.AudioHandle);
-                        }
-                        else {
-                            NG_CORE_LOG_ERROR("Audio with path: {} couldn't load!", result.string());
-                        }
+            if (ImGui::Button("Choose")) {
+                std::filesystem::path result = Nigozi::FileDialogue::OpenFileDialog("wav,mp3,flac");
+                NG_CORE_LOG_INFO("New audio path: {}", result.string());
+                if (!result.empty()) {
+                    Nigozi::Audio* newAudio = nullptr;
+                    if (audio.AudioHandle) {
+                        newAudio = Nigozi::AudioEngine::LoadAudioFromFile(result, audio.AudioHandle->GetAudioGroupName());
                     }
                     else {
-                        NG_CORE_LOG_ERROR("Couldn't get audio path: {}", result.string());
+                        newAudio = Nigozi::AudioEngine::LoadAudioFromFile(result);
                     }
-                }
-                std::filesystem::path audioPath("empty");
-                if (audio.AudioHandle) {
-                    NG_CORE_LOG_INFO(audio.AudioHandle->GetFilePath().string());
-                    audioPath = audio.AudioHandle->GetFilePath();
-                }
-                std::string audioPathString = audioPath.string();
-                if (audioPathString.size() > 32) {
-                    audioPathString = audioPathString.substr(audioPathString.size() - 32);
-                }
-                ImGui::Text(audioPathString.c_str());
-                if (audio.AudioHandle) {
-                    if (ImGui::DragFloat("Volume", &audio.Volume, 0.2f)) {
+                    NG_CORE_LOG_INFO("New audio: {}", (size_t)newAudio);
+                    if (newAudio) {
+                        if (audio.AudioHandle) {
+                            Nigozi::AudioEngine::UnloadAudio(audio.AudioHandle);
+                        }
+                        audio.AudioHandle = newAudio;
                         audio.AudioHandle->SetVolume(audio.Volume);
+                        NG_CORE_LOG_INFO("Set audio: {}", (size_t)audio.AudioHandle);
                     }
-                    bool lastPlayingVal = audio.AudioHandle->IsPlaying();
-                    bool playingVal = lastPlayingVal;
-                    if (ImGui::Checkbox("Playing", &playingVal)) {
-                        if (playingVal != lastPlayingVal) {
-                            if (playingVal) {
-                                audio.AudioHandle->Play();
-                            }
-                            else {
-                                audio.AudioHandle->Stop();
-                            }
+                    else {
+                        NG_CORE_LOG_ERROR("Audio with path: {} couldn't load!", result.string());
+                    }
+                }
+                else {
+                    NG_CORE_LOG_ERROR("Couldn't get audio path: {}", result.string());
+                }
+            }
+            std::filesystem::path audioPath("empty");
+            if (audio.AudioHandle) {
+                NG_CORE_LOG_INFO(audio.AudioHandle->GetFilePath().string());
+                audioPath = audio.AudioHandle->GetFilePath();
+            }
+            std::string audioPathString = audioPath.string();
+            if (audioPathString.size() > 32) {
+                audioPathString = audioPathString.substr(audioPathString.size() - 32);
+            }
+            ImGui::Text(audioPathString.c_str());
+            if (audio.AudioHandle) {
+                if (ImGui::DragFloat("Volume", &audio.Volume, 0.2f)) {
+                    audio.AudioHandle->SetVolume(audio.Volume);
+                }
+                bool lastPlayingVal = audio.AudioHandle->IsPlaying();
+                bool playingVal = lastPlayingVal;
+                if (ImGui::Checkbox("Playing", &playingVal)) {
+                    if (playingVal != lastPlayingVal) {
+                        if (playingVal) {
+                            audio.AudioHandle->Play();
+                        }
+                        else {
+                            audio.AudioHandle->Stop();
                         }
                     }
                 }
             }
 
             ImGui::TreePop();
+            ImGui::Separator();
         }
 
         if (ImGui::TreeNodeEx((void*)(typeid(Nigozi::TransformComponent).hash_code() + (size_t)m_selectionContext),
             ImGuiTreeNodeFlags_DefaultOpen, "Transform")) {
             auto& transform = entity.GetComponent<Nigozi::TransformComponent>();
+            
+            ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2{ 0, 0 });
+            ImGui::PushStyleVar(ImGuiStyleVar_CellPadding, ImVec2{ 10.0f, 4.0f });
+            
+            ImGuiTableFlags flags = 
+                ImGuiTableFlags_SizingFixedFit | 
+                ImGuiTableFlags_Resizable | 
+                ImGuiTableFlags_Hideable;
+
+            // TRANSFORM TABLE
+            ImGui::BeginTable("transform_table", 2, flags);
+
+            ImGui::TableSetupColumn("##TRANSFORM_LABEL", ImGuiTableColumnFlags_WidthFixed);
+            ImGui::TableSetupColumn("##TRANSFORM_PARAMS", ImGuiTableColumnFlags_WidthStretch);
+            // --POSITION ROW
+            ImGui::TableNextRow();
+
+            // --(0)POSITION TITLE COLUMN
+            // ImGui::SetColumnWidth(0, 100);
+            ImGui::TableNextColumn();
             ImGui::Text("Position");
+            
+            ImGui::TableNextColumn();
+
+            // --(1)POSITION TABLE COLUMN
+            ImGuiTableFlags innerFlags = 
+                ImGuiTableFlags_NoPadInnerX | 
+                ImGuiTableFlags_NoPadOuterX | 
+                ImGuiTableFlags_Hideable;
+            ImGui::BeginTable("position_value_table", 2, innerFlags);
+
+            ImGui::TableSetupColumn("##TRANSFORM_POS_X", ImGuiTableColumnFlags_WidthStretch);
+            ImGui::TableSetupColumn("##TRANSFORM_POS_Y", ImGuiTableColumnFlags_WidthStretch);
+
+            // ----POSITION ROW
+            ImGui::TableNextRow();
+
+            // ----(0)POSITION_X COLUMN
+            ImGui::TableNextColumn();
             ImGui::PushID(&transform.Position);
-            ImGui::DragFloat("X", &transform.Position.x, 0.1f);
-            //ImGui::SameLine();
-            ImGui::DragFloat("Y", &transform.Position.y, 0.1f);
+            ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2{ 10.0f, 0.0f });
+            ImGui::Text("X");
+            ImGui::SameLine();
+
+            ImGui::PushItemWidth(-10.0f);
+            ImGui::DragFloat("##X", &transform.Position.x, 0.1f, -INFINITY, INFINITY, "%.2f");
+            ImGui::PopItemWidth();
+
+            // ----(1)POSITION_Y COLUMN
+            ImGui::TableNextColumn();
+            ImGui::Text("Y");
+            ImGui::SameLine();
+
+            ImGui::PushItemWidth(-10.0f);
+            ImGui::DragFloat("##Y", &transform.Position.y, 0.1f);
+            ImGui::PopItemWidth();
+
             ImGui::PopID();
 
+            // --(1)POSITION TABLE END COLUMN
+            ImGui::EndTable();
+
+            // --SCALE ROW
+            ImGui::TableNextRow();
+
+            // --(0)SCALE TITLE COLUMN
+            ImGui::TableNextColumn();
             ImGui::Text("Scale");
+
+            ImGui::TableNextColumn();
+
+            // --(1)SCALE TABLE COLUMN
+            ImGui::BeginTable("scale_value_table", 2, innerFlags);
+
+            ImGui::TableSetupColumn("##TRANSFORM_SCALE_X", ImGuiTableColumnFlags_WidthStretch);
+            ImGui::TableSetupColumn("##TRANSFORM_SCALE_Y", ImGuiTableColumnFlags_WidthStretch);
+
+            // ----SCALE ROW
+            ImGui::TableNextRow();
+
+            // ----(0)SCALE_X COLUMN
+            ImGui::TableNextColumn();
             ImGui::PushID(&transform.Scale);
-            ImGui::DragFloat("X", &transform.Scale.x, 0.1f);
-            //ImGui::SameLine();
-            ImGui::DragFloat("Y", &transform.Scale.y, 0.1f);
+            ImGui::Text("X");
+            ImGui::SameLine();
+
+            ImGui::PushItemWidth(-10.0f);
+            ImGui::DragFloat("##X", &transform.Scale.x, 0.1f);
+            ImGui::PopItemWidth();
+
+            // ----(1)SCALE_Y COLUMN
+            ImGui::TableNextColumn();
+            ImGui::Text("Y");
+            ImGui::SameLine();
+
+            ImGui::PushItemWidth(-10.0f);
+            ImGui::DragFloat("##Y", &transform.Scale.y, 0.1f);
+            ImGui::PopItemWidth();
+            ImGui::PopStyleVar();
+
             ImGui::PopID();
 
-            ImGui::DragFloat("Rotation", &transform.Rotation);
+            // --(1)SCALE TABLE END COLUMN
+            ImGui::EndTable();
+
+            // ----SCALE ROW
+            ImGui::TableNextRow();
+
+            // ----(0)SCALE_X COLUMN
+            ImGui::TableNextColumn();
+            ImGui::PushID(&transform.Rotation);
+            ImGui::Text("Rotation");
+
+            ImGui::TableNextColumn();
+            ImGui::PushItemWidth(-10.0f);
+            ImGui::DragFloat("##ROTATION", &transform.Rotation, 0.1f, -360.0f, 360.0f, "%.2f", ImGuiSliderFlags_WrapAround);
+            ImGui::PopItemWidth();
+
+            ImGui::PopID();
+
+            // TRANSFORM TABLE END
+            ImGui::EndTable();
+
+            ImGui::PopStyleVar();
+            ImGui::PopStyleVar();
 
             ImGui::TreePop();
+            ImGui::Separator();
         }
     }
     ImGui::End();
@@ -589,10 +739,9 @@ void EditorLayer::ShowAddNodeModal()
                 if (itemSelectedIndex == CAMERA) {
                     auto cameraView = m_scene->m_Registry.view<Nigozi::CameraComponent>();
                     for (auto [entityHandle, otherCamera] : cameraView.each()) {
-                        if (entityHandle == m_selectionContext) {
-                            continue;
+                        if (entityHandle != entity.GetHandle()) {
+                            otherCamera.Current = false;
                         }
-                        otherCamera.Current = false;
                     }
                 }
                 m_selectionContext = entity.GetHandle();
