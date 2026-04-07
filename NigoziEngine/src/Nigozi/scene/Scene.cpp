@@ -52,7 +52,7 @@ namespace Nigozi
         auto view = m_Registry.view<TransformComponent, SpriteRendererComponent>();
         view.use<SpriteRendererComponent>();
         view.each([](auto entity, auto& transform, auto& sprite) {
-            glm::vec2 spriteSize = sprite.Sprite->GetTextureSize();
+            glm::vec2 spriteSize = sprite.Sprite->GetSize();
             float aspectX = spriteSize.x / spriteSize.y;
             glm::vec2 scale(transform.Scale.x * aspectX, transform.Scale.y);
             Renderer2D::DrawRotatedQuad(transform.Position, scale, glm::radians(transform.Rotation), sprite.Sprite, sprite.Color);
