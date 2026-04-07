@@ -16,6 +16,7 @@ namespace Nigozi
 		inline uint32_t GetSlotX() { return m_slotX; }
 		inline uint32_t GetSlotY() { return m_slotY; }
 		inline glm::vec2& GetTextureSize() { return m_textureSize; }
+		inline glm::vec2& GetSize() { return m_size; }
 		inline const glm::vec2& GetCoordMin() { return m_coordMin; }
 		inline const glm::vec2& GetCoordMax() { return m_coordMax; }
 	private:
