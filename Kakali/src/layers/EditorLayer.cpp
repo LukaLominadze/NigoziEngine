@@ -418,7 +418,7 @@ void EditorLayer::ShowInspector()
                 ImVec4 bg_col = ImVec4(0.0f, 0.0f, 0.0f, 1.0f);             // Black background
                 ImVec4 tint_col = ImVec4(1.0f, 1.0f, 1.0f, 1.0f);           // No tint
                 if (ImGui::ImageButton("Sprite", sprite.SpriteTexture->GetRendererID(), size, uv0, uv1, bg_col, tint_col)) {
-                    std::filesystem::path result = FileDialogue::OpenFileDialog("png;jpg;jpeg");
+                    std::filesystem::path result = Nigozi::FileDialogue::OpenFileDialog("png;jpg;jpeg");
                     if (!result.empty()) {
                         std::string path = result.string();
 
@@ -449,7 +449,7 @@ void EditorLayer::ShowInspector()
                 auto& audio = entity.GetComponent<Nigozi::AudioStreamPlayerComponent>();
 
                 if (ImGui::Button("Choose")) {
-                    std::filesystem::path result = FileDialogue::OpenFileDialog("wav,mp3,flac");
+                    std::filesystem::path result = Nigozi::FileDialogue::OpenFileDialog("wav,mp3,flac");
                     NG_CORE_LOG_INFO("New audio path: {}", result.string());
                     if (!result.empty()) {
                         Nigozi::Audio* newAudio = nullptr;
