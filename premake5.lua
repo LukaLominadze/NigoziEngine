@@ -22,6 +22,7 @@ group "Dependencies"
 	include "vendor/stb"
 	include "vendor/imgui"
 	include "vendor/nfd/build/Build-nfd-Only.lua"
+	include "vendor/box2d"
 group ""
 
 group "Core"

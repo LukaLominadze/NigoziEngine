@@ -11,7 +11,7 @@ namespace Nigozi
 	{
 		ma_result result = ma_sound_init_from_file(&engine, filePath.string().c_str(), NULL, &audioGroup.GetNativeAudioGroup(), NULL, &m_audio);
 		if (result != MA_SUCCESS) {
-			NG_CORE_LOG_ERROR("Couldn't load file!");
+			NG_CORE_LOG_ERROR("[Audio] Couldn't load file!");
 		}
 	}
 
@@ -35,7 +35,7 @@ namespace Nigozi
 		ma_sound_seek_to_pcm_frame(&m_audio, 0);
 		ma_result result = ma_sound_start(&m_audio);
 		if (result != MA_SUCCESS) {
-			NG_CORE_LOG_ERROR("Can't play sound!");
+			NG_CORE_LOG_ERROR("[Audio] Can't play sound!");
 		}
 		m_isPlaying = true;
 		m_isPaused = false;
@@ -48,7 +48,7 @@ namespace Nigozi
 		}
 		ma_result result = ma_sound_stop(&m_audio);
 		if (result != MA_SUCCESS) {
-			NG_CORE_LOG_ERROR("Can't play sound!");
+			NG_CORE_LOG_ERROR("[Audio] Can't play sound!");
 		}
 		m_isPaused = true;
 	}
@@ -60,7 +60,7 @@ namespace Nigozi
 		}
 		ma_result result = ma_sound_start(&m_audio);
 		if (result != MA_SUCCESS) {
-			NG_CORE_LOG_ERROR("Can't play sound!");
+			NG_CORE_LOG_ERROR("[Audio] Can't play sound!");
 		}
 		m_isPaused = false;
 	}
@@ -69,7 +69,7 @@ namespace Nigozi
 	{
 		ma_result result = ma_sound_stop(&m_audio);
 		if (result != MA_SUCCESS) {
-			NG_CORE_LOG_ERROR("Can't play sound!");
+			NG_CORE_LOG_ERROR("[Audio] Can't play sound!");
 		}
 		m_isPlaying = false;
 		m_isPaused = false;

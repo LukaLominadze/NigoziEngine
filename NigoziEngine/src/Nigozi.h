@@ -34,8 +34,7 @@
 #include "Nigozi/utils/StringUtils.h"
 #include "Nigozi/utils/FileDialogue.h"
 
-#include "Nigozi/scene/Scene.h"
-#include "Nigozi/scene/SceneManager.h"
+#include "Nigozi/scene/SceneTree.h"
 #include "Nigozi/scene/Entity.h"
 #include "Nigozi/scene/Component.h"
 

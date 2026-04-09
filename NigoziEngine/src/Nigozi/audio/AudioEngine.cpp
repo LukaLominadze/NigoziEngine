@@ -19,7 +19,7 @@ namespace Nigozi
 		result = ma_engine_init(NULL, &s_engine);
 		if (result != MA_SUCCESS) {
 			// Failed to initialize the engine.
-			std::cout << "Failed to initialize audio engine! : " << result << std::endl;
+			NG_CORE_LOG_INFO("[Audio Engine] Failed to initialize audio engine! : {}", (int)result);
 			s_initialized = false;
 			return;
 		}
@@ -28,7 +28,7 @@ namespace Nigozi
 		s_audioGroups.emplace_back(s_engine, "Master");
 		s_initialized = true;
 
-		NG_CORE_LOG_INFO("Audio Engine initialized!");
+		NG_CORE_LOG_INFO("[Audio Engine] initialized!");
 	}
 
 	void AudioEngine::Deinitialize()
@@ -39,7 +39,7 @@ namespace Nigozi
 		s_audios.clear();
 		s_audioGroups.clear();
 		ma_engine_uninit(&s_engine);
-		NG_CORE_LOG_INFO("Audio Engine deinitialized");
+		NG_CORE_LOG_INFO("[Audio Engine] deinitialized");
 	}
 
 	bool AudioEngine::Initialized()
@@ -108,7 +108,7 @@ namespace Nigozi
 			return audioGroup == group.GetName();
 			});
 		if (it == s_audioGroups.end()) {
-			NG_CORE_LOG_WARN("Audio group with name: {} doesn't exist!", audioGroup);
+			NG_CORE_LOG_WARN("[Audio Engine] Audio group with name: {} doesn't exist!", audioGroup);
 			return;
 		}
 		audio->SetAudioGroup(*it);
@@ -145,7 +145,7 @@ namespace Nigozi
 			return audioGroup == group.GetName();
 			});
 		if (_it == s_audioGroups.end()) {
-			NG_CORE_LOG_WARN("Audio group with name: {} doesn't exist!", audioGroup);
+			NG_CORE_LOG_WARN("[Audio Engine] Audio group with name: {} doesn't exist!", audioGroup);
 			Audio* audio = new Audio(s_engine, filePath, s_audioGroups[MASTER_AUDIO_GROUP_INDEX]);
 			s_audios.push_back(audio);
 			return audio;
@@ -164,7 +164,7 @@ namespace Nigozi
 			return audio == _audio;
 			});
 		if (it == s_audios.end()) {
-			NG_CORE_LOG_ERROR("Audio with name: {} not found in engine repository!", audio->GetName());
+			NG_CORE_LOG_ERROR("[Audio Engine] Audio with name: {} not found in engine repository!", audio->GetName());
 			return;
 		}
 		s_audios.erase(it);

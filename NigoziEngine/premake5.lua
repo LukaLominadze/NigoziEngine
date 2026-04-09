@@ -35,6 +35,7 @@ project "NigoziEngine"
 				  "%{prj.location}/../vendor/imgui",
 				  "%{prj.location}/../vendor/glm",
 				  "%{wks.location}/vendor/nfd/src/include",
+				  "%{wks.location}/vendor/box2d/include",
 				  "%{prj.location}/../vendor/spdlog/include" }
 
 	links {

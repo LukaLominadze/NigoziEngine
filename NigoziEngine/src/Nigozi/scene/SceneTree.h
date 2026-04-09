@@ -2,22 +2,26 @@
 
 #include "ngpch.h"
 #include "layers/Layer.h"
+#include "UUID.h"
 
 namespace Nigozi
 {
 	class Entity;
-	class SceneManager;
+	class TransformComponent;
 
 	/*
 		TODO: There probably should be different versions of a scene,
 		for runtime and for the editor, since components behave differently
 		in each
 	*/
-	class Scene : public Layer
+	class SceneTree : public Layer
 	{
 	public:
-		Scene(SceneManager* sceneManager);
-		~Scene();
+		SceneTree() = default;
+		~SceneTree();
+
+		// void SerializeScene();
+		// void DeserializeScene();
 
 		/*
 			TODO: It would be good to have scene metadeta saved in a file
@@ -34,16 +38,21 @@ namespace Nigozi
 		void OnEditorRender();
 		void OnEditorImGuiRender();
 
+		TransformComponent GetWorldSpaceTransform(Entity entity) const;
+
 		Entity CreateEntity(const std::string& name, const std::string& tag);
+		Entity TryGetEntityByUUID(UUID uuid);
 		Entity TryGetEntityByTag(const std::string& tag = "");
 		std::vector<Entity> TryGetEntitiesByTag(const std::string& tag = "");
+		bool DestroyEntity(Entity entity);
+
+		inline UUID GetSceneRootUUID() const { return m_sceneRootUUID; }
 
 		friend class Entity;
 		entt::registry m_Registry;
-
-		inline SceneManager* GetSceneManager() { return p_sceneManager; }
 	private:
-		SceneManager* p_sceneManager;
+		std::unordered_map<UUID, Entity> m_entityMap;
+		UUID m_sceneRootUUID = UUID::Null;
 	};
 }
 

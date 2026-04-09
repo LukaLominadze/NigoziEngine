@@ -13,29 +13,29 @@ namespace Nigozi
         :m_window(props.Title, props.Width, props.Height, props.Fullscreen, props.VSync)
     {
         if (!SetupWindow(props)) {
-            NG_CORE_LOG_CRITICAL("Couldn't create window! Shutting down...");
+            NG_CORE_LOG_CRITICAL("[App] Couldn't create window! Shutting down...");
             return;
         }
 
         if (!CreateGUILayer()) {
-            NG_CORE_LOG_CRITICAL("Couldn't create GUI layer! Shutting down...");
+            NG_CORE_LOG_CRITICAL("[App] Couldn't create GUI layer! Shutting down...");
             return;
         }
 
         if (!StartRenderer()) {
-            NG_CORE_LOG_CRITICAL("Couldn't initialize renderer! Shutting down...");
+            NG_CORE_LOG_CRITICAL("[App] Couldn't initialize renderer! Shutting down...");
             return;
         }
 
         if (!StartAudioEngine()) {
-            NG_CORE_LOG_CRITICAL("Couldn't initialize audio engine! Shutting down...");
+            NG_CORE_LOG_CRITICAL("[App] Couldn't initialize audio engine! Shutting down...");
             return;
         }
 
         p_eventBufferPointer = (Event*)(m_eventBuffer);
 
         m_initialized = true;
-        NG_CORE_LOG_INFO("Welcome To NigoziEngine!");
+        NG_CORE_LOG_INFO("[App] Welcome To NigoziEngine!");
     }
 
     Application::~Application()
@@ -43,7 +43,7 @@ namespace Nigozi
         Renderer2D::Deinitialize();
         m_window.~Window();
         AudioEngine::Deinitialize();
-        NG_CORE_LOG_INFO("App deinitialized");
+        NG_CORE_LOG_INFO("[App] deinitialized");
     }
 
     void Application::Run()
@@ -70,7 +70,7 @@ namespace Nigozi
     void Application::Close()
     {
         Window::Close();
-        NG_CORE_LOG_INFO("Closing app!");
+        NG_CORE_LOG_INFO("[App] Closing app!");
     }
 
     void Application::PushLayer(Layer* layer)

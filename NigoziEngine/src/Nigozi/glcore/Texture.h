@@ -14,9 +14,9 @@ namespace Nigozi
 
 		void Delete();
 
-		inline int GetWidth() const { return m_width; }
-		inline int GetHeight() const { return m_height; }
-		inline glm::vec2 GetSize() { return glm::vec2(m_width, m_height); }
+		inline int GetWidth() const { return m_size.x; }
+		inline int GetHeight() const { return m_size.y; }
+		inline glm::i32vec2 GetSize() { return m_size; }
 
 		inline const std::string& GetPath() const { return m_filePath; }
 
@@ -25,7 +25,8 @@ namespace Nigozi
 		uint32_t m_rendererID;
 		std::string m_filePath;
 		unsigned char* m_localBuffer;
-		int m_width, m_height, m_BPP;
+		glm::i32vec2 m_size;
+		int m_BPP;
 	};
 }
 

@@ -14,3 +14,6 @@
 [submodule "vendor/nfd"]
 	path = vendor/nfd
 	url = https://github.com/LukaLominadze/nativefiledialog
+[submodule "vendor/box2d"]
+	path = vendor/box2d
+	url = https://github.com/TheCherno/box2d

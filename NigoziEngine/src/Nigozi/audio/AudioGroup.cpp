@@ -1,5 +1,6 @@
 #include "ngpch.h"
 #include "AudioGroup.h"
+#include "core/Log.h"
 
 namespace Nigozi
 {
@@ -8,7 +9,7 @@ namespace Nigozi
 	{
 		ma_result result = ma_sound_group_init(&engine, NULL, NULL, &m_audioGroup);
 		if (result != MA_SUCCESS) {
-			std::cout << "Couldn't initialize audio group!" << std::endl;
+			NG_CORE_LOG_ERROR("[Audio] Couldn't initialize audio group!");
 		}
 	}
 
@@ -17,7 +18,7 @@ namespace Nigozi
 	{
 		ma_result result = ma_sound_group_init(&engine, NULL, &parent.GetNativeAudioGroup(), &m_audioGroup);
 		if (result != MA_SUCCESS) {
-			std::cout << "Couldn't initialize audio group!" << std::endl;
+			NG_CORE_LOG_ERROR("[Audio] Couldn't initialize audio group!");
 		}
 	}
 

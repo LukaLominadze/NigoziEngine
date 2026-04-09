@@ -31,6 +31,7 @@ private:
 private:
 	void DockViewportWithMenuBar();
 	void ShowSceneHierarchy();
+	void DrawSceneHierarchyNode(Nigozi::Entity entity);
 	void ShowInspector();
 	void ShowAddNodeModal();
 	void ShowViewport();
@@ -45,9 +46,10 @@ private:
 private:
 	static bool s_showDemoWindow;
 private:
-	Nigozi::SceneManager m_sceneManager;
+	std::vector<std::shared_ptr<Nigozi::SceneTree>> m_sceneTreeContexts;
+	std::shared_ptr<Nigozi::SceneTree> m_currentContext;
+
 	Nigozi::FrameBuffer* p_viewportBuffer;
-	std::shared_ptr<Nigozi::Scene> m_scene;
 	EditorCamera m_editorCamera;
 
 	Tool m_tool = Tool::SELECT;

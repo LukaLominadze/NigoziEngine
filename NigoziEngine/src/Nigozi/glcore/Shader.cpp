@@ -19,11 +19,11 @@ namespace Nigozi
     {
         m_filePath = filePath;
         ShaderProgramSource shaderSource = ParseShader();
-        NG_CORE_LOG_INFO("Creating shader at " + filePath);
-        NG_CORE_LOG_INFO("SHADER VERTEX");
-        NG_CORE_LOG_INFO("\n{}", shaderSource.VertexShader);
-        NG_CORE_LOG_INFO("SHADER FRAGMENT");
-        NG_CORE_LOG_INFO("\n{}", shaderSource.FragmentShader);
+        NG_CORE_LOG_INFO("[Renderer] [Shader] Creating shader at " + filePath);
+        NG_CORE_LOG_INFO("[Renderer] [Shader] SHADER VERTEX");
+        NG_CORE_LOG_INFO("[Renderer] [Shader] \n{}", shaderSource.VertexShader);
+        NG_CORE_LOG_INFO("[Renderer] [Shader] SHADER FRAGMENT");
+        NG_CORE_LOG_INFO("[Renderer] [Shader] \n{}", shaderSource.FragmentShader);
         m_shader = CreateShader(shaderSource.VertexShader, shaderSource.FragmentShader);
         GLCall(glLinkProgram(m_shader));
         GLCall(glUseProgram(m_shader));
@@ -108,7 +108,7 @@ namespace Nigozi
         if (!success) {
             char infoLog[1024];
             GLCall(glGetProgramInfoLog(program, 1024, nullptr, infoLog));
-            NG_CORE_LOG_ERROR("[Shader Linking Error]:\n" + std::string(infoLog));
+            NG_CORE_LOG_ERROR("[Renderer] [Shader] Linking Error:\n" + std::string(infoLog));
         }
     
         GLCall(glValidateProgram(program));
@@ -118,7 +118,7 @@ namespace Nigozi
         if (!success) {
             char infoLog[1024];
             GLCall(glGetProgramInfoLog(program, 1024, nullptr, infoLog));
-            NG_CORE_LOG_ERROR("[Shader Validation Error]:\n" + std::string(infoLog));
+            NG_CORE_LOG_ERROR("[Renderer] [Shader] Validation Error:\n" + std::string(infoLog));
         }
 
         GLCall(glDeleteShader(_vertexShader));
@@ -140,7 +140,7 @@ namespace Nigozi
         {
             char infoLog[1024];
             GLCall(glGetShaderInfoLog(id, 1024, NULL, infoLog));
-            NG_CORE_LOG_ERROR("[Shader Compilation Error] (" + m_filePath + "):\n" + std::string(infoLog));
+            NG_CORE_LOG_ERROR("[Renderer] [Shader] Compilation Error (" + m_filePath + "):\n" + std::string(infoLog));
         }
 
         return id;

@@ -19,10 +19,10 @@ namespace Nigozi
 		/*GLCall(glEnable(GL_DEPTH_TEST));
 		GLCall(glDepthFunc(GL_LESS));*/
 
-		NG_CORE_LOG_INFO("OpenGL Info: ");
-		NG_CORE_LOG_INFO("  Vendor: {0} " + std::string((const char*)glGetString(GL_VENDOR)));
-		NG_CORE_LOG_INFO("  Renderer: {0} " + std::string((const char*)glGetString(GL_RENDERER)));
-		NG_CORE_LOG_INFO("  Version: {0} " + std::string((const char*)glGetString(GL_VERSION)));
+		NG_CORE_LOG_INFO("[Renderer] OpenGL Info: ");
+		NG_CORE_LOG_INFO("[Renderer]   Vendor: {0} " + std::string((const char*)glGetString(GL_VENDOR)));
+		NG_CORE_LOG_INFO("[Renderer]   Renderer: {0} " + std::string((const char*)glGetString(GL_RENDERER)));
+		NG_CORE_LOG_INFO("[Renderer]   Version: {0} " + std::string((const char*)glGetString(GL_VERSION)));
 
 		GLint maxTextures;
 		GLCall(glGetIntegerv(GL_MAX_TEXTURE_IMAGE_UNITS, &maxTextures));
@@ -77,7 +77,7 @@ namespace Nigozi
 		s_data->Textures[0] = std::make_shared<Texture>("src/Nigozi/res/textures/flatQuad.png");
 		s_data->Textures[s_data->TextureSlot++]->Bind(0);
 
-		NG_CORE_LOG_INFO("Renderer initialized");
+		NG_CORE_LOG_INFO("[Renderer] initialized");
 	}
 
 	void Renderer2D::Deinitialize()
@@ -94,7 +94,7 @@ namespace Nigozi
 		delete s_data->QuadVertexArray;
 		delete s_data;
 
-		NG_CORE_LOG_INFO("Renderer deinitialized");
+		NG_CORE_LOG_INFO("[Renderer] deinitialized");
 	}
 
 	void Renderer2D::SetClearColor(float v0, float v1, float v2, float v3)
@@ -107,8 +107,8 @@ namespace Nigozi
 		GLCall(glClear(GL_COLOR_BUFFER_BIT));
 	}
 
-	void Renderer2D::DrawQuad(const glm::vec2& position, const glm::vec2& scale, std::shared_ptr<SubTexture>& texture, const glm::vec4& color) {
-		DrawQuad(position, scale, texture->GetTexture(), color, texture->GetCoordMin(), texture->GetCoordMax());
+	void Renderer2D::DrawQuad(const glm::vec2& position, const glm::vec2& scale, SubTexture& texture, const glm::vec4& color) {
+		DrawQuad(position, scale, texture.GetTexture(), color, texture.GetCoordMin(), texture.GetCoordMax());
 	}
 
 	void Renderer2D::DrawQuad(const glm::vec2& position, const glm::vec2& scale, const std::shared_ptr<Texture>& texture, const glm::vec4& color, const glm::vec2& coordMin, const glm::vec2& coordMax)
@@ -134,9 +134,9 @@ namespace Nigozi
 		s_data->QuadCount++;
 	}
 
-	void Renderer2D::DrawRotatedQuad(const glm::vec2& position, const glm::vec2& scale, float rotation, std::shared_ptr<SubTexture>& texture, const glm::vec4& color)
+	void Renderer2D::DrawRotatedQuad(const glm::vec2& position, const glm::vec2& scale, float rotation, SubTexture& texture, const glm::vec4& color)
 	{
-		DrawRotatedQuad(position, scale, rotation, texture->GetTexture(), color, texture->GetCoordMin(), texture->GetCoordMax());
+		DrawRotatedQuad(position, scale, rotation, texture.GetTexture(), color, texture.GetCoordMin(), texture.GetCoordMax());
 	}
 
 	void Renderer2D::DrawRotatedQuad(const glm::vec2& position, const glm::vec2& scale, float rotation, const std::shared_ptr<Texture>& texture, const glm::vec4& color, const glm::vec2& coordMin, const glm::vec2& coordMax)

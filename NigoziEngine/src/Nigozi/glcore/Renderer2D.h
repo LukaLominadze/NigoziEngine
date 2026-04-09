@@ -55,14 +55,14 @@ namespace Nigozi
 							 const glm::vec2& coordMin = glm::vec2(0),
 							 const glm::vec2& coordMax = glm::vec2(1));
 		static void DrawQuad(const glm::vec2& position, const glm::vec2& scale,
-							 std::shared_ptr<SubTexture>& texture, const glm::vec4& color);
+							 SubTexture& texture, const glm::vec4& color);
 		static void DrawRotatedQuad(const glm::vec2& position, const glm::vec2& scale,
 									float rotation, const std::shared_ptr<Texture>& texture,
 									const glm::vec4& color,
 									const glm::vec2& coordMin = glm::vec2(0),
 									const glm::vec2 & coordMax = glm::vec2(1));
 		static void DrawRotatedQuad(const glm::vec2& position, const glm::vec2& scale,
-									float rotation, std::shared_ptr<SubTexture>& texture,
+									float rotation, SubTexture& texture,
 									const glm::vec4& color);
 		static void BeginScene();
 		static void EndScene();

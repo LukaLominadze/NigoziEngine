@@ -20,7 +20,7 @@ private:
 	Nigozi::Audio* p_audio;
 
 	std::shared_ptr<Nigozi::Texture> m_luigiTexture;
-	std::shared_ptr<Nigozi::SubTexture> m_playerTexture;
+	Nigozi::SubTexture m_playerTexture;
 
 	std::string m_keystate;
 	glm::vec2 m_mouseDelta;

@@ -13,35 +13,35 @@ namespace Nigozi
 		:m_windowData({ title, width, height, width, height, fullscreen, vsync })
 	{
 		if (!StartGLFW()) {
-			NG_CORE_LOG_CRITICAL("Couldn't initialize GLFW...");
+			NG_CORE_LOG_CRITICAL("[Window] Couldn't initialize GLFW...");
 			return;
 		}
 
 		if (!InitializeWindow()) {
-			NG_CORE_LOG_CRITICAL("Couldn't create window...");
+			NG_CORE_LOG_CRITICAL("[Window] Couldn't create window...");
 			return;
 		}
 
 		if (!SetupMonitor()) {
-			NG_CORE_LOG_CRITICAL("Couldn't initialize primary monitor...");
+			NG_CORE_LOG_CRITICAL("[Window] Couldn't initialize primary monitor...");
 			return;
 		}
 
 		if (!StartGLEW()) {
-			NG_CORE_LOG_CRITICAL("Couldn't initialize GLAD...");
+			NG_CORE_LOG_CRITICAL("[Window] Couldn't initialize GLAD...");
 			return;
 		}
 
 		CreateCallbacks();
 		m_initialized = true;
-		NG_CORE_LOG_INFO("Window initialized");
+		NG_CORE_LOG_INFO("[Window] initialized");
 	}
 
 	Window::~Window()
 	{
 		glfwDestroyWindow(p_window);
 		glfwTerminate();
-		NG_CORE_LOG_INFO("Window deinitialized");
+		NG_CORE_LOG_INFO("[Window] deinitialized");
 	}
 
 	void Window::SetIcon(const char* path)
@@ -66,7 +66,7 @@ namespace Nigozi
 	void Window::Close()
 	{
 		(*(WindowData*)glfwGetWindowUserPointer(glfwGetCurrentContext())).ShouldClose = true;
-		NG_CORE_LOG_INFO("Set window 'ShouldClose' flag");
+		NG_CORE_LOG_INFO("[Window] Set 'ShouldClose' flag");
 	}
 
 	void Window::SetVSync(bool value)
