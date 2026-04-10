@@ -11,6 +11,13 @@ enum class Tool
 	ROTATE
 };
 
+enum class EditorState 
+{
+	EDIT = 0,
+	PLAY,
+	PAUSE
+};
+
 class EditorLayer : public Nigozi::Layer
 {
 public:
@@ -53,6 +60,7 @@ private:
 	EditorCamera m_editorCamera;
 
 	Tool m_tool = Tool::SELECT;
+	EditorState m_editorState = EditorState::EDIT;
 
 	ImVec2 m_viewportSize;
 	glm::vec2 m_windowPosition;

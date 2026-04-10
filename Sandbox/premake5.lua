@@ -33,6 +33,7 @@ project "Sandbox"
 				  "%{prj.location}/../vendor/spdlog/include" }
 
 	links {
+		"box2d",
 		"nfd",
 		"NigoziEngine",
 		"GLEW",

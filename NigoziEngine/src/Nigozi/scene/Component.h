@@ -97,6 +97,7 @@ namespace Nigozi {
 
 	struct CameraComponent {
 		bool Current = true;
+		float Aspect = 16.0f / 9.0f;
 		float Zoom = 5.0f;
 
 		CameraComponent() = default;
@@ -143,6 +144,32 @@ namespace Nigozi {
 
 	struct RigidbodyComponent {
 		// TODO:
+		enum class BodyType 
+		{
+			Static = 0, Kinematic, Dynamic
+		};
+
+		BodyType Type = BodyType::Static;
+		bool FreezeRotation = false;
+		void* RuntimeBody = nullptr;
+
+		RigidbodyComponent() = default;
+		RigidbodyComponent(const RigidbodyComponent& other) = default;
+	};
+
+	struct BoxColliderComponent {
+		glm::vec2 Size{ 0.5f, 0.5f };
+		glm::vec2 Offset{ 0.0f, 0.0f };
+
+		float Density = 1.0f;
+		float Friction = 0.5f;
+		float Restitution = 0.0f;
+		float RestitutionThreshold = 0.5f;
+
+		void* RuntimeFixture = nullptr;
+
+		BoxColliderComponent() = default;
+		BoxColliderComponent(const BoxColliderComponent& other) = default;
 	};
 
 	struct AudioStreamPlayerComponent {

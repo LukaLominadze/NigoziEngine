@@ -33,6 +33,7 @@ project "Kakali"
 				  "%{prj.location}/../vendor/spdlog/include" }
 
 	links {
+		"box2d",
 		"NigoziEngine",
 		"nfd",
 		"GLEW",

@@ -4,6 +4,8 @@
 #include "layers/Layer.h"
 #include "UUID.h"
 
+class b2World;
+
 namespace Nigozi
 {
 	class Entity;
@@ -31,6 +33,8 @@ namespace Nigozi
 			data to that scene. This way we also wouldn't have to create
 			inherited scene classes to have different scenes
 		*/
+		void OnAttach() override;
+		void OnDetach() override;
 		void OnEvent(Event& event) override;
 		void OnUpdate(float timestep) override;
 		void OnRender() override;
@@ -57,6 +61,8 @@ namespace Nigozi
 	private:
 		std::unordered_map<UUID, Entity> m_entityMap;
 		UUID m_sceneRootUUID = UUID::Null;
+
+		b2World* p_physicsWorld = nullptr;
 	};
 }
 

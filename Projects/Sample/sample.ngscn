@@ -11,7 +11,7 @@
                 "parentUuid": 0
             },
             "scene": {
-                "filePath": ""
+                "filePath": "E:\\Luka\\Dev\\C++\\NigoziEngine\\Projects\\Sample\\sample.ngscn"
             },
             "tag": {
                 "tag": "Empty"
@@ -33,98 +33,6 @@
         },
         {
             "name": {
-                "name": "Player\u0000e"
-            },
-            "relationship": {
-                "parentUuid": 5162139645558248151
-            },
-            "tag": {
-                "tag": "Empty"
-            },
-            "transform": {
-                "position": {
-                    "x": -1.899999976158142,
-                    "y": -1.7999999523162842
-                },
-                "rotation": 0.0,
-                "scale": {
-                    "x": 1.0,
-                    "y": 1.0
-                }
-            },
-            "uuid": {
-                "id": 15240704992740279910
-            }
-        },
-        {
-            "name": {
-                "name": "Sprite\u0000e"
-            },
-            "relationship": {
-                "parentUuid": 15240704992740279910
-            },
-            "sprite": {
-                "seperator": {
-                    "x": 10,
-                    "y": 1
-                },
-                "slot": {
-                    "x": 4,
-                    "y": 0
-                },
-                "texture": {
-                    "filePath": "E:\\Luka\\Dev\\C++\\NigoziEngine\\Kakali\\src\\res\\textures\\Player.png"
-                }
-            },
-            "tag": {
-                "tag": "Empty"
-            },
-            "transform": {
-                "position": {
-                    "x": 0.04860270023345947,
-                    "y": 0.03645169734954834
-                },
-                "rotation": 0.0,
-                "scale": {
-                    "x": 1.0,
-                    "y": 1.0
-                }
-            },
-            "uuid": {
-                "id": 6838463181056818049
-            }
-        },
-        {
-            "camera": {
-                "current": true,
-                "zoom": 5.0
-            },
-            "name": {
-                "name": "Camera\u0000e"
-            },
-            "relationship": {
-                "parentUuid": 15240704992740279910
-            },
-            "tag": {
-                "tag": "Empty"
-            },
-            "transform": {
-                "position": {
-                    "x": 0.0,
-                    "y": 0.0
-                },
-                "rotation": 0.0,
-                "scale": {
-                    "x": 1.0,
-                    "y": 1.0
-                }
-            },
-            "uuid": {
-                "id": 14793367517406081700
-            }
-        },
-        {
-            "name": {
                 "name": "Ground\u0000e"
             },
             "relationship": {
@@ -135,10 +43,10 @@
             },
             "transform": {
                 "position": {
-                    "x": 0.0,
+                    "x": -0.8999999761581421,
                     "y": -2.799999952316284
                 },
-                "rotation": 0.0,
+                "rotation": 35.20000076293945,
                 "scale": {
                     "x": 1.0,
                     "y": 1.0
@@ -156,6 +64,12 @@
                 "parentUuid": 13417082783058435392
             },
             "sprite": {
+                "color": {
+                    "a": 1.0,
+                    "b": 0.2179930955171585,
+                    "g": 0.5385711193084717,
+                    "r": 0.8235294222831726
+                },
                 "seperator": {
                     "x": 1,
                     "y": 1
@@ -184,6 +98,266 @@
             },
             "uuid": {
                 "id": 4848402729339016890
+            }
+        },
+        {
+            "boxCollider": {
+                "density": 1.0,
+                "friction": 0.5,
+                "restitution": 0.0,
+                "restitutionThreshold": 0.5,
+                "size": {
+                    "x": 4.5,
+                    "y": 0.5
+                }
+            },
+            "name": {
+                "name": "Collider"
+            },
+            "relationship": {
+                "parentUuid": 13417082783058435392
+            },
+            "rigidbody": {
+                "bodyType": 0,
+                "freezeRotation": true
+            },
+            "tag": {
+                "tag": "Empty"
+            },
+            "transform": {
+                "position": {
+                    "x": 0.0,
+                    "y": 0.0
+                },
+                "rotation": 0.0,
+                "scale": {
+                    "x": 1.0,
+                    "y": 1.0
+                }
+            },
+            "uuid": {
+                "id": 1474181051824415628
+            }
+        },
+        {
+            "boxCollider": {
+                "density": 1.0,
+                "friction": 0.5,
+                "restitution": 0.3499999940395355,
+                "restitutionThreshold": 0.5,
+                "size": {
+                    "x": 0.5,
+                    "y": 0.5
+                }
+            },
+            "name": {
+                "name": "Player\u0000e"
+            },
+            "relationship": {
+                "parentUuid": 5162139645558248151
+            },
+            "rigidbody": {
+                "bodyType": 2,
+                "freezeRotation": false
+            },
+            "tag": {
+                "tag": "Empty"
+            },
+            "transform": {
+                "position": {
+                    "x": -0.30000001192092896,
+                    "y": 1.100000023841858
+                },
+                "rotation": -14.800000190734863,
+                "scale": {
+                    "x": 1.0,
+                    "y": 1.0
+                }
+            },
+            "uuid": {
+                "id": 17031323728387277468
+            }
+        },
+        {
+            "name": {
+                "name": "Sprite\u0000e"
+            },
+            "relationship": {
+                "parentUuid": 17031323728387277468
+            },
+            "sprite": {
+                "color": {
+                    "a": 1.0,
+                    "b": 1.0,
+                    "g": 1.0,
+                    "r": 1.0
+                },
+                "seperator": {
+                    "x": 10,
+                    "y": 1
+                },
+                "slot": {
+                    "x": 4,
+                    "y": 0
+                },
+                "texture": {
+                    "filePath": "E:\\Luka\\Dev\\C++\\NigoziEngine\\Kakali\\src\\res\\textures\\Player.png"
+                }
+            },
+            "tag": {
+                "tag": "Empty"
+            },
+            "transform": {
+                "position": {
+                    "x": 0.0,
+                    "y": 0.0
+                },
+                "rotation": 0.0,
+                "scale": {
+                    "x": 1.0,
+                    "y": 1.0
+                }
+            },
+            "uuid": {
+                "id": 12948363427884916129
+            }
+        },
+        {
+            "camera": {
+                "aspect": 1.7777777910232544,
+                "current": true,
+                "zoom": 5.0
+            },
+            "name": {
+                "name": "Camera\u0000e"
+            },
+            "relationship": {
+                "parentUuid": 17031323728387277468
+            },
+            "tag": {
+                "tag": "Empty"
+            },
+            "transform": {
+                "position": {
+                    "x": 0.0,
+                    "y": 0.0
+                },
+                "rotation": 0.0,
+                "scale": {
+                    "x": 1.0,
+                    "y": 1.0
+                }
+            },
+            "uuid": {
+                "id": 10640016771841302969
+            }
+        },
+        {
+            "name": {
+                "name": "Ground2\u0000"
+            },
+            "relationship": {
+                "parentUuid": 5162139645558248151
+            },
+            "tag": {
+                "tag": "Empty"
+            },
+            "transform": {
+                "position": {
+                    "x": 3.5,
+                    "y": -1.399999976158142
+                },
+                "rotation": -45.0,
+                "scale": {
+                    "x": 7.599999904632568,
+                    "y": 1.0
+                }
+            },
+            "uuid": {
+                "id": 7666352744461164943
+            }
+        },
+        {
+            "name": {
+                "name": "Sprite\u0000e"
+            },
+            "relationship": {
+                "parentUuid": 7666352744461164943
+            },
+            "sprite": {
+                "color": {
+                    "a": 1.0,
+                    "b": 0.23390042781829834,
+                    "g": 0.23390042781829834,
+                    "r": 0.7696078419685364
+                },
+                "seperator": {
+                    "x": 1,
+                    "y": 1
+                },
+                "slot": {
+                    "x": 0,
+                    "y": 0
+                },
+                "texture": {
+                    "filePath": "src/Nigozi/res/textures/flatQuad.png"
+                }
+            },
+            "tag": {
+                "tag": "Empty"
+            },
+            "transform": {
+                "position": {
+                    "x": 0.0,
+                    "y": 0.0
+                },
+                "rotation": 0.0,
+                "scale": {
+                    "x": 1.0,
+                    "y": 1.0
+                }
+            },
+            "uuid": {
+                "id": 9462178028978302548
+            }
+        },
+        {
+            "boxCollider": {
+                "density": 1.0,
+                "friction": 0.5,
+                "restitution": 0.0,
+                "restitutionThreshold": 0.5,
+                "size": {
+                    "x": 0.5,
+                    "y": 0.5
+                }
+            },
+            "name": {
+                "name": "Collider"
+            },
+            "relationship": {
+                "parentUuid": 7666352744461164943
+            },
+            "rigidbody": {
+                "bodyType": 0,
+                "freezeRotation": false
+            },
+            "tag": {
+                "tag": "Empty"
+            },
+            "transform": {
+                "position": {
+                    "x": 0.0,
+                    "y": 0.0
+                },
+                "rotation": 0.0,
+                "scale": {
+                    "x": 1.0,
+                    "y": 1.0
+                }
+            },
+            "uuid": {
+                "id": 13234964329535521412
             }
         }
     ]

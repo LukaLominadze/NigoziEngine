@@ -3,6 +3,11 @@
 #include "Entity.h"
 #include "Component.h"
 
+#include "box2d/b2_world.h"
+#include "box2d/b2_body.h"
+#include "box2d/b2_fixture.h"
+#include "box2d/b2_polygon_shape.h"
+
 namespace Nigozi
 {
     SceneTree::~SceneTree()
@@ -21,6 +26,8 @@ namespace Nigozi
         if (entity == Entity()) {
             return;
         }
+
+        entity.GetComponent<SceneComponent>().FilePath = filePath;
 
         NG_CORE_LOG_INFO("[Scene Tree] Serializing scene at: {}", filePath.string());
         
@@ -78,6 +85,8 @@ namespace Nigozi
 
             if (ent.contains("scene")) {
                 auto& scene = entity.AddComponent<SceneComponent>();
+                if (ent["scene"].contains("filePath"))
+                    scene.FilePath = ent["scene"]["filePath"].get<std::string>();
                 if (m_entityMap.empty()) {
                     m_sceneRootUUID = uuid.ID;
                 }
@@ -104,14 +113,23 @@ namespace Nigozi
 
             if (ent.contains("camera")) {
                 auto& camera = entity.AddComponent<CameraComponent>();
-                camera.Current = ent["camera"]["current"].get<bool>();
-                camera.Zoom = ent["camera"]["zoom"].get<float>();
+                if (ent["camera"].contains("current"))
+                    camera.Current = ent["camera"]["current"].get<bool>();
+
+                if (ent["camera"].contains("aspect"))
+                    camera.Aspect = ent["camera"]["aspect"].get<float>();
+
+                if (ent["camera"].contains("zoom"))
+                    camera.Zoom = ent["camera"]["zoom"].get<float>();
             }
 
             if (ent.contains("sprite")) {
                 auto& sprite = entity.AddComponent<SpriteRendererComponent>();
 
-                std::string texturePath = ent["sprite"]["texture"]["filePath"].get<std::string>();
+                std::string texturePath;
+                if (ent["sprite"].contains("texture") && ent["sprite"]["texture"].contains("filePath")) {
+                    texturePath = ent["sprite"]["texture"]["filePath"].get<std::string>();
+                }
                 if (std::filesystem::exists(std::filesystem::path(texturePath))) {
                     sprite.SpriteTexture = std::make_shared<Texture>(texturePath);
                 }
@@ -120,10 +138,21 @@ namespace Nigozi
                     NG_CORE_LOG_ERROR("[SceneTree] Couldn't find texture with path: {}", texturePath);
                 }
 
-                glm::u32vec2 seperator(
-                    ent["sprite"]["seperator"]["x"].get<int32_t>(),
-                    ent["sprite"]["seperator"]["y"].get<int32_t>()
-                );
+                glm::vec4 color;
+                if (ent["sprite"].contains("color")) {
+                    color.x = ent["sprite"]["color"]["r"].get<float>();
+                    color.y = ent["sprite"]["color"]["g"].get<float>();
+                    color.z = ent["sprite"]["color"]["b"].get<float>();
+                    color.w = ent["sprite"]["color"]["a"].get<float>();
+                }
+
+                glm::u32vec2 seperator(1);
+                if (ent["sprite"].contains("seperator")) {
+                    seperator = glm::u32vec2(
+                        ent["sprite"]["seperator"]["x"].get<int32_t>(),
+                        ent["sprite"]["seperator"]["y"].get<int32_t>()
+                    );
+                }
 
                 glm::vec2 textureSize = sprite.SpriteTexture->GetSize();
                 glm::vec2 subTextureSize(
@@ -131,18 +160,56 @@ namespace Nigozi
                     textureSize.y / seperator.y
                 );
 
-                glm::u32vec2 slot(
-                    ent["sprite"]["slot"]["x"].get<uint32_t>(),
-                    ent["sprite"]["slot"]["y"].get<uint32_t>()
-                );
+                glm::u32vec2 slot(0);
+                if (ent["sprite"].contains("slot")) {
+                    slot = glm::u32vec2(
+                        ent["sprite"]["slot"]["x"].get<uint32_t>(),
+                        ent["sprite"]["slot"]["y"].get<uint32_t>()
+                    );
+                }
                 
                 sprite.Sprite = SubTexture(sprite.SpriteTexture, subTextureSize, slot.x, slot.y);
+                sprite.Color = color;
+            }
+
+            if (ent.contains("rigidbody")) {
+                auto& rigidbody = entity.AddComponent<RigidbodyComponent>();
+
+                if (ent["rigidbody"].contains("bodyType")) {
+                    rigidbody.Type = (RigidbodyComponent::BodyType)ent["rigidbody"]["bodyType"].get<int32_t>();
+                }
+                if (ent["rigidbody"].contains("freezeRotation")) {
+                    rigidbody.FreezeRotation = ent["rigidbody"]["freezeRotation"].get<bool>();
+                }
+            }
+
+            if (ent.contains("boxCollider")) {
+                auto& boxCollider = entity.AddComponent<BoxColliderComponent>();
+                if (ent["boxCollider"].contains("size")) {
+                    boxCollider.Size.x = ent["boxCollider"]["size"]["x"].get<float>();
+                    boxCollider.Size.y = ent["boxCollider"]["size"]["y"].get<float>();
+                }
+                if (ent["boxCollider"].contains("density")) {
+                    boxCollider.Density = ent["boxCollider"]["density"].get<float>();
+                }
+                if (ent["boxCollider"].contains("friction")) {
+                    boxCollider.Friction = ent["boxCollider"]["friction"].get<float>();
+                }
+                if (ent["boxCollider"].contains("restitution")) {
+                    boxCollider.Restitution = ent["boxCollider"]["restitution"].get<float>();
+                }
+                if (ent["boxCollider"].contains("restitutionThreshold")) {
+                    boxCollider.RestitutionThreshold = ent["boxCollider"]["restitutionThreshold"].get<float>();
+                }
             }
 
             if (ent.contains("audioStreamPlayer")) {
                 auto& audio = entity.AddComponent<AudioStreamPlayerComponent>();
 
-                std::filesystem::path audioPath(ent["audioStreamPlayer"]["filePath"].get<std::string>());
+                std::filesystem::path audioPath;
+                if (ent["audioStreamPlayer"].contains("filePath")) {
+                    audioPath = ent["audioStreamPlayer"]["filePath"].get<std::string>();
+                }
                 if (std::filesystem::exists(audioPath)) {
                     audio.AudioHandle = AudioEngine::LoadAudioFromFile(audioPath);
                 }
@@ -150,7 +217,9 @@ namespace Nigozi
                     NG_CORE_LOG_ERROR("[Scene Tree] Couldn't find audio file with path: {}", audioPath.string());
                 }
 
-                audio.Volume = ent["audioStreamPlayer"]["volume"].get<float>();
+                if (ent["audioStreamPlayer"].contains("volume")) {
+                    audio.Volume = ent["audioStreamPlayer"]["volume"].get<float>();
+                }
             }
         }
     }
@@ -178,7 +247,7 @@ namespace Nigozi
 
         if (node.HasComponent<SceneComponent>()) {
             auto& scene = node.GetComponent<SceneComponent>();
-            ent["scene"]["filePath"] = scene.FilePath.string();
+            ent["scene"]["filePath"] = std::filesystem::absolute(scene.FilePath).string();
             if (uuid.ID != m_sceneRootUUID) {
                 // if we are using an external scene, stop serializing
                 doc.push_back(ent);
@@ -204,6 +273,7 @@ namespace Nigozi
         if (node.HasComponent<CameraComponent>()) {
             auto& camera = node.GetComponent<CameraComponent>();
             ent["camera"]["current"] = camera.Current;
+            ent["camera"]["aspect"] = camera.Aspect;
             ent["camera"]["zoom"] = camera.Zoom;
         }
 
@@ -211,6 +281,11 @@ namespace Nigozi
             auto& sprite = node.GetComponent<SpriteRendererComponent>();
             ent["sprite"]["texture"]["filePath"] = sprite.SpriteTexture->GetPath();
             
+            ent["sprite"]["color"]["r"] = sprite.Color.x;
+            ent["sprite"]["color"]["g"] = sprite.Color.y;
+            ent["sprite"]["color"]["b"] = sprite.Color.z;
+            ent["sprite"]["color"]["a"] = sprite.Color.w;
+
             ent["sprite"]["slot"]["x"] = sprite.Sprite.GetSlotX();
             ent["sprite"]["slot"]["y"] = sprite.Sprite.GetSlotY();
 
@@ -221,6 +296,23 @@ namespace Nigozi
                 seperators.y++;
             ent["sprite"]["seperator"]["x"] = (int32_t)(seperators.x);
             ent["sprite"]["seperator"]["y"] = (int32_t)(seperators.y);
+        }
+
+        if (node.HasComponent<RigidbodyComponent>()) {
+            auto& rigidbody = node.GetComponent<RigidbodyComponent>();
+            ent["rigidbody"]["bodyType"] = (int32_t)rigidbody.Type;
+            ent["rigidbody"]["freezeRotation"] = rigidbody.FreezeRotation;
+        }
+
+        if (node.HasComponent<BoxColliderComponent>()) {
+            auto& boxCollider = node.GetComponent<BoxColliderComponent>();
+            ent["boxCollider"]["size"]["x"] = boxCollider.Size.x;
+            ent["boxCollider"]["size"]["y"] = boxCollider.Size.y;
+
+            ent["boxCollider"]["density"] = boxCollider.Density;
+            ent["boxCollider"]["friction"] = boxCollider.Friction;
+            ent["boxCollider"]["restitution"] = boxCollider.Restitution;
+            ent["boxCollider"]["restitutionThreshold"] = boxCollider.RestitutionThreshold;
         }
 
         if (node.HasComponent<AudioStreamPlayerComponent>()) {
@@ -234,6 +326,52 @@ namespace Nigozi
         for (const auto child : node.GetChildren()) {
             SerializeNode(child, doc);
         }
+    }
+
+    void SceneTree::OnAttach()
+    {
+        p_physicsWorld = new b2World({ 0.0f, -9.8f });
+        auto view = m_Registry.view<RigidbodyComponent>();
+        for (auto entityHandle : view) {
+            Entity entity(entityHandle, this);
+            auto& transform = entity.GetComponent<TransformComponent>();
+            auto worldTransform = GetWorldSpaceTransform(entity);
+            auto& rigidbody = entity.GetComponent<RigidbodyComponent>();
+
+            b2BodyDef bodyDef;
+            // TODO: conversion func
+            bodyDef.type = (b2BodyType)rigidbody.Type;
+            bodyDef.position.Set(worldTransform.Position.x, worldTransform.Position.y);
+            bodyDef.angle = glm::radians(-worldTransform.Rotation);
+
+            b2Body* body = p_physicsWorld->CreateBody(&bodyDef);
+            body->SetFixedRotation(rigidbody.FreezeRotation);
+
+            rigidbody.RuntimeBody = (void*)body;
+
+            if (entity.HasComponent<BoxColliderComponent>()) {
+                auto& boxCollider = entity.GetComponent<BoxColliderComponent>();
+
+                b2PolygonShape polygonShape;
+                polygonShape.SetAsBox(boxCollider.Size.x * worldTransform.Scale.x,
+                                      boxCollider.Size.y * worldTransform.Scale.y);
+
+                b2FixtureDef fixtureDef;
+                fixtureDef.shape = &polygonShape;
+                fixtureDef.density = boxCollider.Density;
+                fixtureDef.friction = boxCollider.Friction;
+                fixtureDef.restitution = boxCollider.Restitution;
+                fixtureDef.restitutionThreshold = boxCollider.RestitutionThreshold;
+
+                boxCollider.RuntimeFixture = (void*)body->CreateFixture(&fixtureDef);
+            }
+        }
+    }
+
+    void SceneTree::OnDetach()
+    {
+        delete p_physicsWorld;
+        p_physicsWorld = nullptr;
     }
 
     void SceneTree::OnEvent(Event& event)
@@ -263,6 +401,32 @@ namespace Nigozi
         scriptView.each([timestep](auto script) {
             script.ScriptHandle->OnUpdate(timestep);
             });
+
+        const int32_t velocityIterations = 6;
+        const int32_t positionIteration = 2;
+        p_physicsWorld->Step(timestep, velocityIterations, positionIteration);
+
+        auto view = m_Registry.view<RigidbodyComponent>();
+        for (auto entityHandle : view) {
+            Entity entity(entityHandle, this);
+            auto& transform = entity.GetComponent<TransformComponent>();
+            auto worldTransform = GetWorldSpaceTransform(entity);
+            auto& rigidbody = entity.GetComponent<RigidbodyComponent>();
+
+            b2Body* body = (b2Body*)rigidbody.RuntimeBody;
+            const auto& position = body->GetPosition();
+
+            glm::vec2 delta(
+                position.x - worldTransform.Position.x,
+                position.y - worldTransform.Position.y
+            );
+            float bodyAngle = glm::degrees(body->GetAngle());
+            NG_CORE_LOG_INFO("[Scene Tree] body angle: ID: {}, {}", (uint64_t)entityHandle, bodyAngle);
+            float rotationDelta = -(bodyAngle - (worldTransform.Rotation - transform.Rotation));
+
+            transform.Position += delta;
+            transform.Rotation = rotationDelta;
+        }
     }
 
     void SceneTree::OnRender()
@@ -275,15 +439,30 @@ namespace Nigozi
         m_Registry.sort<SpriteRendererComponent>([](const SpriteRendererComponent& a, const SpriteRendererComponent& b) {
             return a.ZOrder < b.ZOrder;
             });
+        
+        auto cameraView = m_Registry.view<TransformComponent, CameraComponent>();
+        cameraView.each([this](auto entity, auto& transform, auto& camera) {
+            if (camera.Current) {
+                OrthographicCamera orthoCamera(-camera.Aspect * camera.Zoom, camera.Aspect * camera.Zoom, -camera.Zoom, camera.Zoom);
+                
+                auto worldTransform = GetWorldSpaceTransform(Entity(entity, this));
+                orthoCamera.SetPosition(glm::vec3(worldTransform.Position, 0.0f));
+                orthoCamera.SetRotation(-worldTransform.Rotation);
+
+                orthoCamera.SetMVPMatrix();
+            }
+            });
 
         auto view = m_Registry.view<TransformComponent, SpriteRendererComponent>();
         view.use<SpriteRendererComponent>();
-        view.each([](auto entity, auto& transform, auto& sprite) {
+        view.each([&](auto entity, auto& transform, auto& sprite) {
+            auto worldTransform = GetWorldSpaceTransform(Entity(entity, this));
+
             glm::vec2 spriteSize = sprite.Sprite.GetSize();
             float sizeY = spriteSize.y / sprite.Sprite.GetTextureSize().y;
             float aspectX = spriteSize.x / spriteSize.y;
-            glm::vec2 scale(transform.Scale.x * aspectX * sizeY, transform.Scale.y * sizeY);
-            Renderer2D::DrawRotatedQuad(transform.Position, scale, glm::radians(transform.Rotation), sprite.Sprite, sprite.Color);
+            glm::vec2 scale(worldTransform.Scale.x * aspectX * sizeY, worldTransform.Scale.y * sizeY);
+            Renderer2D::DrawRotatedQuad(worldTransform.Position, scale, glm::radians(worldTransform.Rotation), sprite.Sprite, sprite.Color);
             });
     }
 

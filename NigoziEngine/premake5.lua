@@ -39,6 +39,7 @@ project "NigoziEngine"
 				  "%{prj.location}/../vendor/spdlog/include" }
 
 	links {
+		"box2d",
 		"nfd",
 		"GLEW",
 		"GLFW",

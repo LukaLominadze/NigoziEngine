@@ -15,29 +15,46 @@ EditorLayer::EditorLayer(Nigozi::FrameBuffer* viewportBuffer)
 void EditorLayer::OnEvent(Nigozi::Event& event)
 {
     Nigozi::EventDispatcher dispatcher(event);
-    if (m_viewportHovered) {
-        m_editorCamera.OnEvent(event);
-    }
+
     dispatcher.Dispatch<Nigozi::MouseButtonPressedEvent>(std::bind(&EditorLayer::OnSelectMouseButtonPressed, this, std::placeholders::_1));
     dispatcher.Dispatch<Nigozi::MouseButtonPressedEvent>(std::bind(&EditorLayer::OnMoveMouseButtonPressed, this, std::placeholders::_1));
     dispatcher.Dispatch<Nigozi::MouseMovedEvent>(std::bind(&EditorLayer::OnMouseMoved, this, std::placeholders::_1));
     dispatcher.Dispatch<Nigozi::MouseMovedEvent>(std::bind(&EditorLayer::OnRotateMouseMoved, this, std::placeholders::_1));
     dispatcher.Dispatch<Nigozi::MouseButtonReleasedEvent>(std::bind(&EditorLayer::OnMouseButtonReleased, this, std::placeholders::_1));
+    if (m_editorState == EditorState::EDIT) {
+        if (m_viewportHovered) {
+            m_editorCamera.OnEvent(event);
+        }
+    }
+    else {
+        m_currentContext->OnEvent(event);
+    }
 }
 
 void EditorLayer::OnUpdate(float timestep)
 {
-    if (m_viewportHovered) {
-        m_editorCamera.OnUpdate(timestep);
+    if (m_editorState == EditorState::EDIT) {
+        if (m_viewportHovered) {
+            m_editorCamera.OnUpdate(timestep);
+        }
+        m_currentContext->OnEditorUpdate(timestep);
     }
-    m_currentContext->OnEditorUpdate(timestep);
+    else {
+        m_currentContext->OnUpdate(timestep);
+    }
 }
 
 void EditorLayer::OnRender()
 {
-    m_editorCamera.OnResize(m_viewportSize.x, m_viewportSize.y);
-    m_editorCamera.OnRender();
-    m_currentContext->OnEditorRender();
+    if (m_editorState == EditorState::EDIT) {
+        m_editorCamera.OnResize(m_viewportSize.x, m_viewportSize.y);
+        m_editorCamera.OnRender();
+        m_currentContext->OnEditorRender();
+    }
+    else {
+        m_currentContext->OnRender();
+        GLCall(glViewport(0, 0, m_viewportSize.x, m_viewportSize.y));
+    }
 
     Nigozi::Renderer2D::Flush();
     GLCall(glPolygonMode(GL_FRONT_AND_BACK, GL_LINE));
@@ -69,14 +86,13 @@ endSelectionGizmoRender:
     auto cameraView = m_currentContext->m_Registry.view<Nigozi::TransformComponent, Nigozi::CameraComponent>();
     for (auto [entityHandle, transform, camera] : cameraView.each()) {
         auto worldTransform = m_currentContext->GetWorldSpaceTransform(Nigozi::Entity(entityHandle, m_currentContext.get()));
-        float aspect = m_editorCamera.GetCamera().GetAspect();
         glm::vec4 color(0.4f, 0.6f, 1.0f, 1.0f);
         if (!camera.Current) {
             color = glm::vec4(0.4f, 0.4f, 0.4f, 1.0f);
         }
         Nigozi::Renderer2D::DrawRotatedQuad(
             worldTransform.Position,
-            glm::vec2(camera.Zoom * aspect, camera.Zoom),
+            glm::vec2(camera.Zoom * camera.Aspect * 2.0f, camera.Zoom * 2.0f),
             glm::radians(worldTransform.Rotation),
             Nigozi::Renderer2D::GetData()->Textures[0],
             color
@@ -92,7 +108,12 @@ void EditorLayer::OnImGuiRender()
     ShowSceneHierarchy();
     ShowInspector();
     ShowViewport();
-    m_currentContext->OnEditorImGuiRender();
+    if (m_editorState == EditorState::EDIT) {
+        m_currentContext->OnEditorImGuiRender();
+    }
+    else {
+        m_currentContext->OnImGuiRender();
+    }
     if (s_showDemoWindow) {
         ImGui::ShowDemoWindow(&s_showDemoWindow);
     }
@@ -465,6 +486,7 @@ void EditorLayer::ShowInspector()
                     otherCamera.Current = false;
                 }
             }
+            ImGui::DragFloat("Aspect", &camera.Aspect, 0.1f, 0.01f);
 
             ImGui::TreePop();
             ImGui::Separator();
@@ -586,6 +608,42 @@ void EditorLayer::ShowInspector()
 
             ImGui::TreePop();
             ImGui::Separator();
+        }
+
+        if (entity.HasComponent<Nigozi::RigidbodyComponent>()) {
+            if (ImGui::TreeNodeEx((void*)(typeid(Nigozi::RigidbodyComponent).hash_code() + (size_t)m_selectionContext),
+                ImGuiTreeNodeFlags_DefaultOpen, "Rigidbody")) {
+                auto& rigidbody = entity.GetComponent<Nigozi::RigidbodyComponent>();
+
+                const char* bodyTypeNames[] = {
+                    "Static", "Kinematic", "Dynamic"
+                };
+                int currentType = (int)rigidbody.Type;
+
+                ImGui::Combo("Body Type", &currentType, bodyTypeNames, 3);
+                rigidbody.Type = (Nigozi::RigidbodyComponent::BodyType)currentType;
+
+                ImGui::Checkbox("Freeze Rotation", &rigidbody.FreezeRotation);
+
+                ImGui::TreePop();
+            }
+        }
+
+        if (entity.HasComponent<Nigozi::BoxColliderComponent>()) {
+            if (ImGui::TreeNodeEx((void*)(typeid(Nigozi::BoxColliderComponent).hash_code() + (size_t)m_selectionContext),
+                ImGuiTreeNodeFlags_DefaultOpen, "Box Collider")) {
+                auto& boxCollider = entity.GetComponent<Nigozi::BoxColliderComponent>();
+
+                ImGui::DragFloat2("Size", (float*)&boxCollider.Size, 0.05f, 0.01f);
+                ImGui::DragFloat2("Offset", (float*)&boxCollider.Offset, 0.05f);
+
+                ImGui::DragFloat("Density", &boxCollider.Density, 0.05f);
+                ImGui::DragFloat("Friction", &boxCollider.Friction, 0.05f);
+                ImGui::DragFloat("Restitution", &boxCollider.Restitution, 0.05f);
+                ImGui::DragFloat("Restitution Threshold", &boxCollider.RestitutionThreshold, 0.05f);
+
+                ImGui::TreePop();
+            }
         }
 
         if (ImGui::TreeNodeEx((void*)(typeid(Nigozi::TransformComponent).hash_code() + (size_t)m_selectionContext),
@@ -738,13 +796,15 @@ void EditorLayer::ShowAddNodeModal()
         enum class NodeTypes {
             NODE_2D,
             SPRITE_RENDERER,
+            RIGID_BODY,
             AUDIO_STREAM_PLAYER,
             CAMERA
         };
 
-        static std::array<std::string, 4> items = {
+        static std::array<std::string, 5> items = {
             "Node2D",
             "Sprite Renderer",
+            "Rigidbody",
             "Audio Stream Player",
             "Camera"
         };
@@ -786,6 +846,9 @@ void EditorLayer::ShowAddNodeModal()
             }
 
             AddComponent<Nigozi::SpriteRendererComponent>(entity, itemSelectedIndex == NodeTypes::SPRITE_RENDERER);
+            AddComponent<Nigozi::RigidbodyComponent>(entity, itemSelectedIndex == NodeTypes::RIGID_BODY);
+            // Rigidbody needs a box collider and we shoulnt have box collider as a seperate node
+            AddComponent<Nigozi::BoxColliderComponent>(entity, itemSelectedIndex == NodeTypes::RIGID_BODY);
             AddComponent<Nigozi::AudioStreamPlayerComponent>(entity, itemSelectedIndex == NodeTypes::AUDIO_STREAM_PLAYER);
             AddComponent<Nigozi::CameraComponent>(entity, itemSelectedIndex == NodeTypes::CAMERA);
 
@@ -826,15 +889,62 @@ void EditorLayer::ShowViewport()
         buttonHovered = true;
         m_tool = Tool::ROTATE;
     }
+    if (ImGui::Button("Play")) {
+        m_editorState = EditorState::PLAY;
+        m_currentContext->OnAttach();
+    }
+    ImGui::SameLine();
+    if (ImGui::Button("Pause") && m_editorState == EditorState::PLAY) {
+        m_editorState = EditorState::PAUSE;
+    }
+    ImGui::SameLine();
+    if (ImGui::Button("Stop")) {
+        Nigozi::Entity entity = m_currentContext->TryGetEntityByUUID(m_currentContext->GetSceneRootUUID());
+        auto scene = entity.GetComponent<Nigozi::SceneComponent>();
+        if (std::filesystem::exists(scene.FilePath) && !std::filesystem::is_directory(scene.FilePath)) {
+            m_currentContext->OnDetach();
+            m_currentContext->ClearSceneTree();
+            m_currentContext->DeserializeScene(scene.FilePath);
+            m_selectionContext = entt::null;
+            m_movingSelectionContext = entt::null;
+        }
+        m_editorState = EditorState::EDIT;
+    }
     if (ImGui::IsItemHovered()) buttonHovered = true;
 
     m_viewportSize = ImGui::GetContentRegionAvail();
 
     ImVec2 viewportFrameSize = ImGui::GetContentRegionMax();
+    if (m_editorState == EditorState::PLAY || m_editorState == EditorState::PAUSE) {
+        auto cameraView = m_currentContext->m_Registry.view<Nigozi::CameraComponent>();
+        for (auto [entity, camera] : cameraView.each()) {
+            if (!camera.Current) {
+                continue;
+            }
+            float availableAspect = m_viewportSize.x / m_viewportSize.y;
+            if (camera.Aspect > availableAspect) {
+                m_viewportSize.y = m_viewportSize.x / camera.Aspect;
+            }
+            else {
+                m_viewportSize.x = m_viewportSize.y / (1.0f / camera.Aspect);
+            }
+            break;
+        }
+    }
     ImVec2 padding{ viewportFrameSize.x - m_viewportSize.x, viewportFrameSize.y - m_viewportSize.y };
     padding.y += ImGui::GetFrameHeight();
 
-    m_viewportPosition = glm::vec2(ImGui::GetWindowPos().x + padding.x, ImGui::GetWindowPos().y + padding.y);
+    ImVec2 availableFrameSize = ImGui::GetContentRegionAvail();
+    ImVec2 offset
+    { 
+        (availableFrameSize.x - m_viewportSize.x) / 2.0f,
+        (availableFrameSize.y - m_viewportSize.y) / 2.0f 
+    };
+
+    ImGui::SetCursorPosX(ImGui::GetCursorPosX() + offset.x);
+    ImGui::SetCursorPosY(ImGui::GetCursorPosY() + offset.y);
+
+    m_viewportPosition = glm::vec2(ImGui::GetWindowPos().x + padding.x + offset.x, ImGui::GetWindowPos().y + padding.y + offset.y);
 
     ImGui::Image((uint64_t)(p_viewportBuffer->GetColorAttachment()), m_viewportSize, ImVec2(0, 1), ImVec2(1, 0));
     m_viewportHovered = ImGui::IsWindowHovered() && !buttonHovered;
