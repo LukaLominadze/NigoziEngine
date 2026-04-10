@@ -309,6 +309,19 @@ void EditorLayer::DockViewportWithMenuBar()
     if (ImGui::BeginMenuBar())
     {
         if (ImGui::BeginMenu("File")) {
+            if (ImGui::MenuItem("Save")) {
+                std::filesystem::path savePath = Nigozi::FileDialogue::OpenSaveDialog("ngscn");
+                if (!savePath.empty()) {
+                    m_currentContext->SerializeScene(savePath);
+                }
+            }
+            if (ImGui::MenuItem("Load")) {
+                std::filesystem::path scenePath = Nigozi::FileDialogue::OpenFileDialog("ngscn");
+                if (!scenePath.empty()) {
+                    m_currentContext->ClearSceneTree();
+                    m_currentContext->DeserializeScene(scenePath);
+                }
+            }
             if (ImGui::MenuItem("Exit")) {
                 Nigozi::Application::Close();
             }
@@ -403,7 +416,7 @@ void EditorLayer::DrawSceneHierarchyNode(Nigozi::Entity entity)
     auto& nameComponent = entity.GetComponent<Nigozi::NameComponent>();
 
     ImGuiTreeNodeFlags flags = ((m_selectionContext == entity.GetHandle()) ? ImGuiTreeNodeFlags_Selected : 0)
-        | ((entity.GetChildrenUUIDs().size() == 0) ? ImGuiTreeNodeFlags_Leaf : ImGuiTreeNodeFlags_OpenOnArrow);
+        | ((entity.GetChildrenUUIDs().size() == 0) ? ImGuiTreeNodeFlags_Leaf : ImGuiTreeNodeFlags_OpenOnArrow | ImGuiTreeNodeFlags_OpenOnDoubleClick);
 
     bool opened = ImGui::TreeNodeEx((void*)(uint64_t)(uint32_t)entity.GetHandle(), flags, nameComponent.Name.c_str());
 

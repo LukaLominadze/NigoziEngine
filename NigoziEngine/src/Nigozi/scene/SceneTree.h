@@ -20,8 +20,10 @@ namespace Nigozi
 		SceneTree() = default;
 		~SceneTree();
 
-		// void SerializeScene();
-		// void DeserializeScene();
+		void SerializeScene(const std::filesystem::path& filePath);
+		void DeserializeScene(const std::filesystem::path& filePath);
+
+		void ClearSceneTree();
 
 		/*
 			TODO: It would be good to have scene metadeta saved in a file
@@ -47,7 +49,9 @@ namespace Nigozi
 		bool DestroyEntity(Entity entity);
 
 		inline UUID GetSceneRootUUID() const { return m_sceneRootUUID; }
-
+	private:
+		void SerializeNode(Entity node, nlohmann::json& doc);
+	public:
 		friend class Entity;
 		entt::registry m_Registry;
 	private:

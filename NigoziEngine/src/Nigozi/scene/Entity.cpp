@@ -21,7 +21,10 @@ namespace Nigozi
 
 		if (relationship.ParentUUID.GetUUID() != Nigozi::UUID::Null) {
 			std::vector<UUID>& childrenUUIDs = GetParent().GetComponent<RelationshipComponent>().ChildrenUUIDs;
-			childrenUUIDs.erase(std::find(childrenUUIDs.begin(), childrenUUIDs.end(), thisUuid));
+			auto it = std::find(childrenUUIDs.begin(), childrenUUIDs.end(), thisUuid);
+			if (it != childrenUUIDs.end()) {
+				childrenUUIDs.erase(std::find(childrenUUIDs.begin(), childrenUUIDs.end(), thisUuid));
+			}
 		}
 
 		relationship.ParentUUID = uuid;

@@ -26,5 +26,9 @@
 
 #include <utility>
 
+#include <filesystem>
+#include <fstream>
+#include <iomanip>
+
 #include "Nigozi/json/json.hpp"
 #include "Nigozi/entt/entt.hpp"

@@ -1,0 +1,190 @@
+{
+    "metadata": {
+        "version": 0
+    },
+    "nodes": [
+        {
+            "name": {
+                "name": "World\u0000de"
+            },
+            "relationship": {
+                "parentUuid": 0
+            },
+            "scene": {
+                "filePath": ""
+            },
+            "tag": {
+                "tag": "Empty"
+            },
+            "transform": {
+                "position": {
+                    "x": 0.0,
+                    "y": 0.0
+                },
+                "rotation": 0.0,
+                "scale": {
+                    "x": 1.0,
+                    "y": 1.0
+                }
+            },
+            "uuid": {
+                "id": 5162139645558248151
+            }
+        },
+        {
+            "name": {
+                "name": "Player\u0000e"
+            },
+            "relationship": {
+                "parentUuid": 5162139645558248151
+            },
+            "tag": {
+                "tag": "Empty"
+            },
+            "transform": {
+                "position": {
+                    "x": -1.899999976158142,
+                    "y": -1.7999999523162842
+                },
+                "rotation": 0.0,
+                "scale": {
+                    "x": 1.0,
+                    "y": 1.0
+                }
+            },
+            "uuid": {
+                "id": 15240704992740279910
+            }
+        },
+        {
+            "name": {
+                "name": "Sprite\u0000e"
+            },
+            "relationship": {
+                "parentUuid": 15240704992740279910
+            },
+            "sprite": {
+                "seperator": {
+                    "x": 10,
+                    "y": 1
+                },
+                "slot": {
+                    "x": 4,
+                    "y": 0
+                },
+                "texture": {
+                    "filePath": "E:\\Luka\\Dev\\C++\\NigoziEngine\\Kakali\\src\\res\\textures\\Player.png"
+                }
+            },
+            "tag": {
+                "tag": "Empty"
+            },
+            "transform": {
+                "position": {
+                    "x": 0.04860270023345947,
+                    "y": 0.03645169734954834
+                },
+                "rotation": 0.0,
+                "scale": {
+                    "x": 1.0,
+                    "y": 1.0
+                }
+            },
+            "uuid": {
+                "id": 6838463181056818049
+            }
+        },
+        {
+            "camera": {
+                "current": true,
+                "zoom": 5.0
+            },
+            "name": {
+                "name": "Camera\u0000e"
+            },
+            "relationship": {
+                "parentUuid": 15240704992740279910
+            },
+            "tag": {
+                "tag": "Empty"
+            },
+            "transform": {
+                "position": {
+                    "x": 0.0,
+                    "y": 0.0
+                },
+                "rotation": 0.0,
+                "scale": {
+                    "x": 1.0,
+                    "y": 1.0
+                }
+            },
+            "uuid": {
+                "id": 14793367517406081700
+            }
+        },
+        {
+            "name": {
+                "name": "Ground\u0000e"
+            },
+            "relationship": {
+                "parentUuid": 5162139645558248151
+            },
+            "tag": {
+                "tag": "Empty"
+            },
+            "transform": {
+                "position": {
+                    "x": 0.0,
+                    "y": -2.799999952316284
+                },
+                "rotation": 0.0,
+                "scale": {
+                    "x": 1.0,
+                    "y": 1.0
+                }
+            },
+            "uuid": {
+                "id": 13417082783058435392
+            }
+        },
+        {
+            "name": {
+                "name": "Sprite\u0000e"
+            },
+            "relationship": {
+                "parentUuid": 13417082783058435392
+            },
+            "sprite": {
+                "seperator": {
+                    "x": 1,
+                    "y": 1
+                },
+                "slot": {
+                    "x": 0,
+                    "y": 0
+                },
+                "texture": {
+                    "filePath": "src/Nigozi/res/textures/flatQuad.png"
+                }
+            },
+            "tag": {
+                "tag": "Empty"
+            },
+            "transform": {
+                "position": {
+                    "x": 0.0,
+                    "y": 0.0
+                },
+                "rotation": 0.0,
+                "scale": {
+                    "x": 9.0,
+                    "y": 1.0
+                }
+            },
+            "uuid": {
+                "id": 4848402729339016890
+            }
+        }
+    ]
+}
