@@ -2,6 +2,7 @@
 
 #include <Nigozi.h>
 #include "EditorCamera.h"
+#include "command/CommandQueue.h"
 
 enum class Tool
 {
@@ -43,6 +44,14 @@ private:
 	void ShowAddNodeModal();
 	void ShowViewport();
 
+	void CloseSceneTab(const std::shared_ptr<Nigozi::SceneTree>& sceneContext);
+
+	bool SaveAllScenes();
+	bool SaveScene(const std::shared_ptr<Nigozi::SceneTree>& context);
+	bool SaveCurrentScene();
+	bool SaveCurrentSceneAs();
+	void LoadScene();
+
 	template<typename T>
 	void AddComponent(Nigozi::Entity& entity, bool selectedComponent) {
 		if (selectedComponent &&
@@ -54,6 +63,7 @@ private:
 	static bool s_showDemoWindow;
 private:
 	std::vector<std::shared_ptr<Nigozi::SceneTree>> m_sceneTreeContexts;
+	std::shared_ptr<Nigozi::SceneTree> m_lastContext;
 	std::shared_ptr<Nigozi::SceneTree> m_currentContext;
 
 	Nigozi::FrameBuffer* p_viewportBuffer;
@@ -61,6 +71,8 @@ private:
 
 	Tool m_tool = Tool::SELECT;
 	EditorState m_editorState = EditorState::EDIT;
+
+	CommandQueue m_commandQueue;
 
 	ImVec2 m_viewportSize;
 	glm::vec2 m_windowPosition;

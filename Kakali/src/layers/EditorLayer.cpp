@@ -126,7 +126,18 @@ bool EditorLayer::OnSelectMouseButtonPressed(Nigozi::MouseButtonPressedEvent& ev
     }
     if (event.GetButton() == GLFW_MOUSE_BUTTON_1) {
         glm::vec2 viewportRelPos = m_viewportPosition - m_windowPosition;
-        glm::vec2 mousePosition = m_editorCamera.GetCamera().GetMousePositionWorldSpace(Nigozi::Input::GetMousePosition() - viewportRelPos, *(glm::vec2*)&m_viewportSize);
+
+        Nigozi::OrthographicCamera camera = m_editorCamera.GetCamera();
+        if (m_editorState != EditorState::EDIT) {
+            Nigozi::CameraComponent* cameraComponent = m_currentContext->GetMainCamera();
+            if (cameraComponent) {
+                float aspect = cameraComponent->Aspect;
+                float zoom = cameraComponent->Zoom;
+                camera = Nigozi::OrthographicCamera(-aspect * zoom, aspect * zoom, -zoom, zoom);
+            }
+        }
+
+        glm::vec2 mousePosition = camera.GetMousePositionWorldSpace(Nigozi::Input::GetMousePosition() - viewportRelPos, *(glm::vec2*)&m_viewportSize);
 
         // Nigozi::Renderer2D::DrawQuad(mousePosition, glm::vec2(0.1f), Nigozi::Renderer2D::GetData()->Textures[0], glm::vec4(0.0f, 1.0f, 1.0f, 1.0f));
 
@@ -204,9 +215,20 @@ bool EditorLayer::OnMouseMoved(Nigozi::MouseMovedEvent& event)
 
     glm::vec2 viewportRelPos = m_viewportPosition - m_windowPosition;
     glm::vec2 mouseScreenPosition = glm::vec2(event.GetX(), event.GetY());
-    glm::vec2 mousePosition = m_editorCamera.GetCamera().GetMousePositionWorldSpace(glm::vec2(event.GetX(), event.GetY()) - viewportRelPos, *(glm::vec2*)&m_viewportSize);
+    
+    Nigozi::OrthographicCamera camera = m_editorCamera.GetCamera();
+    if (m_editorState != EditorState::EDIT) {
+        Nigozi::CameraComponent* cameraComponent = m_currentContext->GetMainCamera();
+        if (cameraComponent) {
+            float aspect = cameraComponent->Aspect;
+            float zoom = cameraComponent->Zoom;
+            camera = Nigozi::OrthographicCamera(-aspect * zoom, aspect * zoom, -zoom, zoom);
+        }
+    }
+    
+    glm::vec2 mousePosition = camera.GetMousePositionWorldSpace(glm::vec2(event.GetX(), event.GetY()) - viewportRelPos, *(glm::vec2*)&m_viewportSize);
 
-    glm::vec2 mouseOldPosition = m_editorCamera.GetCamera().GetMousePositionWorldSpace(m_mouseOldPosition - viewportRelPos, *(glm::vec2*)&m_viewportSize);
+    glm::vec2 mouseOldPosition = camera.GetMousePositionWorldSpace(m_mouseOldPosition - viewportRelPos, *(glm::vec2*)&m_viewportSize);
 
     glm::vec2 mouseDelta = mousePosition - mouseOldPosition;
 
@@ -233,7 +255,18 @@ bool EditorLayer::OnRotateMouseMoved(Nigozi::MouseMovedEvent& event)
 
     glm::vec2 viewportRelPos = m_viewportPosition - m_windowPosition;
     glm::vec2 mouseScreenPosition = glm::vec2(event.GetX(), event.GetY());
-    glm::vec2 mousePosition = m_editorCamera.GetCamera().GetMousePositionWorldSpace(glm::vec2(event.GetX(), event.GetY()) - viewportRelPos, *(glm::vec2*)&m_viewportSize);
+
+    Nigozi::OrthographicCamera camera = m_editorCamera.GetCamera();
+    if (m_editorState != EditorState::EDIT) {
+        Nigozi::CameraComponent* cameraComponent = m_currentContext->GetMainCamera();
+        if (cameraComponent) {
+            float aspect = cameraComponent->Aspect;
+            float zoom = cameraComponent->Zoom;
+            camera = Nigozi::OrthographicCamera(-aspect * zoom, aspect * zoom, -zoom, zoom);
+        }
+    }
+
+    glm::vec2 mousePosition = camera.GetMousePositionWorldSpace(glm::vec2(event.GetX(), event.GetY()) - viewportRelPos, *(glm::vec2*)&m_viewportSize);
 
     // Transform the point into rectangle space
     float rotation = glm::radians(-worldTransform.Rotation);
@@ -330,19 +363,26 @@ void EditorLayer::DockViewportWithMenuBar()
     if (ImGui::BeginMenuBar())
     {
         if (ImGui::BeginMenu("File")) {
-            if (ImGui::MenuItem("Save")) {
-                std::filesystem::path savePath = Nigozi::FileDialogue::OpenSaveDialog("ngscn");
-                if (!savePath.empty()) {
-                    m_currentContext->SerializeScene(savePath);
-                }
+            if (ImGui::MenuItem("Save", "Ctrl+S")) {
+                SaveCurrentScene();
+            }
+            if (ImGui::MenuItem("Save As...", "Ctrl+Shift+S")) {
+                SaveCurrentSceneAs();
+            }
+            if (ImGui::MenuItem("Save All Scenes...", "Ctrl+Alt+Shift+S")) {
+                SaveAllScenes();
             }
             if (ImGui::MenuItem("Load")) {
-                std::filesystem::path scenePath = Nigozi::FileDialogue::OpenFileDialog("ngscn");
-                if (!scenePath.empty()) {
-                    m_currentContext->ClearSceneTree();
-                    m_currentContext->DeserializeScene(scenePath);
-                }
+                LoadScene();
             }
+            ImGui::Separator();
+            if (ImGui::MenuItem("Undo", "Ctrl+Z")) {
+                m_commandQueue.RevertBack();
+            }
+            if (ImGui::MenuItem("Redo", "Ctrl+Shift+Z")) {
+                m_commandQueue.RedoBack();
+            }
+            ImGui::Separator();
             if (ImGui::MenuItem("Exit")) {
                 Nigozi::Application::Close();
             }
@@ -462,322 +502,325 @@ void EditorLayer::DrawSceneHierarchyNode(Nigozi::Entity entity)
 void EditorLayer::ShowInspector()
 {
     ImGui::Begin("Inspector");
-    if (m_selectionContext != entt::null) {
-        Nigozi::Entity entity(m_selectionContext, m_currentContext.get());
+    if (m_selectionContext == entt::null) {
+        ImGui::End();
+        return;
+    }
+    Nigozi::Entity entity(m_selectionContext, m_currentContext.get());
 
-        auto& uuidComponent = entity.GetComponent<Nigozi::UUIDComponent>();
-        auto& nameComponent = entity.GetComponent<Nigozi::NameComponent>();
-        auto& tagComponent = entity.GetComponent<Nigozi::TagComponent>();
-        ImGui::Text(std::to_string(uuidComponent.ID.GetUUID()).c_str());
-        ImGui::InputText("Name", nameComponent.Name.data(), nameComponent.Name.capacity());
-        ImGui::InputText("Tag", tagComponent.Tag.data(), tagComponent.Tag.capacity());
+    auto& uuidComponent = entity.GetComponent<Nigozi::UUIDComponent>();
+    auto& nameComponent = entity.GetComponent<Nigozi::NameComponent>();
+    auto& tagComponent = entity.GetComponent<Nigozi::TagComponent>();
+    ImGui::Text(std::to_string(uuidComponent.ID.GetUUID()).c_str());
+    ImGui::InputText("Name", nameComponent.Name.data(), nameComponent.Name.capacity());
+    ImGui::InputText("Tag", tagComponent.Tag.data(), tagComponent.Tag.capacity());
 
-        if (entity.HasComponent<Nigozi::CameraComponent>() &&
-            ImGui::TreeNodeEx((void*)(typeid(Nigozi::CameraComponent).hash_code() + (size_t)m_selectionContext),
-                ImGuiTreeNodeFlags_DefaultOpen, "Camera")) {
-            auto& camera = entity.GetComponent<Nigozi::CameraComponent>();
-            ImGui::DragFloat("Zoom", &camera.Zoom, 0.05f, 0.01f);
-            if (ImGui::Checkbox("Current", &camera.Current)) {
-                auto cameraView = m_currentContext->m_Registry.view<Nigozi::CameraComponent>();
-                for (auto [entityHandle, otherCamera] : cameraView.each()) {
-                    if (entityHandle == entity.GetHandle()) {
-                        continue;
-                    }
-                    otherCamera.Current = false;
+    if (entity.HasComponent<Nigozi::CameraComponent>() &&
+        ImGui::TreeNodeEx((void*)(typeid(Nigozi::CameraComponent).hash_code() + (size_t)m_selectionContext),
+            ImGuiTreeNodeFlags_DefaultOpen, "Camera")) {
+        auto& camera = entity.GetComponent<Nigozi::CameraComponent>();
+        ImGui::DragFloat("Zoom", &camera.Zoom, 0.05f, 0.01f);
+        if (ImGui::Checkbox("Current", &camera.Current)) {
+            auto cameraView = m_currentContext->m_Registry.view<Nigozi::CameraComponent>();
+            for (auto [entityHandle, otherCamera] : cameraView.each()) {
+                if (entityHandle == entity.GetHandle()) {
+                    continue;
                 }
+                otherCamera.Current = false;
             }
-            ImGui::DragFloat("Aspect", &camera.Aspect, 0.1f, 0.01f);
+        }
+        ImGui::DragFloat("Aspect", &camera.Aspect, 0.1f, 0.01f);
 
-            ImGui::TreePop();
-            ImGui::Separator();
+        ImGui::TreePop();
+        ImGui::Separator();
+    }
+
+    if (entity.HasComponent<Nigozi::SpriteRendererComponent>() &&
+        ImGui::TreeNodeEx((void*)(typeid(Nigozi::SpriteRendererComponent).hash_code() + (size_t)m_selectionContext),
+            ImGuiTreeNodeFlags_DefaultOpen, "Sprite Renderer")) {
+        auto& sprite = entity.GetComponent<Nigozi::SpriteRendererComponent>();
+
+        ImGuiTableFlags flags =
+            ImGuiTableFlags_SizingFixedFit |
+            ImGuiTableFlags_Hideable;
+
+        // TRANSFORM TABLE
+        float availableSizeX = ImGui::GetContentRegionAvail().x;
+        // UV coordinates are often (0.0f, 0.0f) and (1.0f, 1.0f) to display an entire textures.
+        // Here are trying to display only a 32x32 pixels area of the texture, hence the UV computation.
+        // Read about UV coordinates here: https://github.com/ocornut/imgui/wiki/Image-Loading-and-Displaying-Examples
+        ImVec2 size = ImVec2(availableSizeX / 2.0f - 10.0f, availableSizeX / 2.0f - 10.0f);                     // Size of the image we want to make visible
+        ImVec2 uv0 = ImVec2(0.0f, 1.0f);                            // UV coordinates for lower-left
+        ImVec2 uv1 = ImVec2(1.0f, 0.0f);    
+        ImVec4 bg_col = ImVec4(0.0f, 0.0f, 0.0f, 1.0f);             // Black background
+        ImVec4 tint_col = ImVec4(1.0f, 1.0f, 1.0f, 1.0f);           // No tint
+        if (ImGui::ImageButton("Sprite", sprite.SpriteTexture->GetRendererID(), size, uv0, uv1, bg_col, tint_col)) {
+            std::filesystem::path result = Nigozi::FileDialogue::OpenFileDialog("png;jpg;jpeg");
+            if (!result.empty()) {
+                std::string path = result.string();
+
+                sprite.SpriteTexture.reset();
+                sprite.SpriteTexture = std::make_shared<Nigozi::Texture>(path);
+                sprite.Sprite = Nigozi::SubTexture(sprite.SpriteTexture, sprite.SpriteTexture->GetSize());
+            }
         }
 
-        if (entity.HasComponent<Nigozi::SpriteRendererComponent>() &&
-            ImGui::TreeNodeEx((void*)(typeid(Nigozi::SpriteRendererComponent).hash_code() + (size_t)m_selectionContext),
-                ImGuiTreeNodeFlags_DefaultOpen, "Sprite Renderer")) {
-            auto& sprite = entity.GetComponent<Nigozi::SpriteRendererComponent>();
-
-            ImGuiTableFlags flags =
-                ImGuiTableFlags_SizingFixedFit |
-                ImGuiTableFlags_Hideable;
-
-            // TRANSFORM TABLE
-            float availableSizeX = ImGui::GetContentRegionAvail().x;
-            // UV coordinates are often (0.0f, 0.0f) and (1.0f, 1.0f) to display an entire textures.
-            // Here are trying to display only a 32x32 pixels area of the texture, hence the UV computation.
-            // Read about UV coordinates here: https://github.com/ocornut/imgui/wiki/Image-Loading-and-Displaying-Examples
-            ImVec2 size = ImVec2(availableSizeX / 2.0f - 10.0f, availableSizeX / 2.0f - 10.0f);                     // Size of the image we want to make visible
-            ImVec2 uv0 = ImVec2(0.0f, 1.0f);                            // UV coordinates for lower-left
-            ImVec2 uv1 = ImVec2(1.0f, 0.0f);    
-            ImVec4 bg_col = ImVec4(0.0f, 0.0f, 0.0f, 1.0f);             // Black background
-            ImVec4 tint_col = ImVec4(1.0f, 1.0f, 1.0f, 1.0f);           // No tint
-            if (ImGui::ImageButton("Sprite", sprite.SpriteTexture->GetRendererID(), size, uv0, uv1, bg_col, tint_col)) {
-                std::filesystem::path result = Nigozi::FileDialogue::OpenFileDialog("png;jpg;jpeg");
-                if (!result.empty()) {
-                    std::string path = result.string();
-
-                    sprite.SpriteTexture.reset();
-                    sprite.SpriteTexture = std::make_shared<Nigozi::Texture>(path);
-                    sprite.Sprite = Nigozi::SubTexture(sprite.SpriteTexture, sprite.SpriteTexture->GetSize());
-                }
-            }
-
-            ImGui::ColorEdit4("Color", (float*)&sprite.Color);
-            int zorder = sprite.ZOrder;
-            ImGui::SliderInt("Z Order", &zorder, -127, 127);
-            sprite.ZOrder = (int16_t)zorder;
+        ImGui::ColorEdit4("Color", (float*)&sprite.Color);
+        int zorder = sprite.ZOrder;
+        ImGui::SliderInt("Z Order", &zorder, -127, 127);
+        sprite.ZOrder = (int16_t)zorder;
             
-            glm::i32vec2 seperators = glm::i32vec2((glm::vec2)sprite.Sprite.GetTextureSize() / sprite.Sprite.GetSize());
-            glm::i32vec2 lastSeperators = seperators;
-            ImGui::DragInt2("Seperators", (int*)&seperators, 1.0f, 1, 0x7fffffff);
-            if (seperators.x != lastSeperators.x || seperators.y != lastSeperators.y) {
-                glm::vec2 texSize = sprite.Sprite.GetTextureSize();
-                glm::vec2 size(texSize.x / seperators.x, texSize.y / seperators.y);
-                sprite.Sprite.SetSubTexture(size, 0, 0);
-            }
-            glm::u32vec2 slots = { sprite.Sprite.GetSlotX(), sprite.Sprite.GetSlotY() };
-            glm::u32vec2 lastSlots = slots;
-            ImGui::DragInt2("Slot", (int*)&slots, 1.0f, 0, 0x7fffffff);
-            if (slots.x != lastSlots.x || slots.y != lastSlots.y) {
-                sprite.Sprite.SetSlot(slots.x, slots.y);
-            }
-            ImGui::TreePop();
-            ImGui::Separator();
+        glm::i32vec2 seperators = glm::i32vec2((glm::vec2)sprite.Sprite.GetTextureSize() / sprite.Sprite.GetSize());
+        glm::i32vec2 lastSeperators = seperators;
+        ImGui::DragInt2("Seperators", (int*)&seperators, 1.0f, 1, 0x7fffffff);
+        if (seperators.x != lastSeperators.x || seperators.y != lastSeperators.y) {
+            glm::vec2 texSize = sprite.Sprite.GetTextureSize();
+            glm::vec2 size(texSize.x / seperators.x, texSize.y / seperators.y);
+            sprite.Sprite.SetSubTexture(size, 0, 0);
         }
+        glm::u32vec2 slots = { sprite.Sprite.GetSlotX(), sprite.Sprite.GetSlotY() };
+        glm::u32vec2 lastSlots = slots;
+        ImGui::DragInt2("Slot", (int*)&slots, 1.0f, 0, 0x7fffffff);
+        if (slots.x != lastSlots.x || slots.y != lastSlots.y) {
+            sprite.Sprite.SetSlot(slots.x, slots.y);
+        }
+        ImGui::TreePop();
+        ImGui::Separator();
+    }
 
-        if (entity.HasComponent<Nigozi::AudioStreamPlayerComponent>() &&
-            ImGui::TreeNodeEx((void*)(typeid(Nigozi::AudioStreamPlayerComponent).hash_code() + (size_t)m_selectionContext),
-                ImGuiTreeNodeFlags_DefaultOpen, "Audio Stream Player")) {
-            auto& audio = entity.GetComponent<Nigozi::AudioStreamPlayerComponent>();
+    if (entity.HasComponent<Nigozi::AudioStreamPlayerComponent>() &&
+        ImGui::TreeNodeEx((void*)(typeid(Nigozi::AudioStreamPlayerComponent).hash_code() + (size_t)m_selectionContext),
+            ImGuiTreeNodeFlags_DefaultOpen, "Audio Stream Player")) {
+        auto& audio = entity.GetComponent<Nigozi::AudioStreamPlayerComponent>();
 
-            if (ImGui::Button("Choose")) {
-                std::filesystem::path result = Nigozi::FileDialogue::OpenFileDialog("wav,mp3,flac");
-                NG_CORE_LOG_INFO("New audio path: {}", result.string());
-                if (!result.empty()) {
-                    Nigozi::Audio* newAudio = nullptr;
-                    if (audio.AudioHandle) {
-                        newAudio = Nigozi::AudioEngine::LoadAudioFromFile(result, audio.AudioHandle->GetAudioGroupName());
-                    }
-                    else {
-                        newAudio = Nigozi::AudioEngine::LoadAudioFromFile(result);
-                    }
-                    NG_CORE_LOG_INFO("New audio: {}", (size_t)newAudio);
-                    if (newAudio) {
-                        if (audio.AudioHandle) {
-                            Nigozi::AudioEngine::UnloadAudio(audio.AudioHandle);
-                        }
-                        audio.AudioHandle = newAudio;
-                        audio.AudioHandle->SetVolume(audio.Volume);
-                        NG_CORE_LOG_INFO("Set audio: {}", (size_t)audio.AudioHandle);
-                    }
-                    else {
-                        NG_CORE_LOG_ERROR("Audio with path: {} couldn't load!", result.string());
-                    }
+        if (ImGui::Button("Choose")) {
+            std::filesystem::path result = Nigozi::FileDialogue::OpenFileDialog("wav,mp3,flac");
+            NG_CORE_LOG_INFO("New audio path: {}", result.string());
+            if (!result.empty()) {
+                Nigozi::Audio* newAudio = nullptr;
+                if (audio.AudioHandle) {
+                    newAudio = Nigozi::AudioEngine::LoadAudioFromFile(result, audio.AudioHandle->GetAudioGroupName());
                 }
                 else {
-                    NG_CORE_LOG_ERROR("Couldn't get audio path: {}", result.string());
+                    newAudio = Nigozi::AudioEngine::LoadAudioFromFile(result);
                 }
-            }
-            std::filesystem::path audioPath("empty");
-            if (audio.AudioHandle) {
-                NG_CORE_LOG_INFO(audio.AudioHandle->GetFilePath().string());
-                audioPath = audio.AudioHandle->GetFilePath();
-            }
-            std::string audioPathString = audioPath.string();
-            if (audioPathString.size() > 32) {
-                audioPathString = audioPathString.substr(audioPathString.size() - 32);
-            }
-            ImGui::Text(audioPathString.c_str());
-            if (audio.AudioHandle) {
-                if (ImGui::DragFloat("Volume", &audio.Volume, 0.2f)) {
+                NG_CORE_LOG_INFO("New audio: {}", (size_t)newAudio);
+                if (newAudio) {
+                    if (audio.AudioHandle) {
+                        Nigozi::AudioEngine::UnloadAudio(audio.AudioHandle);
+                    }
+                    audio.AudioHandle = newAudio;
                     audio.AudioHandle->SetVolume(audio.Volume);
+                    NG_CORE_LOG_INFO("Set audio: {}", (size_t)audio.AudioHandle);
                 }
-                bool lastPlayingVal = audio.AudioHandle->IsPlaying();
-                bool playingVal = lastPlayingVal;
-                if (ImGui::Checkbox("Playing", &playingVal)) {
-                    if (playingVal != lastPlayingVal) {
-                        if (playingVal) {
-                            audio.AudioHandle->Play();
-                        }
-                        else {
-                            audio.AudioHandle->Stop();
-                        }
+                else {
+                    NG_CORE_LOG_ERROR("Audio with path: {} couldn't load!", result.string());
+                }
+            }
+            else {
+                NG_CORE_LOG_ERROR("Couldn't get audio path: {}", result.string());
+            }
+        }
+        std::filesystem::path audioPath("empty");
+        if (audio.AudioHandle) {
+            NG_CORE_LOG_INFO(audio.AudioHandle->GetFilePath().string());
+            audioPath = audio.AudioHandle->GetFilePath();
+        }
+        std::string audioPathString = audioPath.string();
+        if (audioPathString.size() > 32) {
+            audioPathString = audioPathString.substr(audioPathString.size() - 32);
+        }
+        ImGui::Text(audioPathString.c_str());
+        if (audio.AudioHandle) {
+            if (ImGui::DragFloat("Volume", &audio.Volume, 0.2f)) {
+                audio.AudioHandle->SetVolume(audio.Volume);
+            }
+            bool lastPlayingVal = audio.AudioHandle->IsPlaying();
+            bool playingVal = lastPlayingVal;
+            if (ImGui::Checkbox("Playing", &playingVal)) {
+                if (playingVal != lastPlayingVal) {
+                    if (playingVal) {
+                        audio.AudioHandle->Play();
+                    }
+                    else {
+                        audio.AudioHandle->Stop();
                     }
                 }
             }
+        }
+
+        ImGui::TreePop();
+        ImGui::Separator();
+    }
+
+    if (entity.HasComponent<Nigozi::RigidbodyComponent>()) {
+        if (ImGui::TreeNodeEx((void*)(typeid(Nigozi::RigidbodyComponent).hash_code() + (size_t)m_selectionContext),
+            ImGuiTreeNodeFlags_DefaultOpen, "Rigidbody")) {
+            auto& rigidbody = entity.GetComponent<Nigozi::RigidbodyComponent>();
+
+            const char* bodyTypeNames[] = {
+                "Static", "Kinematic", "Dynamic"
+            };
+            int currentType = (int)rigidbody.Type;
+
+            ImGui::Combo("Body Type", &currentType, bodyTypeNames, 3);
+            rigidbody.Type = (Nigozi::RigidbodyComponent::BodyType)currentType;
+
+            ImGui::Checkbox("Freeze Rotation", &rigidbody.FreezeRotation);
 
             ImGui::TreePop();
-            ImGui::Separator();
-        }
-
-        if (entity.HasComponent<Nigozi::RigidbodyComponent>()) {
-            if (ImGui::TreeNodeEx((void*)(typeid(Nigozi::RigidbodyComponent).hash_code() + (size_t)m_selectionContext),
-                ImGuiTreeNodeFlags_DefaultOpen, "Rigidbody")) {
-                auto& rigidbody = entity.GetComponent<Nigozi::RigidbodyComponent>();
-
-                const char* bodyTypeNames[] = {
-                    "Static", "Kinematic", "Dynamic"
-                };
-                int currentType = (int)rigidbody.Type;
-
-                ImGui::Combo("Body Type", &currentType, bodyTypeNames, 3);
-                rigidbody.Type = (Nigozi::RigidbodyComponent::BodyType)currentType;
-
-                ImGui::Checkbox("Freeze Rotation", &rigidbody.FreezeRotation);
-
-                ImGui::TreePop();
-            }
-        }
-
-        if (entity.HasComponent<Nigozi::BoxColliderComponent>()) {
-            if (ImGui::TreeNodeEx((void*)(typeid(Nigozi::BoxColliderComponent).hash_code() + (size_t)m_selectionContext),
-                ImGuiTreeNodeFlags_DefaultOpen, "Box Collider")) {
-                auto& boxCollider = entity.GetComponent<Nigozi::BoxColliderComponent>();
-
-                ImGui::DragFloat2("Size", (float*)&boxCollider.Size, 0.05f, 0.01f);
-                ImGui::DragFloat2("Offset", (float*)&boxCollider.Offset, 0.05f);
-
-                ImGui::DragFloat("Density", &boxCollider.Density, 0.05f);
-                ImGui::DragFloat("Friction", &boxCollider.Friction, 0.05f);
-                ImGui::DragFloat("Restitution", &boxCollider.Restitution, 0.05f);
-                ImGui::DragFloat("Restitution Threshold", &boxCollider.RestitutionThreshold, 0.05f);
-
-                ImGui::TreePop();
-            }
-        }
-
-        if (ImGui::TreeNodeEx((void*)(typeid(Nigozi::TransformComponent).hash_code() + (size_t)m_selectionContext),
-            ImGuiTreeNodeFlags_DefaultOpen, "Transform")) {
-            auto& transform = entity.GetComponent<Nigozi::TransformComponent>();
-
-            ImGui::Text("Parent");
-            ImGui::SameLine();
-            Nigozi::UUID parentUUID = Nigozi::UUID::Null;
-            Nigozi::Entity parent = entity.GetParent();
-            if (entity.GetParent() != Nigozi::Entity()) {
-                parentUUID = parent.GetUUID();
-            }
-            ImGui::Button(std::to_string(parentUUID).c_str());
-            
-            ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2{ 0, 0 });
-            ImGui::PushStyleVar(ImGuiStyleVar_CellPadding, ImVec2{ 10.0f, 4.0f });
-            
-            ImGuiTableFlags flags = 
-                ImGuiTableFlags_SizingFixedFit | 
-                ImGuiTableFlags_Hideable;
-
-            // TRANSFORM TABLE
-            ImGui::BeginTable("transform_table", 2, flags);
-
-            ImGui::TableSetupColumn("##TRANSFORM_LABEL", ImGuiTableColumnFlags_WidthFixed);
-            ImGui::TableSetupColumn("##TRANSFORM_PARAMS", ImGuiTableColumnFlags_WidthStretch);
-            // --POSITION ROW
-            ImGui::TableNextRow();
-
-            // --(0)POSITION TITLE COLUMN
-            // ImGui::SetColumnWidth(0, 100);
-            ImGui::TableNextColumn();
-            ImGui::Text("Position");
-            
-            ImGui::TableNextColumn();
-
-            // --(1)POSITION TABLE COLUMN
-            ImGuiTableFlags innerFlags = 
-                ImGuiTableFlags_NoPadInnerX | 
-                ImGuiTableFlags_NoPadOuterX | 
-                ImGuiTableFlags_Hideable;
-            ImGui::BeginTable("position_value_table", 2, innerFlags);
-
-            ImGui::TableSetupColumn("##TRANSFORM_POS_X", ImGuiTableColumnFlags_WidthStretch);
-            ImGui::TableSetupColumn("##TRANSFORM_POS_Y", ImGuiTableColumnFlags_WidthStretch);
-
-            // ----POSITION ROW
-            ImGui::TableNextRow();
-
-            // ----(0)POSITION_X COLUMN
-            ImGui::TableNextColumn();
-            ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2{ 10.0f, 0.0f });
-            ImGui::Text("X");
-            ImGui::SameLine();
-
-            ImGui::PushItemWidth(-10.0f);
-            ImGui::DragFloat("##X", &transform.Position.x, 0.1f, -INFINITY, INFINITY, "%.2f");
-            ImGui::PopItemWidth();
-
-            // ----(1)POSITION_Y COLUMN
-            ImGui::TableNextColumn();
-            ImGui::Text("Y");
-            ImGui::SameLine();
-
-            ImGui::PushItemWidth(-10.0f);
-            ImGui::DragFloat("##Y", &transform.Position.y, 0.1f);
-            ImGui::PopItemWidth();
-
-            // --(1)POSITION TABLE END COLUMN
-            ImGui::EndTable();
-
-            // --SCALE ROW
-            ImGui::TableNextRow();
-
-            // --(0)SCALE TITLE COLUMN
-            ImGui::TableNextColumn();
-            ImGui::Text("Scale");
-
-            ImGui::TableNextColumn();
-
-            // --(1)SCALE TABLE COLUMN
-            ImGui::BeginTable("scale_value_table", 2, innerFlags);
-
-            ImGui::TableSetupColumn("##TRANSFORM_SCALE_X", ImGuiTableColumnFlags_WidthStretch);
-            ImGui::TableSetupColumn("##TRANSFORM_SCALE_Y", ImGuiTableColumnFlags_WidthStretch);
-
-            // ----SCALE ROW
-            ImGui::TableNextRow();
-
-            // ----(0)SCALE_X COLUMN
-            ImGui::TableNextColumn();
-            ImGui::Text("X");
-            ImGui::SameLine();
-
-            ImGui::PushItemWidth(-10.0f);
-            ImGui::DragFloat("##X", &transform.Scale.x, 0.1f);
-            ImGui::PopItemWidth();
-
-            // ----(1)SCALE_Y COLUMN
-            ImGui::TableNextColumn();
-            ImGui::Text("Y");
-            ImGui::SameLine();
-
-            ImGui::PushItemWidth(-10.0f);
-            ImGui::DragFloat("##Y", &transform.Scale.y, 0.1f);
-            ImGui::PopItemWidth();
-            ImGui::PopStyleVar();
-
-            // --(1)SCALE TABLE END COLUMN
-            ImGui::EndTable();
-
-            // ----SCALE ROW
-            ImGui::TableNextRow();
-
-            // ----(0)SCALE_X COLUMN
-            ImGui::TableNextColumn();
-            ImGui::Text("Rotation");
-
-            ImGui::TableNextColumn();
-            ImGui::PushItemWidth(-10.0f);
-            ImGui::DragFloat("##ROTATION", &transform.Rotation, 0.1f, -360.0f, 360.0f, "%.2f", ImGuiSliderFlags_WrapAround);
-            ImGui::PopItemWidth();
-
-            // TRANSFORM TABLE END
-            ImGui::EndTable();
-
-            ImGui::PopStyleVar();
-            ImGui::PopStyleVar();
-
-            ImGui::TreePop();
-            ImGui::Separator();
         }
     }
+
+    if (entity.HasComponent<Nigozi::BoxColliderComponent>()) {
+        if (ImGui::TreeNodeEx((void*)(typeid(Nigozi::BoxColliderComponent).hash_code() + (size_t)m_selectionContext),
+            ImGuiTreeNodeFlags_DefaultOpen, "Box Collider")) {
+            auto& boxCollider = entity.GetComponent<Nigozi::BoxColliderComponent>();
+
+            ImGui::DragFloat2("Size", (float*)&boxCollider.Size, 0.05f, 0.01f);
+            ImGui::DragFloat2("Offset", (float*)&boxCollider.Offset, 0.05f);
+
+            ImGui::DragFloat("Density", &boxCollider.Density, 0.05f);
+            ImGui::DragFloat("Friction", &boxCollider.Friction, 0.05f);
+            ImGui::DragFloat("Restitution", &boxCollider.Restitution, 0.05f);
+            ImGui::DragFloat("Restitution Threshold", &boxCollider.RestitutionThreshold, 0.05f);
+
+            ImGui::TreePop();
+        }
+    }
+
+    if (ImGui::TreeNodeEx((void*)(typeid(Nigozi::TransformComponent).hash_code() + (size_t)m_selectionContext),
+        ImGuiTreeNodeFlags_DefaultOpen, "Transform")) {
+        auto& transform = entity.GetComponent<Nigozi::TransformComponent>();
+
+        ImGui::Text("Parent");
+        ImGui::SameLine();
+        Nigozi::UUID parentUUID = Nigozi::UUID::Null;
+        Nigozi::Entity parent = entity.GetParent();
+        if (entity.GetParent() != Nigozi::Entity()) {
+            parentUUID = parent.GetUUID();
+        }
+        ImGui::Button(std::to_string(parentUUID).c_str());
+            
+        ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2{ 0, 0 });
+        ImGui::PushStyleVar(ImGuiStyleVar_CellPadding, ImVec2{ 10.0f, 4.0f });
+            
+        ImGuiTableFlags flags = 
+            ImGuiTableFlags_SizingFixedFit | 
+            ImGuiTableFlags_Hideable;
+
+        // TRANSFORM TABLE
+        ImGui::BeginTable("transform_table", 2, flags);
+
+        ImGui::TableSetupColumn("##TRANSFORM_LABEL", ImGuiTableColumnFlags_WidthFixed);
+        ImGui::TableSetupColumn("##TRANSFORM_PARAMS", ImGuiTableColumnFlags_WidthStretch);
+        // --POSITION ROW
+        ImGui::TableNextRow();
+
+        // --(0)POSITION TITLE COLUMN
+        // ImGui::SetColumnWidth(0, 100);
+        ImGui::TableNextColumn();
+        ImGui::Text("Position");
+            
+        ImGui::TableNextColumn();
+
+        // --(1)POSITION TABLE COLUMN
+        ImGuiTableFlags innerFlags = 
+            ImGuiTableFlags_NoPadInnerX | 
+            ImGuiTableFlags_NoPadOuterX | 
+            ImGuiTableFlags_Hideable;
+        ImGui::BeginTable("position_value_table", 2, innerFlags);
+
+        ImGui::TableSetupColumn("##TRANSFORM_POS_X", ImGuiTableColumnFlags_WidthStretch);
+        ImGui::TableSetupColumn("##TRANSFORM_POS_Y", ImGuiTableColumnFlags_WidthStretch);
+
+        // ----POSITION ROW
+        ImGui::TableNextRow();
+
+        // ----(0)POSITION_X COLUMN
+        ImGui::TableNextColumn();
+        ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2{ 10.0f, 0.0f });
+        ImGui::Text("X");
+        ImGui::SameLine();
+
+        ImGui::PushItemWidth(-10.0f);
+        ImGui::DragFloat("##X", &transform.Position.x, 0.1f, -INFINITY, INFINITY, "%.2f");
+        ImGui::PopItemWidth();
+
+        // ----(1)POSITION_Y COLUMN
+        ImGui::TableNextColumn();
+        ImGui::Text("Y");
+        ImGui::SameLine();
+
+        ImGui::PushItemWidth(-10.0f);
+        ImGui::DragFloat("##Y", &transform.Position.y, 0.1f);
+        ImGui::PopItemWidth();
+
+        // --(1)POSITION TABLE END COLUMN
+        ImGui::EndTable();
+
+        // --SCALE ROW
+        ImGui::TableNextRow();
+
+        // --(0)SCALE TITLE COLUMN
+        ImGui::TableNextColumn();
+        ImGui::Text("Scale");
+
+        ImGui::TableNextColumn();
+
+        // --(1)SCALE TABLE COLUMN
+        ImGui::BeginTable("scale_value_table", 2, innerFlags);
+
+        ImGui::TableSetupColumn("##TRANSFORM_SCALE_X", ImGuiTableColumnFlags_WidthStretch);
+        ImGui::TableSetupColumn("##TRANSFORM_SCALE_Y", ImGuiTableColumnFlags_WidthStretch);
+
+        // ----SCALE ROW
+        ImGui::TableNextRow();
+
+        // ----(0)SCALE_X COLUMN
+        ImGui::TableNextColumn();
+        ImGui::Text("X");
+        ImGui::SameLine();
+
+        ImGui::PushItemWidth(-10.0f);
+        ImGui::DragFloat("##X", &transform.Scale.x, 0.1f);
+        ImGui::PopItemWidth();
+
+        // ----(1)SCALE_Y COLUMN
+        ImGui::TableNextColumn();
+        ImGui::Text("Y");
+        ImGui::SameLine();
+
+        ImGui::PushItemWidth(-10.0f);
+        ImGui::DragFloat("##Y", &transform.Scale.y, 0.1f);
+        ImGui::PopItemWidth();
+        ImGui::PopStyleVar();
+
+        // --(1)SCALE TABLE END COLUMN
+        ImGui::EndTable();
+
+        // ----SCALE ROW
+        ImGui::TableNextRow();
+
+        // ----(0)SCALE_X COLUMN
+        ImGui::TableNextColumn();
+        ImGui::Text("Rotation");
+
+        ImGui::TableNextColumn();
+        ImGui::PushItemWidth(-10.0f);
+        ImGui::DragFloat("##ROTATION", &transform.Rotation, 0.1f, -360.0f, 360.0f, "%.2f", ImGuiSliderFlags_WrapAround);
+        ImGui::PopItemWidth();
+
+        // TRANSFORM TABLE END
+        ImGui::EndTable();
+
+        ImGui::PopStyleVar();
+        ImGui::PopStyleVar();
+
+        ImGui::TreePop();
+        ImGui::Separator();
+    }
+
     ImGui::End();
 }
 
@@ -836,31 +879,59 @@ void EditorLayer::ShowAddNodeModal()
         }
         ImGui::SameLine();
         if (ImGui::Button("Add")) {
-            Nigozi::Entity entity = m_currentContext->CreateEntity("New Node", "Empty");
+            class CommandParams {
+            public:
+                Nigozi::UUID UUID;
+                Nigozi::UUID ParentUUID = Nigozi::UUID::Null;
+            };
 
-            if (entity.GetUUID() != m_currentContext->GetSceneRootUUID() && m_selectionContext != entt::null) {
-                entity.SetParentUUID(Nigozi::Entity(m_selectionContext, m_currentContext.get()).GetUUID());
+            CommandParams params;
+            Nigozi::UUID sceneRootUuid = m_currentContext->GetSceneRootUUID();
+            if (sceneRootUuid.GetUUID() != Nigozi::UUID::Null && m_selectionContext != entt::null) {
+                params.ParentUUID = Nigozi::Entity(m_selectionContext, m_currentContext.get()).GetUUID();
             }
-            else if (entity.GetUUID() != m_currentContext->GetSceneRootUUID()) {
-                entity.SetParentUUID(m_currentContext->GetSceneRootUUID());
+            else if (sceneRootUuid.GetUUID() != Nigozi::UUID::Null && params.UUID != sceneRootUuid) {
+                params.ParentUUID = m_currentContext->GetSceneRootUUID();
             }
 
-            AddComponent<Nigozi::SpriteRendererComponent>(entity, itemSelectedIndex == NodeTypes::SPRITE_RENDERER);
-            AddComponent<Nigozi::RigidbodyComponent>(entity, itemSelectedIndex == NodeTypes::RIGID_BODY);
-            // Rigidbody needs a box collider and we shoulnt have box collider as a seperate node
-            AddComponent<Nigozi::BoxColliderComponent>(entity, itemSelectedIndex == NodeTypes::RIGID_BODY);
-            AddComponent<Nigozi::AudioStreamPlayerComponent>(entity, itemSelectedIndex == NodeTypes::AUDIO_STREAM_PLAYER);
-            AddComponent<Nigozi::CameraComponent>(entity, itemSelectedIndex == NodeTypes::CAMERA);
+            m_commandQueue.PushBack(Command(
+                [&, itemSelectedIndex = itemSelectedIndex](void* data) {
+                    CommandParams* params = (CommandParams*)data;
+                    Nigozi::Entity entity = m_currentContext->CreateEntity("New Node", "Empty", params->UUID);
+                    
+                    entity.SetParentUUID(params->ParentUUID);
 
-            if (itemSelectedIndex == NodeTypes::CAMERA) {
-                auto cameraView = m_currentContext->m_Registry.view<Nigozi::CameraComponent>();
-                for (auto [entityHandle, otherCamera] : cameraView.each()) {
-                    if (entityHandle != entity.GetHandle()) {
-                        otherCamera.Current = false;
+                    AddComponent<Nigozi::SpriteRendererComponent>(entity, itemSelectedIndex == NodeTypes::SPRITE_RENDERER);
+                    AddComponent<Nigozi::RigidbodyComponent>(entity, itemSelectedIndex == NodeTypes::RIGID_BODY);
+                    // Rigidbody needs a box collider and we shoulnt have box collider as a seperate node
+                    AddComponent<Nigozi::BoxColliderComponent>(entity, itemSelectedIndex == NodeTypes::RIGID_BODY);
+                    AddComponent<Nigozi::AudioStreamPlayerComponent>(entity, itemSelectedIndex == NodeTypes::AUDIO_STREAM_PLAYER);
+                    AddComponent<Nigozi::CameraComponent>(entity, itemSelectedIndex == NodeTypes::CAMERA);
+
+                    if (itemSelectedIndex == NodeTypes::CAMERA) {
+                        auto cameraView = m_currentContext->m_Registry.view<Nigozi::CameraComponent>();
+                        for (auto [entityHandle, otherCamera] : cameraView.each()) {
+                            if (entityHandle != entity.GetHandle()) {
+                                otherCamera.Current = false;
+                            }
+                        }
+                    }
+                    m_selectionContext = entity.GetHandle();
+                },
+                [&, itemSelectedIndex = itemSelectedIndex](void* data) {
+                    CommandParams* params = (CommandParams*)data;
+                    Nigozi::Entity entity = m_currentContext->TryGetEntityByUUID(params->UUID);
+
+                    m_selectionContext = entity.GetParent().GetHandle();
+                    if (m_movingSelectionContext == entity.GetHandle()) {
+                        m_movingSelectionContext = m_selectionContext;
+                    }
+
+                    if (entity != Nigozi::Entity()) {
+                        entity.Destroy();
                     }
                 }
-            }
-            m_selectionContext = entity.GetHandle();
+            ), params);
 
             ImGui::CloseCurrentPopup();
         }
@@ -889,9 +960,18 @@ void EditorLayer::ShowViewport()
         buttonHovered = true;
         m_tool = Tool::ROTATE;
     }
-    if (ImGui::Button("Play")) {
-        m_editorState = EditorState::PLAY;
-        m_currentContext->OnAttach();
+    if (ImGui::Button("Play") && m_currentContext->GetSceneRootUUID().GetUUID() != Nigozi::UUID::Null) {
+        if (SaveAllScenes()) {
+            m_lastContext = m_currentContext;
+            m_currentContext = std::make_shared<Nigozi::SceneTree>();
+            m_currentContext->DeserializeScene(m_lastContext->GetFilePath());
+            m_currentContext->OnAttach();
+
+            m_selectionContext = entt::null;
+            m_movingSelectionContext = entt::null;
+            
+            m_editorState = EditorState::PLAY;
+        }
     }
     ImGui::SameLine();
     if (ImGui::Button("Pause") && m_editorState == EditorState::PLAY) {
@@ -899,22 +979,58 @@ void EditorLayer::ShowViewport()
     }
     ImGui::SameLine();
     if (ImGui::Button("Stop")) {
-        Nigozi::Entity entity = m_currentContext->TryGetEntityByUUID(m_currentContext->GetSceneRootUUID());
-        auto scene = entity.GetComponent<Nigozi::SceneComponent>();
-        if (std::filesystem::exists(scene.FilePath) && !std::filesystem::is_directory(scene.FilePath)) {
-            m_currentContext->OnDetach();
-            m_currentContext->ClearSceneTree();
-            m_currentContext->DeserializeScene(scene.FilePath);
-            m_selectionContext = entt::null;
-            m_movingSelectionContext = entt::null;
-        }
+        m_currentContext.reset();
+        m_currentContext = m_lastContext;
+
+        m_selectionContext = entt::null;
+        m_movingSelectionContext = entt::null;
+
         m_editorState = EditorState::EDIT;
     }
     if (ImGui::IsItemHovered()) buttonHovered = true;
 
+    ImGuiTabBarFlags tab_bar_flags = 
+        ImGuiTabBarFlags_AutoSelectNewTabs | 
+        ImGuiTabBarFlags_Reorderable | 
+        ImGuiTabBarFlags_FittingPolicyResizeDown;
+    std::shared_ptr<Nigozi::SceneTree> closeContext;
+    
+    if (m_editorState == EditorState::EDIT && ImGui::BeginTabBar("SceneTab", tab_bar_flags)) {
+        for (const auto& context : m_sceneTreeContexts) {
+            std::string name = "*";
+            if (context->HasFilePath()) {
+                name = context->GetFilePath().filename().string();
+            }
+            bool contextOpen = true;
+            ImGui::PushID((std::to_string((uint64_t)context.get()).c_str()));
+            if (ImGui::BeginTabItem(name.c_str(), &contextOpen)) {
+                if (m_currentContext != context) {
+                    m_currentContext = context;
+                }
+                ImGui::EndTabItem();
+            }
+            if (!contextOpen) {
+                closeContext = context;
+            }
+            ImGui::PopID();
+        }
+        if (ImGui::TabItemButton("+", ImGuiTabItemFlags_Trailing | ImGuiTabItemFlags_NoTooltip)) {
+            m_currentContext = std::make_shared<Nigozi::SceneTree>();
+            m_sceneTreeContexts.push_back(m_currentContext);
+        }
+        ImGui::EndTabBar();
+    }
+    if (m_editorState == EditorState::EDIT && closeContext.get()) {
+        CloseSceneTab(closeContext);
+    }
+
     m_viewportSize = ImGui::GetContentRegionAvail();
 
     ImVec2 viewportFrameSize = ImGui::GetContentRegionMax();
+    
+    ImVec2 padding{ viewportFrameSize.x - m_viewportSize.x, viewportFrameSize.y - m_viewportSize.y };
+    padding.y += ImGui::GetFrameHeight();
+    
     if (m_editorState == EditorState::PLAY || m_editorState == EditorState::PAUSE) {
         auto cameraView = m_currentContext->m_Registry.view<Nigozi::CameraComponent>();
         for (auto [entity, camera] : cameraView.each()) {
@@ -931,8 +1047,6 @@ void EditorLayer::ShowViewport()
             break;
         }
     }
-    ImVec2 padding{ viewportFrameSize.x - m_viewportSize.x, viewportFrameSize.y - m_viewportSize.y };
-    padding.y += ImGui::GetFrameHeight();
 
     ImVec2 availableFrameSize = ImGui::GetContentRegionAvail();
     ImVec2 offset
@@ -941,12 +1055,127 @@ void EditorLayer::ShowViewport()
         (availableFrameSize.y - m_viewportSize.y) / 2.0f 
     };
 
-    ImGui::SetCursorPosX(ImGui::GetCursorPosX() + offset.x);
-    ImGui::SetCursorPosY(ImGui::GetCursorPosY() + offset.y);
-
     m_viewportPosition = glm::vec2(ImGui::GetWindowPos().x + padding.x + offset.x, ImGui::GetWindowPos().y + padding.y + offset.y);
 
+    ImGui::SetCursorPosX(ImGui::GetCursorPosX() + offset.x);
+    ImGui::SetCursorPosY(ImGui::GetCursorPosY() + offset.y);
+    
     ImGui::Image((uint64_t)(p_viewportBuffer->GetColorAttachment()), m_viewportSize, ImVec2(0, 1), ImVec2(1, 0));
+    
     m_viewportHovered = ImGui::IsWindowHovered() && !buttonHovered;
     ImGui::End();
+}
+
+void EditorLayer::CloseSceneTab(const std::shared_ptr<Nigozi::SceneTree>& sceneContext)
+{
+    auto it = std::find(m_sceneTreeContexts.begin(), m_sceneTreeContexts.end(), sceneContext);
+    if (it == m_sceneTreeContexts.end()) {
+        NG_CLIENT_LOG_ERROR("Couldn't find context in vector! {}", (void*)sceneContext.get());
+        return;
+    }
+
+    if (m_sceneTreeContexts.size() == 1 && !sceneContext->HasFilePath()) {
+        return;
+    }
+
+    m_commandQueue.PushBack(Command(
+        [&, filePath = sceneContext->GetFilePath()](void* data) {
+            for (auto it = m_sceneTreeContexts.begin(); it != m_sceneTreeContexts.end(); ++it) {
+                if ((*it)->GetFilePath() == filePath) {
+                    if (it == m_sceneTreeContexts.begin() && m_sceneTreeContexts.size() == 1) {
+                        m_currentContext = std::make_shared<Nigozi::SceneTree>();
+                        m_sceneTreeContexts.push_back(m_currentContext);
+                    }
+                    else if (it == m_sceneTreeContexts.begin()) {
+                        m_currentContext = (*std::next(it));
+                    }
+                    else {
+                        m_currentContext = (*std::prev(it));
+                    }
+                    m_sceneTreeContexts.erase(it);
+                    break;
+                }
+            }
+        },
+        [&, filePath = sceneContext->GetFilePath()](void* data) {
+            m_currentContext = std::make_shared<Nigozi::SceneTree>();
+            m_currentContext->DeserializeScene(filePath);
+            m_sceneTreeContexts.push_back(m_currentContext);
+        })
+    );
+}
+
+bool EditorLayer::SaveAllScenes()
+{
+    for (const auto& context : m_sceneTreeContexts) {
+        if (!SaveScene(context)) {
+            return false;
+        }
+    }
+    return true;
+}
+
+bool EditorLayer::SaveScene(const std::shared_ptr<Nigozi::SceneTree>& context)
+{
+    if (context->HasFilePath()) {
+        return context->SerializeScene();
+    }
+    std::filesystem::path savePath = Nigozi::FileDialogue::OpenSaveDialog("ngscn");
+    if (!savePath.empty()) {
+        return context->SerializeScene(savePath);
+    }
+    return false;
+}
+
+bool EditorLayer::SaveCurrentScene()
+{
+    if (m_currentContext->HasFilePath()) {
+        return m_currentContext->SerializeScene();
+    }
+    std::filesystem::path savePath = Nigozi::FileDialogue::OpenSaveDialog("ngscn");
+    if (!savePath.empty()) {
+        return m_currentContext->SerializeScene(savePath);
+    }
+    return false;
+}
+
+bool EditorLayer::SaveCurrentSceneAs()
+{
+    std::filesystem::path savePath = Nigozi::FileDialogue::OpenSaveDialog("ngscn");
+    if (!savePath.empty()) {
+        return m_currentContext->SerializeScene(savePath);
+    }
+    return false;
+}
+
+void EditorLayer::LoadScene()
+{
+    std::filesystem::path scenePath = Nigozi::FileDialogue::OpenFileDialog("ngscn");
+    if (scenePath.empty()) {
+        return;
+    }
+    for (const auto& context : m_sceneTreeContexts) {
+        if (context->GetFilePath() == scenePath) {
+            return;
+        }
+    }
+
+    m_commandQueue.PushBack(Command(
+        [&, filePath = scenePath](void* data) {
+            auto sceneContext = std::make_shared<Nigozi::SceneTree>();
+            m_currentContext = sceneContext;
+            m_sceneTreeContexts.push_back(m_currentContext);
+            m_currentContext->DeserializeScene(filePath);
+        },
+        [&, filePath = scenePath](void* data) {
+            for (auto it = m_sceneTreeContexts.begin(); it < m_sceneTreeContexts.end(); ++it) {
+                if ((*it)->GetFilePath() == filePath) {
+                    m_sceneTreeContexts.erase(it);
+                    m_selectionContext = entt::null;
+                    m_movingSelectionContext = entt::null;
+                    break;
+                }
+            }
+        })
+    );
 }

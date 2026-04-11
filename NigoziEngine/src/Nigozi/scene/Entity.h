@@ -62,6 +62,19 @@ namespace Nigozi
 		}
 
 		void Destroy() {
+			if (!p_scene->m_Registry.valid(m_entityHandle)) {
+				return;
+			}
+
+			if (GetUUID() == p_scene->m_sceneRootUUID) {
+				p_scene->m_sceneRootUUID = UUID::Null;
+			}
+
+			SetParentUUID(UUID::Null);
+			for (Entity child : GetChildren()) {
+				child.Destroy();
+			}
+
 			p_scene->m_Registry.destroy(m_entityHandle);
 		}
 

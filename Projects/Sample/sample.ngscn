@@ -225,7 +225,7 @@
         {
             "camera": {
                 "aspect": 1.7777777910232544,
-                "current": true,
+                "current": false,
                 "zoom": 5.0
             },
             "name": {
@@ -358,6 +358,36 @@
             },
             "uuid": {
                 "id": 13234964329535521412
+            }
+        },
+        {
+            "camera": {
+                "aspect": 1.7777777910232544,
+                "current": true,
+                "zoom": 5.0
+            },
+            "name": {
+                "name": "New Node"
+            },
+            "relationship": {
+                "parentUuid": 5162139645558248151
+            },
+            "tag": {
+                "tag": "Empty"
+            },
+            "transform": {
+                "position": {
+                    "x": 0.0,
+                    "y": 0.0
+                },
+                "rotation": 0.0,
+                "scale": {
+                    "x": 1.0,
+                    "y": 1.0
+                }
+            },
+            "uuid": {
+                "id": 17229220921010365816
             }
         }
     ]

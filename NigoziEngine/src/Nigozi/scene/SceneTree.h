@@ -10,6 +10,7 @@ namespace Nigozi
 {
 	class Entity;
 	class TransformComponent;
+	class CameraComponent;
 
 	/*
 		TODO: There probably should be different versions of a scene,
@@ -22,7 +23,8 @@ namespace Nigozi
 		SceneTree() = default;
 		~SceneTree();
 
-		void SerializeScene(const std::filesystem::path& filePath);
+		bool SerializeScene();
+		bool SerializeScene(const std::filesystem::path& filePath);
 		void DeserializeScene(const std::filesystem::path& filePath);
 
 		void ClearSceneTree();
@@ -44,13 +46,18 @@ namespace Nigozi
 		void OnEditorRender();
 		void OnEditorImGuiRender();
 
+		inline const std::filesystem::path GetFilePath() const { return m_filePath; }
+		inline bool HasFilePath() const { return !m_filePath.empty(); }
+
 		TransformComponent GetWorldSpaceTransform(Entity entity) const;
 
-		Entity CreateEntity(const std::string& name, const std::string& tag);
+		Entity CreateEntity(const std::string& name, const std::string& tag, UUID uuid = UUID());
 		Entity TryGetEntityByUUID(UUID uuid);
 		Entity TryGetEntityByTag(const std::string& tag = "");
 		std::vector<Entity> TryGetEntitiesByTag(const std::string& tag = "");
 		bool DestroyEntity(Entity entity);
+
+		CameraComponent* GetMainCamera();
 
 		inline UUID GetSceneRootUUID() const { return m_sceneRootUUID; }
 	private:
@@ -61,6 +68,8 @@ namespace Nigozi
 	private:
 		std::unordered_map<UUID, Entity> m_entityMap;
 		UUID m_sceneRootUUID = UUID::Null;
+
+		std::filesystem::path m_filePath;
 
 		b2World* p_physicsWorld = nullptr;
 	};

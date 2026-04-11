@@ -16,15 +16,20 @@ namespace Nigozi
         m_entityMap.clear();
     }
 
-    void SceneTree::SerializeScene(const std::filesystem::path& filePath)
+    bool SceneTree::SerializeScene()
+    {
+        return SerializeScene(m_filePath);
+    }
+
+    bool SceneTree::SerializeScene(const std::filesystem::path& filePath)
     {
         if (filePath.empty()) {
-            return;
+            return false;
         }
 
         Entity entity = TryGetEntityByUUID(m_sceneRootUUID);
         if (entity == Entity()) {
-            return;
+            return false;
         }
 
         entity.GetComponent<SceneComponent>().FilePath = filePath;
@@ -44,6 +49,10 @@ namespace Nigozi
 
         // set indent to 4
         file << std::setw(4) << data << std::endl;
+
+        m_filePath = filePath;
+
+        return true;
     }
 
     void SceneTree::DeserializeScene(const std::filesystem::path& filePath)
@@ -222,6 +231,8 @@ namespace Nigozi
                 }
             }
         }
+
+        m_filePath = filePath;
     }
 
     void SceneTree::ClearSceneTree()
@@ -421,7 +432,6 @@ namespace Nigozi
                 position.y - worldTransform.Position.y
             );
             float bodyAngle = glm::degrees(body->GetAngle());
-            NG_CORE_LOG_INFO("[Scene Tree] body angle: ID: {}, {}", (uint64_t)entityHandle, bodyAngle);
             float rotationDelta = -(bodyAngle - (worldTransform.Rotation - transform.Rotation));
 
             transform.Position += delta;
@@ -538,16 +548,17 @@ namespace Nigozi
         return thisTransform;
     }
 
-    Entity SceneTree::CreateEntity(const std::string& name, const std::string& tag)
+    Entity SceneTree::CreateEntity(const std::string& name, const std::string& tag, UUID uuid)
     {
         Entity entity = Entity(m_Registry.create(), this);
-        auto& uuid = entity.AddComponent<Nigozi::UUIDComponent>();
+        auto& uuidComponent = entity.AddComponent<Nigozi::UUIDComponent>();
+        uuidComponent.ID = uuid;
 
         if (m_entityMap.empty()) {
             entity.AddComponent<SceneComponent>();
-            m_sceneRootUUID = uuid.ID;
+            m_sceneRootUUID = uuidComponent.ID;
         }
-        m_entityMap[uuid.ID] = entity;
+        m_entityMap[uuidComponent.ID] = entity;
 
         auto& name_ = entity.AddComponent<NameComponent>();
         name_.Name = name.empty() ? "" : name;
@@ -609,5 +620,17 @@ namespace Nigozi
 
         m_Registry.destroy(entity.GetHandle());
         return true;
+    }
+
+    CameraComponent* SceneTree::GetMainCamera()
+    {
+        auto view = m_Registry.view<CameraComponent>();
+        for (auto entityHandle : view) {
+            auto& camera = Entity(entityHandle, this).GetComponent<CameraComponent>();
+            if (camera.Current) {
+                return &camera;
+            }
+        }
+        return nullptr;
     }
 }
