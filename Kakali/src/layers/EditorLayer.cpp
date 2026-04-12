@@ -565,10 +565,39 @@ void EditorLayer::ShowInspector()
             }
         }
 
-        ImGui::ColorEdit4("Color", (float*)&sprite.Color);
+        EditValueInInspector<glm::vec4>(
+            [&]() { ImGui::ColorEdit4("Color", (float*)&sprite.Color); },
+            [&](glm::vec4 color) {
+                m_commandQueue.PushBack(Command(
+                    [&, newColor = sprite.Color, uuid = uuidComponent.ID](void* data) {
+                        auto& sprite = m_currentContext->TryGetEntityByUUID(uuid).GetComponent<Nigozi::SpriteRendererComponent>();
+                        sprite.Color = newColor;
+                    },
+                    [&, oldColor = color, uuid = uuidComponent.ID](void* data) {
+                        auto& sprite = m_currentContext->TryGetEntityByUUID(uuid).GetComponent<Nigozi::SpriteRendererComponent>();
+                        sprite.Color = oldColor;
+                    }
+                ));
+            },
+            uuidComponent.ID,
+            sprite.Color
+        );
         int zorder = sprite.ZOrder;
-        ImGui::SliderInt("Z Order", &zorder, -127, 127);
-        sprite.ZOrder = (int16_t)zorder;
+        EditValueInInspector<int>(
+            [&]() { ImGui::SliderInt("Z Order", &zorder, -127, 127); sprite.ZOrder = (int16_t)zorder; },
+            [&](int zorder) {
+                m_commandQueue.PushBack(Command(
+                    [&, newZOrder = sprite.ZOrder, uuid = uuidComponent.ID](void* data) {
+                        sprite.ZOrder = (int16_t)newZOrder;
+                    },
+                    [&, oldZOrder = zorder, uuid = uuidComponent.ID](void* data) {
+                        sprite.ZOrder = (int16_t)oldZOrder;
+                    }
+                ));
+            },
+            uuidComponent.ID,
+            sprite.ZOrder
+        );
             
         glm::i32vec2 seperators = glm::i32vec2((glm::vec2)sprite.Sprite.GetTextureSize() / sprite.Sprite.GetSize());
         glm::i32vec2 lastSeperators = seperators;
@@ -623,7 +652,6 @@ void EditorLayer::ShowInspector()
         }
         std::filesystem::path audioPath("empty");
         if (audio.AudioHandle) {
-            NG_CORE_LOG_INFO(audio.AudioHandle->GetFilePath().string());
             audioPath = audio.AudioHandle->GetFilePath();
         }
         std::string audioPathString = audioPath.string();
@@ -632,9 +660,29 @@ void EditorLayer::ShowInspector()
         }
         ImGui::Text(audioPathString.c_str());
         if (audio.AudioHandle) {
-            if (ImGui::DragFloat("Volume", &audio.Volume, 0.2f)) {
-                audio.AudioHandle->SetVolume(audio.Volume);
-            }
+            EditValueInInspector<float>(
+                [&]() {
+                    if (ImGui::DragFloat("Volume", &audio.Volume, 0.2f)) {
+                        audio.AudioHandle->SetVolume(audio.Volume);
+                    }
+                },
+                [&](float volume) {
+                    m_commandQueue.PushBack(Command(
+                        [&, newVolume = audio.Volume, uuid = uuidComponent.ID](void* data) {
+                            auto& audio = m_currentContext->TryGetEntityByUUID(uuid).GetComponent<Nigozi::AudioStreamPlayerComponent>();
+                            audio.Volume = newVolume;
+                            audio.AudioHandle->SetVolume(audio.Volume);
+                        },
+                        [&, oldVolume = volume, uuid = uuidComponent.ID](void* data) {
+                            auto& audio = m_currentContext->TryGetEntityByUUID(uuid).GetComponent<Nigozi::AudioStreamPlayerComponent>();
+                            audio.Volume = oldVolume;
+                            audio.AudioHandle->SetVolume(audio.Volume);
+                        }
+                    ));
+                },
+                uuidComponent.ID,
+                audio.Volume
+            );
             bool lastPlayingVal = audio.AudioHandle->IsPlaying();
             bool playingVal = lastPlayingVal;
             if (ImGui::Checkbox("Playing", &playingVal)) {
@@ -662,11 +710,43 @@ void EditorLayer::ShowInspector()
                 "Static", "Kinematic", "Dynamic"
             };
             int currentType = (int)rigidbody.Type;
+            ImGui::Combo("Body Type", &currentType, bodyTypeNames, 3); rigidbody.Type = (Nigozi::RigidbodyComponent::BodyType)currentType;
+            // TODO: Combo boxes send different events
+            // EditValueInInspector<Nigozi::RigidbodyComponent::BodyType>(
+            //     [&]() { ImGui::Combo("Body Type", &currentType, bodyTypeNames, 3); rigidbody.Type = (Nigozi::RigidbodyComponent::BodyType)currentType; },
+            //     [&](Nigozi::RigidbodyComponent::BodyType type) {
+            //         m_commandQueue.PushBack(Command(
+            //             [&, newType = rigidbody.Type, uuid = uuidComponent.ID](void* data) {
+            //                 auto& rigidbody = m_currentContext->TryGetEntityByUUID(uuid).GetComponent<Nigozi::RigidbodyComponent>();
+            //                 rigidbody.Type = newType;
+            //             },
+            //             [&, oldType = type, uuid = uuidComponent.ID](void* data) {
+            //                 auto& rigidbody = m_currentContext->TryGetEntityByUUID(uuid).GetComponent<Nigozi::RigidbodyComponent>();
+            //                 rigidbody.Type = oldType;
+            //             }
+            //         ));
+            //     },
+            //     uuidComponent.ID,
+            //     rigidbody.Type
+            // );
 
-            ImGui::Combo("Body Type", &currentType, bodyTypeNames, 3);
-            rigidbody.Type = (Nigozi::RigidbodyComponent::BodyType)currentType;
-
-            ImGui::Checkbox("Freeze Rotation", &rigidbody.FreezeRotation);
+            EditValueInInspector<bool>(
+                [&]() { ImGui::Checkbox("Freeze Rotation", &rigidbody.FreezeRotation); },
+                [&](bool freezeRotation) {
+                    m_commandQueue.PushBack(Command(
+                        [&, newRotation = rigidbody.FreezeRotation, uuid = uuidComponent.ID](void* data) {
+                            auto& rigidbody = m_currentContext->TryGetEntityByUUID(uuid).GetComponent<Nigozi::RigidbodyComponent>();
+                            rigidbody.FreezeRotation = newRotation;
+                        },
+                        [&, oldRotation = freezeRotation, uuid = uuidComponent.ID](void* data) {
+                            auto& rigidbody = m_currentContext->TryGetEntityByUUID(uuid).GetComponent<Nigozi::RigidbodyComponent>();
+                            rigidbody.FreezeRotation = oldRotation;
+                        }
+                    ));
+                },
+                uuidComponent.ID,
+                rigidbody.FreezeRotation
+            );
 
             ImGui::TreePop();
         }
@@ -677,13 +757,109 @@ void EditorLayer::ShowInspector()
             ImGuiTreeNodeFlags_DefaultOpen, "Box Collider")) {
             auto& boxCollider = entity.GetComponent<Nigozi::BoxColliderComponent>();
 
-            ImGui::DragFloat2("Size", (float*)&boxCollider.Size, 0.05f, 0.01f);
-            ImGui::DragFloat2("Offset", (float*)&boxCollider.Offset, 0.05f);
+            EditValueInInspector<glm::vec2>(
+                [&]() { ImGui::DragFloat2("Size", (float*)&boxCollider.Size, 0.05f, 0.01f); },
+                [&](glm::vec2 size) {
+                    m_commandQueue.PushBack(Command(
+                        [&, newSize = boxCollider.Size, uuid = uuidComponent.ID](void* data) {
+                            auto& boxCollider = m_currentContext->TryGetEntityByUUID(uuid).GetComponent<Nigozi::BoxColliderComponent>();
+                            boxCollider.Size = newSize;
+                        },
+                        [&, oldSize = size, uuid = uuidComponent.ID](void* data) {
+                            auto& boxCollider = m_currentContext->TryGetEntityByUUID(uuid).GetComponent<Nigozi::BoxColliderComponent>();
+                            boxCollider.Size = oldSize;
+                        }
+                    ));
+                },
+                uuidComponent.ID,
+                boxCollider.Size
+            );
+            EditValueInInspector<glm::vec2>(
+                [&]() { ImGui::DragFloat2("Offset", (float*)&boxCollider.Offset, 0.05f); },
+                [&](glm::vec2 offset) {
+                    m_commandQueue.PushBack(Command(
+                        [&, newOffset = boxCollider.Offset, uuid = uuidComponent.ID](void* data) {
+                            auto& boxCollider = m_currentContext->TryGetEntityByUUID(uuid).GetComponent<Nigozi::BoxColliderComponent>();
+                            boxCollider.Offset = newOffset;
+                        },
+                        [&, oldOffset = offset, uuid = uuidComponent.ID](void* data) {
+                            auto& boxCollider = m_currentContext->TryGetEntityByUUID(uuid).GetComponent<Nigozi::BoxColliderComponent>();
+                            boxCollider.Offset = oldOffset;
+                        }
+                    ));
+                },
+                uuidComponent.ID,
+                boxCollider.Offset
+            );
 
-            ImGui::DragFloat("Density", &boxCollider.Density, 0.05f);
-            ImGui::DragFloat("Friction", &boxCollider.Friction, 0.05f);
-            ImGui::DragFloat("Restitution", &boxCollider.Restitution, 0.05f);
-            ImGui::DragFloat("Restitution Threshold", &boxCollider.RestitutionThreshold, 0.05f);
+            EditValueInInspector<float>(
+                [&]() { ImGui::DragFloat("Density", &boxCollider.Density, 0.05f); },
+                [&](float density) {
+                    m_commandQueue.PushBack(Command(
+                        [&, newDensity = boxCollider.Density, uuid = uuidComponent.ID](void* data) {
+                            auto& boxCollider = m_currentContext->TryGetEntityByUUID(uuid).GetComponent<Nigozi::BoxColliderComponent>();
+                            boxCollider.Density = newDensity;
+                        },
+                        [&, oldDensity = density, uuid = uuidComponent.ID](void* data) {
+                            auto& boxCollider = m_currentContext->TryGetEntityByUUID(uuid).GetComponent<Nigozi::BoxColliderComponent>();
+                            boxCollider.Density = oldDensity;
+                        }
+                    ));
+                },
+                uuidComponent.ID,
+                boxCollider.Density
+            );
+            EditValueInInspector<float>(
+                [&]() { ImGui::DragFloat("Friction", &boxCollider.Friction, 0.05f); },
+                [&](float friction) {
+                    m_commandQueue.PushBack(Command(
+                        [&, newFriction = boxCollider.Friction, uuid = uuidComponent.ID](void* data) {
+                            auto& boxCollider = m_currentContext->TryGetEntityByUUID(uuid).GetComponent<Nigozi::BoxColliderComponent>();
+                            boxCollider.Friction = newFriction;
+                        },
+                        [&, oldFriction = friction, uuid = uuidComponent.ID](void* data) {
+                            auto& boxCollider = m_currentContext->TryGetEntityByUUID(uuid).GetComponent<Nigozi::BoxColliderComponent>();
+                            boxCollider.Friction = oldFriction;
+                        }
+                    ));
+                },
+                uuidComponent.ID,
+                boxCollider.Friction
+            );
+            EditValueInInspector<float>(
+                [&]() { ImGui::DragFloat("Restitution", &boxCollider.Restitution, 0.05f); },
+                [&](float restitution) {
+                    m_commandQueue.PushBack(Command(
+                        [&, newRestitution = boxCollider.Restitution, uuid = uuidComponent.ID](void* data) {
+                            auto& boxCollider = m_currentContext->TryGetEntityByUUID(uuid).GetComponent<Nigozi::BoxColliderComponent>();
+                            boxCollider.Restitution = newRestitution;
+                        },
+                        [&, oldRestitution = restitution, uuid = uuidComponent.ID](void* data) {
+                            auto& boxCollider = m_currentContext->TryGetEntityByUUID(uuid).GetComponent<Nigozi::BoxColliderComponent>();
+                            boxCollider.Restitution = oldRestitution;
+                        }
+                    ));
+                },
+                uuidComponent.ID,
+                boxCollider.Restitution
+            );
+            EditValueInInspector<float>(
+                [&]() { ImGui::DragFloat("Restitution Threshold", &boxCollider.RestitutionThreshold, 0.05f); },
+                [&](float restitutionThreshold) {
+                    m_commandQueue.PushBack(Command(
+                        [&, newRestitutionThreshold = boxCollider.RestitutionThreshold, uuid = uuidComponent.ID](void* data) {
+                            auto& boxCollider = m_currentContext->TryGetEntityByUUID(uuid).GetComponent<Nigozi::BoxColliderComponent>();
+                            boxCollider.RestitutionThreshold = newRestitutionThreshold;
+                        },
+                        [&, oldRestitutionThreshold = restitutionThreshold, uuid = uuidComponent.ID](void* data) {
+                            auto& boxCollider = m_currentContext->TryGetEntityByUUID(uuid).GetComponent<Nigozi::BoxColliderComponent>();
+                            boxCollider.RestitutionThreshold = oldRestitutionThreshold;
+                        }
+                    ));
+                },
+                uuidComponent.ID,
+                boxCollider.RestitutionThreshold
+            );
 
             ImGui::TreePop();
         }
@@ -701,12 +877,12 @@ void EditorLayer::ShowInspector()
             parentUUID = parent.GetUUID();
         }
         ImGui::Button(std::to_string(parentUUID).c_str());
-            
+
         ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2{ 0, 0 });
         ImGui::PushStyleVar(ImGuiStyleVar_CellPadding, ImVec2{ 10.0f, 4.0f });
-            
-        ImGuiTableFlags flags = 
-            ImGuiTableFlags_SizingFixedFit | 
+
+        ImGuiTableFlags flags =
+            ImGuiTableFlags_SizingFixedFit |
             ImGuiTableFlags_Hideable;
 
         // TRANSFORM TABLE
@@ -721,13 +897,13 @@ void EditorLayer::ShowInspector()
         // ImGui::SetColumnWidth(0, 100);
         ImGui::TableNextColumn();
         ImGui::Text("Position");
-            
+
         ImGui::TableNextColumn();
 
         // --(1)POSITION TABLE COLUMN
-        ImGuiTableFlags innerFlags = 
-            ImGuiTableFlags_NoPadInnerX | 
-            ImGuiTableFlags_NoPadOuterX | 
+        ImGuiTableFlags innerFlags =
+            ImGuiTableFlags_NoPadInnerX |
+            ImGuiTableFlags_NoPadOuterX |
             ImGuiTableFlags_Hideable;
         ImGui::BeginTable("position_value_table", 2, innerFlags);
 
@@ -744,7 +920,23 @@ void EditorLayer::ShowInspector()
         ImGui::SameLine();
 
         ImGui::PushItemWidth(-10.0f);
-        ImGui::DragFloat("##X", &transform.Position.x, 0.1f, -INFINITY, INFINITY, "%.2f");
+        EditValueInInspector<float>(
+            [&]() {  ImGui::DragFloat("##X", &transform.Position.x, 0.1f, -INFINITY, INFINITY, "%.2f"); },
+            [&](float positionX) {
+                m_commandQueue.PushBack(Command(
+                    [&, newPositionX = transform.Position.x, uuid = uuidComponent.ID](void* data) {
+                        auto& transform = m_currentContext->TryGetEntityByUUID(uuid).GetComponent<Nigozi::TransformComponent>();
+                        transform.Position.x = newPositionX;
+                    },
+                    [&, oldPositionX = positionX, uuid = uuidComponent.ID](void* data) {
+                        auto& transform = m_currentContext->TryGetEntityByUUID(uuid).GetComponent<Nigozi::TransformComponent>();
+                        transform.Position.x = oldPositionX;
+                    }
+                ));
+            },
+            uuidComponent.ID,
+            transform.Position.x
+        );
         ImGui::PopItemWidth();
 
         // ----(1)POSITION_Y COLUMN
@@ -753,7 +945,23 @@ void EditorLayer::ShowInspector()
         ImGui::SameLine();
 
         ImGui::PushItemWidth(-10.0f);
-        ImGui::DragFloat("##Y", &transform.Position.y, 0.1f);
+        EditValueInInspector<float>(
+            [&]() {  ImGui::DragFloat("##Y", &transform.Position.y, 0.1f, -INFINITY, INFINITY, "%.2f"); },
+            [&](float positionY) {
+                m_commandQueue.PushBack(Command(
+                    [&, newPositionY = transform.Position.y, uuid = uuidComponent.ID](void* data) {
+                        auto& transform = m_currentContext->TryGetEntityByUUID(uuid).GetComponent<Nigozi::TransformComponent>();
+                        transform.Position.y = newPositionY;
+                    },
+                    [&, oldPositionY = positionY, uuid = uuidComponent.ID](void* data) {
+                        auto& transform = m_currentContext->TryGetEntityByUUID(uuid).GetComponent<Nigozi::TransformComponent>();
+                        transform.Position.y = oldPositionY;
+                    }
+                ));
+            },
+            uuidComponent.ID,
+            transform.Position.y
+        );
         ImGui::PopItemWidth();
 
         // --(1)POSITION TABLE END COLUMN
@@ -783,7 +991,23 @@ void EditorLayer::ShowInspector()
         ImGui::SameLine();
 
         ImGui::PushItemWidth(-10.0f);
-        ImGui::DragFloat("##X", &transform.Scale.x, 0.1f);
+        EditValueInInspector<float>(
+            [&]() {  ImGui::DragFloat("##X", &transform.Scale.x, 0.1f); },
+            [&](float scaleX) {
+                m_commandQueue.PushBack(Command(
+                    [&, newScaleX = transform.Scale.x, uuid = uuidComponent.ID](void* data) {
+                        auto& transform = m_currentContext->TryGetEntityByUUID(uuid).GetComponent<Nigozi::TransformComponent>();
+                        transform.Scale.x = newScaleX;
+                    },
+                    [&, oldScaleX = scaleX, uuid = uuidComponent.ID](void* data) {
+                        auto& transform = m_currentContext->TryGetEntityByUUID(uuid).GetComponent<Nigozi::TransformComponent>();
+                        transform.Scale.x = oldScaleX;
+                    }
+                ));
+            },
+            uuidComponent.ID,
+            transform.Scale.x
+        );
         ImGui::PopItemWidth();
 
         // ----(1)SCALE_Y COLUMN
@@ -792,7 +1016,23 @@ void EditorLayer::ShowInspector()
         ImGui::SameLine();
 
         ImGui::PushItemWidth(-10.0f);
-        ImGui::DragFloat("##Y", &transform.Scale.y, 0.1f);
+        EditValueInInspector<float>(
+            [&]() { ImGui::DragFloat("##Y", &transform.Scale.y, 0.1f); },
+            [&](float scaleY) {
+                m_commandQueue.PushBack(Command(
+                    [&, newScaleY = transform.Scale.y, uuid = uuidComponent.ID](void* data) {
+                        auto& transform = m_currentContext->TryGetEntityByUUID(uuid).GetComponent<Nigozi::TransformComponent>();
+                        transform.Scale.y = newScaleY;
+                    },
+                    [&, oldScaleY = scaleY, uuid = uuidComponent.ID](void* data) {
+                        auto& transform = m_currentContext->TryGetEntityByUUID(uuid).GetComponent<Nigozi::TransformComponent>();
+                        transform.Scale.y = oldScaleY;
+                    }
+                ));
+            },
+            uuidComponent.ID,
+            transform.Scale.y
+        );
         ImGui::PopItemWidth();
         ImGui::PopStyleVar();
 
@@ -808,7 +1048,24 @@ void EditorLayer::ShowInspector()
 
         ImGui::TableNextColumn();
         ImGui::PushItemWidth(-10.0f);
-        ImGui::DragFloat("##ROTATION", &transform.Rotation, 0.1f, -360.0f, 360.0f, "%.2f", ImGuiSliderFlags_WrapAround);
+        EditValueInInspector<float>(
+            [&]() { ImGui::DragFloat("##ROTATION", &transform.Rotation, 0.1f, -360.0f, 360.0f, "%.2f", ImGuiSliderFlags_WrapAround); },
+            [&](float rotation) {
+                m_commandQueue.PushBack(Command(
+                    [&, newRotation = transform.Rotation, uuid = uuidComponent.ID](void* data) {
+                        auto& transform = m_currentContext->TryGetEntityByUUID(uuid).GetComponent<Nigozi::TransformComponent>();
+                        transform.Rotation = newRotation;
+                    },
+                    [&, oldRotation = rotation, uuid = uuidComponent.ID](void* data) {
+                        auto& transform = m_currentContext->TryGetEntityByUUID(uuid).GetComponent<Nigozi::TransformComponent>();
+                        transform.Rotation = oldRotation;
+                    }
+                ));
+            },
+            uuidComponent.ID,
+            transform.Rotation
+        );
+        // ImGui::DragFloat("##ROTATION", &transform.Rotation, 0.1f, -360.0f, 360.0f, "%.2f", ImGuiSliderFlags_WrapAround);
         ImGui::PopItemWidth();
 
         // TRANSFORM TABLE END
@@ -879,27 +1136,22 @@ void EditorLayer::ShowAddNodeModal()
         }
         ImGui::SameLine();
         if (ImGui::Button("Add")) {
-            class CommandParams {
-            public:
-                Nigozi::UUID UUID;
-                Nigozi::UUID ParentUUID = Nigozi::UUID::Null;
-            };
+            Nigozi::UUID nodeUuid;
+            Nigozi::UUID parentUuid = Nigozi::UUID::Null;
 
-            CommandParams params;
             Nigozi::UUID sceneRootUuid = m_currentContext->GetSceneRootUUID();
             if (sceneRootUuid.GetUUID() != Nigozi::UUID::Null && m_selectionContext != entt::null) {
-                params.ParentUUID = Nigozi::Entity(m_selectionContext, m_currentContext.get()).GetUUID();
+                parentUuid = Nigozi::Entity(m_selectionContext, m_currentContext.get()).GetUUID();
             }
-            else if (sceneRootUuid.GetUUID() != Nigozi::UUID::Null && params.UUID != sceneRootUuid) {
-                params.ParentUUID = m_currentContext->GetSceneRootUUID();
+            else if (sceneRootUuid.GetUUID() != Nigozi::UUID::Null && nodeUuid != sceneRootUuid) {
+                parentUuid = m_currentContext->GetSceneRootUUID();
             }
 
             m_commandQueue.PushBack(Command(
-                [&, itemSelectedIndex = itemSelectedIndex](void* data) {
-                    CommandParams* params = (CommandParams*)data;
-                    Nigozi::Entity entity = m_currentContext->CreateEntity("New Node", "Empty", params->UUID);
+                [&, itemSelectedIndex = itemSelectedIndex, nodeUuid = nodeUuid, parentUuid = parentUuid](void* data) {
+                    Nigozi::Entity entity = m_currentContext->CreateEntity("New Node", "Empty", nodeUuid);
                     
-                    entity.SetParentUUID(params->ParentUUID);
+                    entity.SetParentUUID(parentUuid);
 
                     AddComponent<Nigozi::SpriteRendererComponent>(entity, itemSelectedIndex == NodeTypes::SPRITE_RENDERER);
                     AddComponent<Nigozi::RigidbodyComponent>(entity, itemSelectedIndex == NodeTypes::RIGID_BODY);
@@ -918,9 +1170,8 @@ void EditorLayer::ShowAddNodeModal()
                     }
                     m_selectionContext = entity.GetHandle();
                 },
-                [&, itemSelectedIndex = itemSelectedIndex](void* data) {
-                    CommandParams* params = (CommandParams*)data;
-                    Nigozi::Entity entity = m_currentContext->TryGetEntityByUUID(params->UUID);
+                [&, itemSelectedIndex = itemSelectedIndex, nodeUuid = nodeUuid](void* data) {
+                    Nigozi::Entity entity = m_currentContext->TryGetEntityByUUID(nodeUuid);
 
                     m_selectionContext = entity.GetParent().GetHandle();
                     if (m_movingSelectionContext == entity.GetHandle()) {
@@ -931,7 +1182,7 @@ void EditorLayer::ShowAddNodeModal()
                         entity.Destroy();
                     }
                 }
-            ), params);
+            ));
 
             ImGui::CloseCurrentPopup();
         }

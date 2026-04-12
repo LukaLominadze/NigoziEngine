@@ -11,7 +11,7 @@ public:
 
 	template<typename T>
 	inline void SetData(const T& data) {
-		static_assert(sizeof(T) <= COMMAND_DATA_SIZE, "[Command] Data size must be lower or equal to 256 bytes!");
+		static_assert(sizeof(T) <= COMMAND_DATA_SIZE, "[Command] Data size must be lower or equal to buffer size!");
 		new (p_data) T(data);
 	}
 

@@ -3,6 +3,7 @@
 #include <Nigozi.h>
 #include "EditorCamera.h"
 #include "command/CommandQueue.h"
+#include <new>
 
 enum class Tool
 {
@@ -44,6 +45,23 @@ private:
 	void ShowAddNodeModal();
 	void ShowViewport();
 
+	template<typename T>
+	void EditValueInInspector(const std::function<void()>& imGuiFunction, const std::function<void(T)>& onEditedFunction, Nigozi::UUID uuid, T args)
+	{
+		if (m_editValueSelectionContext != m_selectionContext) {
+			m_editValueSelectionContext = m_selectionContext;
+			m_editValueData.clear();
+		}
+		static_assert(sizeof(args) <= 24, "[Editor Layer] Size of input values must be lower or equal to buffer!");
+		imGuiFunction();
+		if (ImGui::IsItemActivated()) {
+			new (m_editValueData[uuid.GetUUID()]) T(args);
+		}
+		else if (ImGui::IsItemDeactivatedAfterEdit()) {
+			onEditedFunction(*(T*)m_editValueData[uuid.GetUUID()]);
+		}
+	}
+
 	void CloseSceneTab(const std::shared_ptr<Nigozi::SceneTree>& sceneContext);
 
 	bool SaveAllScenes();
@@ -66,6 +84,8 @@ private:
 	std::shared_ptr<Nigozi::SceneTree> m_lastContext;
 	std::shared_ptr<Nigozi::SceneTree> m_currentContext;
 
+	std::unordered_map<uint64_t, char[24]> m_editValueData;
+
 	Nigozi::FrameBuffer* p_viewportBuffer;
 	EditorCamera m_editorCamera;
 
@@ -81,6 +101,8 @@ private:
 
 	entt::entity m_selectionContext = entt::null;
 	entt::entity m_movingSelectionContext = entt::null;
+
+	entt::entity m_editValueSelectionContext = entt::null;
 
 	glm::vec2 m_mouseOldPosition;
 };
