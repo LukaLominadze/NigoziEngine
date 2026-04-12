@@ -45,8 +45,15 @@ private:
 	void ShowAddNodeModal();
 	void ShowViewport();
 
+	enum EditValueInInspectorFlags 
+	{
+		NONE = 0,
+		COMBO_BOX = 1 << 0
+	};
+
 	template<typename T>
-	void EditValueInInspector(const std::function<void()>& imGuiFunction, const std::function<void(T)>& onEditedFunction, Nigozi::UUID uuid, T args)
+	void EditValueInInspector(const std::function<void()>& imGuiFunction, const std::function<void(T)>& onEditedFunction, Nigozi::UUID uuid, T args, 
+							  EditValueInInspectorFlags flags = EditValueInInspectorFlags::NONE)
 	{
 		if (m_editValueSelectionContext != m_selectionContext) {
 			m_editValueSelectionContext = m_selectionContext;
@@ -56,6 +63,9 @@ private:
 		imGuiFunction();
 		if (ImGui::IsItemActivated()) {
 			new (m_editValueData[uuid.GetUUID()]) T(args);
+		}
+		if (flags & EditValueInInspectorFlags::COMBO_BOX && ImGui::IsItemEdited()) {
+			onEditedFunction(*(T*)m_editValueData[uuid.GetUUID()]);
 		}
 		else if (ImGui::IsItemDeactivatedAfterEdit()) {
 			onEditedFunction(*(T*)m_editValueData[uuid.GetUUID()]);
@@ -83,6 +93,7 @@ private:
 	std::vector<std::shared_ptr<Nigozi::SceneTree>> m_sceneTreeContexts;
 	std::shared_ptr<Nigozi::SceneTree> m_lastContext;
 	std::shared_ptr<Nigozi::SceneTree> m_currentContext;
+	CommandQueue m_commandQueue;
 
 	std::unordered_map<uint64_t, char[24]> m_editValueData;
 
@@ -91,8 +102,6 @@ private:
 
 	Tool m_tool = Tool::SELECT;
 	EditorState m_editorState = EditorState::EDIT;
-
-	CommandQueue m_commandQueue;
 
 	ImVec2 m_viewportSize;
 	glm::vec2 m_windowPosition;

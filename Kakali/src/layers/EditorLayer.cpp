@@ -685,16 +685,40 @@ void EditorLayer::ShowInspector()
             );
             bool lastPlayingVal = audio.AudioHandle->IsPlaying();
             bool playingVal = lastPlayingVal;
-            if (ImGui::Checkbox("Playing", &playingVal)) {
-                if (playingVal != lastPlayingVal) {
-                    if (playingVal) {
-                        audio.AudioHandle->Play();
+            EditValueInInspector<bool>(
+                [&]() {
+                    if (ImGui::Checkbox("Playing", &playingVal)) {
+                        if (playingVal != lastPlayingVal) {
+                            if (playingVal) {
+                                audio.AudioHandle->Play();
+                            }
+                            else {
+                                audio.AudioHandle->Stop();
+                            }
+                        }
                     }
-                    else {
-                        audio.AudioHandle->Stop();
-                    }
-                }
-            }
+                },
+                [&](bool isPlaying) {
+                    m_commandQueue.PushBack(Command(
+                        [&, newPlaying = audio.AudioHandle->IsPlaying(), uuid = uuidComponent.ID](void* data) {
+                            auto& audio = m_currentContext->TryGetEntityByUUID(uuid).GetComponent<Nigozi::AudioStreamPlayerComponent>();
+                            if (newPlaying)
+                                audio.AudioHandle->Play();
+                            else
+                                audio.AudioHandle->Stop();
+                        },
+                        [&, oldPlaying = isPlaying, uuid = uuidComponent.ID](void* data) {
+                            auto& audio = m_currentContext->TryGetEntityByUUID(uuid).GetComponent<Nigozi::AudioStreamPlayerComponent>();
+                            if (oldPlaying)
+                                audio.AudioHandle->Play();
+                            else
+                                audio.AudioHandle->Stop();
+                        }
+                    ));
+                },
+                uuidComponent.ID,
+                playingVal
+            );
         }
 
         ImGui::TreePop();
@@ -710,25 +734,34 @@ void EditorLayer::ShowInspector()
                 "Static", "Kinematic", "Dynamic"
             };
             int currentType = (int)rigidbody.Type;
-            ImGui::Combo("Body Type", &currentType, bodyTypeNames, 3); rigidbody.Type = (Nigozi::RigidbodyComponent::BodyType)currentType;
-            // TODO: Combo boxes send different events
-            // EditValueInInspector<Nigozi::RigidbodyComponent::BodyType>(
-            //     [&]() { ImGui::Combo("Body Type", &currentType, bodyTypeNames, 3); rigidbody.Type = (Nigozi::RigidbodyComponent::BodyType)currentType; },
-            //     [&](Nigozi::RigidbodyComponent::BodyType type) {
-            //         m_commandQueue.PushBack(Command(
-            //             [&, newType = rigidbody.Type, uuid = uuidComponent.ID](void* data) {
-            //                 auto& rigidbody = m_currentContext->TryGetEntityByUUID(uuid).GetComponent<Nigozi::RigidbodyComponent>();
-            //                 rigidbody.Type = newType;
-            //             },
-            //             [&, oldType = type, uuid = uuidComponent.ID](void* data) {
-            //                 auto& rigidbody = m_currentContext->TryGetEntityByUUID(uuid).GetComponent<Nigozi::RigidbodyComponent>();
-            //                 rigidbody.Type = oldType;
-            //             }
-            //         ));
-            //     },
-            //     uuidComponent.ID,
-            //     rigidbody.Type
-            // );
+            // ImGui::Combo("Body Type", &currentType, bodyTypeNames, 3); rigidbody.Type = (Nigozi::RigidbodyComponent::BodyType)currentType;
+            // NG_CLIENT_LOG_INFO("ImGui::IsItemActivated(): {}", ImGui::IsItemActivated());
+            // NG_CLIENT_LOG_INFO("ImGui::IsItemActive(): {}", ImGui::IsItemActive());
+            // NG_CLIENT_LOG_INFO("ImGui::IsItemActivated(): {}", ImGui::IsItemActivated());
+            // NG_CLIENT_LOG_INFO("ImGui::IsItemClicked(): {}", ImGui::IsItemClicked());
+            // NG_CLIENT_LOG_INFO("ImGui::IsItemEdited(): {}", ImGui::IsItemEdited());
+            // NG_CLIENT_LOG_INFO("ImGui::IsItemDeactivated(): {}", ImGui::IsItemDeactivated());
+            // NG_CLIENT_LOG_INFO("ImGui::IsItemDeactivatedAfterEdit(): {}", ImGui::IsItemDeactivatedAfterEdit());
+            // NG_CLIENT_LOG_INFO("ImGui::IsItemFocused(): {}", ImGui::IsItemFocused());
+            // NG_CLIENT_LOG_INFO("ImGui::IsItemHovered(): {}", ImGui::IsItemHovered());
+            EditValueInInspector<Nigozi::RigidbodyComponent::BodyType>(
+                [&]() { ImGui::Combo("Body Type", &currentType, bodyTypeNames, 3); rigidbody.Type = (Nigozi::RigidbodyComponent::BodyType)currentType; },
+                [&](Nigozi::RigidbodyComponent::BodyType type) {
+                    m_commandQueue.PushBack(Command(
+                        [&, newType = rigidbody.Type, uuid = uuidComponent.ID](void* data) {
+                            auto& rigidbody = m_currentContext->TryGetEntityByUUID(uuid).GetComponent<Nigozi::RigidbodyComponent>();
+                            rigidbody.Type = newType;
+                        },
+                        [&, oldType = type, uuid = uuidComponent.ID](void* data) {
+                            auto& rigidbody = m_currentContext->TryGetEntityByUUID(uuid).GetComponent<Nigozi::RigidbodyComponent>();
+                            rigidbody.Type = oldType;
+                        }
+                    ));
+                },
+                uuidComponent.ID,
+                rigidbody.Type,
+                EditValueInInspectorFlags::COMBO_BOX
+            );
 
             EditValueInInspector<bool>(
                 [&]() { ImGui::Checkbox("Freeze Rotation", &rigidbody.FreezeRotation); },
