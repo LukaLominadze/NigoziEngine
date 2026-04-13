@@ -1,3 +1,5 @@
+include "../vendor/Coral/Premake/DebuggerTypeExtension.lua"
+
 project "NigoziEngine"
 	kind "StaticLib"
 	staticruntime "off"

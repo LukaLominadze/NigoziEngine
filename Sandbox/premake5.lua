@@ -1,3 +1,5 @@
+include "../vendor/Coral/Premake/DebuggerTypeExtension.lua"
+
 project "Sandbox"
 	kind "ConsoleApp"
 	staticruntime "off"
@@ -31,17 +33,19 @@ project "Sandbox"
 				  "%{wks.location}/vendor/glm",
 				  "%{wks.location}/vendor/nfd/src/include",
 				  "%{wks.location}/vendor/box2d/include",
-				  "%{prj.location}/../vendor/spdlog/include" }
+				  "%{prj.location}/../vendor/spdlog/include",
+				  "%{wks.location}/vendor/Coral/Coral.Native/Include" }
 
 	links {
 		"box2d",
 		"nfd",
 		"yaml-cpp",
+		"Coral.Native",
 		"NigoziEngine",
 		"GLEW",
 		"GLFW",
 		"STB",
-		"ImGui",
+		"ImGui"
 		 }
 
 	configurations {

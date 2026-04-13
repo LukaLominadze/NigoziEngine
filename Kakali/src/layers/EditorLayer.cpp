@@ -16,6 +16,110 @@ void EditorLayer::OnAttach()
 {
     ImGuiIO& io = ImGui::GetIO(); (void)io;
     io.FontDefault = io.Fonts->AddFontFromFileTTF(std::filesystem::path("src/res/fonts/Open_Sans/static/OpenSans-Medium.ttf").string().c_str(), 18.0f);
+    
+    ImGuiStyle& style = ImGui::GetStyle();
+
+    // ---- Shape ------------------------------------------------------------------
+    style.WindowRounding = 4.f;
+    style.ChildRounding = 4.f;
+    style.FrameRounding = 4.f;
+    style.PopupRounding = 4.f;
+    style.ScrollbarRounding = 6.f;
+    style.GrabRounding = 4.f;
+    style.TabRounding = 4.f;
+
+    style.WindowBorderSize = 1.f;
+    style.FrameBorderSize = 0.f;
+    style.PopupBorderSize = 1.f;
+
+    style.WindowPadding = { 12.f, 10.f };
+    style.FramePadding = { 8.f,  6.f };
+    style.ItemSpacing = { 8.f,  6.f };
+    style.ItemInnerSpacing = { 6.f,  5.f };
+    style.IndentSpacing = 18.f;
+    style.ScrollbarSize = 8.f;
+    style.GrabMinSize = 8.f;
+
+    // Button centred so icons sit in the middle of their cell
+    style.ButtonTextAlign = { 0.5f, 0.5f };
+    style.SelectableTextAlign = { 0.0f, 0.5f };
+
+    auto color = [](int red, int green, int blue, int alpha = 255) -> ImVec4 {
+        return { red / 255.f, green / 255.f, blue / 255.f, alpha / 255.f };
+        };
+
+    const ImVec4 bg_deep = color(15, 15, 18);
+    const ImVec4 bg_base = color(22, 22, 26);   // window / panel
+    const ImVec4 bg_raised = color(30, 30, 35);   // frames, inputs
+    const ImVec4 bg_pop = color(38, 38, 44);   // buttons, popups
+    const ImVec4 bg_hover = color(47, 47, 53);   // hover
+    const ImVec4 bg_active = color(56, 56, 63);   // pressed (non-accent)
+    const ImVec4 border = color(35, 35, 41);   // near-invisible borders
+    const ImVec4 text = color(224, 224, 232);   // primary text (cooler white)
+    const ImVec4 text_dim = color(82, 82, 92);   // disabled / secondary
+    const ImVec4 accent = color(49, 197, 209);
+    const ImVec4 accent_d = color(49, 197, 209, 180);
+    const ImVec4 accent_bg = color(49, 197, 209, 35);
+
+    ImVec4* col = ImGui::GetStyle().Colors;
+
+    col[ImGuiCol_Text] = text;
+    col[ImGuiCol_TextDisabled] = text_dim;
+    col[ImGuiCol_WindowBg] = bg_base;
+    col[ImGuiCol_ChildBg] = bg_base;
+    col[ImGuiCol_PopupBg] = color(26, 26, 30);
+    col[ImGuiCol_Border] = border;
+    col[ImGuiCol_BorderShadow] = color(0, 0, 0, 0);
+    col[ImGuiCol_FrameBg] = bg_raised;
+    col[ImGuiCol_FrameBgHovered] = bg_hover;
+    col[ImGuiCol_FrameBgActive] = bg_active;
+    col[ImGuiCol_TitleBg] = bg_deep;
+    col[ImGuiCol_TitleBgActive] = bg_deep;
+    col[ImGuiCol_TitleBgCollapsed] = bg_deep;
+    col[ImGuiCol_MenuBarBg] = bg_deep;
+    col[ImGuiCol_ScrollbarBg] = color(0, 0, 0, 0);
+    col[ImGuiCol_ScrollbarGrab] = color(60, 60, 80, 140);
+    col[ImGuiCol_ScrollbarGrabHovered] = color(80, 80, 100, 180);
+    col[ImGuiCol_ScrollbarGrabActive] = accent;
+    col[ImGuiCol_CheckMark] = accent;
+    col[ImGuiCol_SliderGrab] = accent_d;
+    col[ImGuiCol_SliderGrabActive] = accent;
+    col[ImGuiCol_Button] = bg_pop;
+    col[ImGuiCol_ButtonHovered] = bg_hover;
+    col[ImGuiCol_ButtonActive] = accent;
+    col[ImGuiCol_Header] = accent_bg;
+    col[ImGuiCol_HeaderHovered] = color(49, 197, 209, 60);
+    col[ImGuiCol_HeaderActive] = accent_d;
+    col[ImGuiCol_Separator] = border;
+    col[ImGuiCol_SeparatorHovered] = accent_d;
+    col[ImGuiCol_SeparatorActive] = accent;
+    col[ImGuiCol_ResizeGrip] = color(0, 0, 0, 0);
+    col[ImGuiCol_ResizeGripHovered] = accent_d;
+    col[ImGuiCol_ResizeGripActive] = accent;
+    col[ImGuiCol_Tab] = bg_raised;
+    col[ImGuiCol_TabHovered] = bg_hover;
+    col[ImGuiCol_TabSelected] = bg_pop;
+    col[ImGuiCol_TabSelectedOverline] = accent;
+    col[ImGuiCol_TabDimmed] = bg_base;
+    col[ImGuiCol_TabDimmedSelected] = bg_raised;
+    col[ImGuiCol_TabDimmedSelectedOverline] = border;
+    col[ImGuiCol_DockingPreview] = accent_d;
+    col[ImGuiCol_DockingEmptyBg] = bg_deep;
+    col[ImGuiCol_PlotLines] = accent;
+    col[ImGuiCol_PlotLinesHovered] = color(255, 200, 80);
+    col[ImGuiCol_PlotHistogram] = accent;
+    col[ImGuiCol_PlotHistogramHovered] = color(255, 200, 80);
+    col[ImGuiCol_TableHeaderBg] = bg_deep;
+    col[ImGuiCol_TableBorderStrong] = border;
+    col[ImGuiCol_TableBorderLight] = color(30, 30, 35);
+    col[ImGuiCol_TableRowBg] = color(0, 0, 0, 0);
+    col[ImGuiCol_TableRowBgAlt] = color(255, 255, 255, 5);
+    col[ImGuiCol_TextSelectedBg] = accent_bg;
+    col[ImGuiCol_DragDropTarget] = accent;
+    col[ImGuiCol_NavHighlight] = accent;
+    col[ImGuiCol_NavWindowingHighlight] = accent;
+    col[ImGuiCol_NavWindowingDimBg] = color(0, 0, 0, 100);
+    col[ImGuiCol_ModalWindowDimBg] = color(0, 0, 0, 140);
 }
 
 void EditorLayer::OnEvent(Nigozi::Event& event)
@@ -44,10 +148,12 @@ void EditorLayer::OnUpdate(float timestep)
             m_editorCamera.OnUpdate(timestep);
         }
         m_currentContext->OnEditorUpdate(timestep);
+        return;
     }
-    else {
-        m_currentContext->OnUpdate(timestep);
+    if (m_editorState == EditorState::PAUSE) {
+        return;
     }
+    m_currentContext->OnUpdate(timestep);
 }
 
 void EditorLayer::OnRender()
@@ -216,7 +322,8 @@ bool EditorLayer::OnMouseMoved(Nigozi::MouseMovedEvent& event)
         m_mouseOldPosition = glm::vec2(event.GetX(), event.GetY());
         return false;
     }
-    auto& transform = Nigozi::Entity(m_movingSelectionContext, m_currentContext.get()).GetComponent<Nigozi::TransformComponent>();
+    auto entity = Nigozi::Entity(m_movingSelectionContext, m_currentContext.get());
+    auto& transform = entity.GetComponent<Nigozi::TransformComponent>();
     auto worldTransform = m_currentContext->GetWorldSpaceTransform(Nigozi::Entity(m_movingSelectionContext, m_currentContext.get()));
 
     glm::vec2 viewportRelPos = m_viewportPosition - m_windowPosition;
@@ -248,6 +355,18 @@ bool EditorLayer::OnMouseMoved(Nigozi::MouseMovedEvent& event)
 
     m_mouseOldPosition = mouseScreenPosition;
 
+    if (m_editorState != EditorState::EDIT) {
+        if (!entity.HasComponent<Nigozi::RigidbodyComponent>()) {
+            return false;
+        }
+        auto& rigidbody = entity.GetComponent<Nigozi::RigidbodyComponent>();
+        b2Body* body = (b2Body*)rigidbody.RuntimeBody;
+        auto rTransform = body->GetTransform();
+        rTransform.p.x += rotated.x;
+        rTransform.p.y += rotated.y;
+        body->SetTransform(rTransform.p, rTransform.q.GetAngle());
+        body->SetAwake(true);
+    }
     return false;
 }
 
@@ -256,7 +375,8 @@ bool EditorLayer::OnRotateMouseMoved(Nigozi::MouseMovedEvent& event)
     if (m_tool != Tool::ROTATE || m_movingSelectionContext == entt::null) {
         return false;
     }
-    auto& transform = Nigozi::Entity(m_movingSelectionContext, m_currentContext.get()).GetComponent<Nigozi::TransformComponent>();
+    auto entity = Nigozi::Entity(m_movingSelectionContext, m_currentContext.get());
+    auto& transform = entity.GetComponent<Nigozi::TransformComponent>();
     auto worldTransform = m_currentContext->GetWorldSpaceTransform(Nigozi::Entity(m_movingSelectionContext, m_currentContext.get()));
 
     glm::vec2 viewportRelPos = m_viewportPosition - m_windowPosition;
@@ -292,6 +412,16 @@ bool EditorLayer::OnRotateMouseMoved(Nigozi::MouseMovedEvent& event)
     angle -= ((int)(angle / 360)) * 360.0f;
 
     transform.Rotation = angle;
+    if (m_editorState != EditorState::EDIT) {
+        if (!entity.HasComponent<Nigozi::RigidbodyComponent>()) {
+            return false;
+        }
+        auto& rigidbody = entity.GetComponent<Nigozi::RigidbodyComponent>();
+        b2Body* body = (b2Body*)rigidbody.RuntimeBody;
+        auto rTransform = body->GetTransform();
+        body->SetTransform(rTransform.p, glm::radians(angle));
+        body->SetAwake(true);
+    }
 
     return false;
 }
@@ -520,6 +650,52 @@ static void DrawComponentInInspector(const std::string& name, Nigozi::Entity ent
         ImGui::TreePop();
         ImGui::Separator();
     }
+}
+
+void EditorLayer::UpdateRigidbodyTransform(Nigozi::Entity entity) {
+    if (m_editorState != EditorState::EDIT) {
+        if (!entity.HasComponent<Nigozi::RigidbodyComponent>()) {
+            return;
+        }
+        auto& transform = entity.GetComponent<Nigozi::TransformComponent>();
+        auto& rigidbody = entity.GetComponent<Nigozi::RigidbodyComponent>();
+        b2Body* body = (b2Body*)rigidbody.RuntimeBody;
+        auto rTransform = body->GetTransform();
+        auto worldTransform = m_currentContext->GetWorldSpaceTransform(entity);
+        rTransform.p.x = worldTransform.Position.x;
+        rTransform.p.y = worldTransform.Position.y;
+        body->SetTransform(rTransform.p, glm::radians(-worldTransform.Rotation));
+        body->SetAwake(true);
+    }
+}
+
+void EditorLayer::UpdateBoxCollider(Nigozi::Entity entity, glm::vec2 size)
+{
+    auto& boxCollider = entity.GetComponent<Nigozi::BoxColliderComponent>();
+    b2Fixture* oldFixture = (b2Fixture*)boxCollider.RuntimeFixture;
+
+    auto& rigidbody = entity.GetComponent<Nigozi::RigidbodyComponent>();
+    b2Body* body = (b2Body*)rigidbody.RuntimeBody;
+    
+    float density = oldFixture->GetDensity();
+    float friction = oldFixture->GetFriction();
+    float restitution = oldFixture->GetRestitution();
+    bool isSensor = oldFixture->IsSensor();
+
+    body->DestroyFixture(oldFixture);
+
+    b2PolygonShape newShape;
+    newShape.SetAsBox(size.x, size.y);
+
+    b2FixtureDef fixtureDef;
+    fixtureDef.shape = &newShape;
+    fixtureDef.density = density;
+    fixtureDef.friction = friction;
+    fixtureDef.restitution = restitution;
+
+    boxCollider.RuntimeFixture = (void*)body->CreateFixture(&fixtureDef);
+
+    body->ResetMassData();
 }
 
 void EditorLayer::ShowInspector()
@@ -783,15 +959,22 @@ void EditorLayer::ShowInspector()
     DrawComponentInInspector<Nigozi::BoxColliderComponent>("Box Collider", entity, m_selectionContext,
         [&](auto& component) {
             EditValueInInspector<glm::vec2>(
-                [&]() { ImGui::DragFloat2("Size", (float*)&component.Size, 0.05f, 0.01f); },
+                [&]() 
+                { 
+                    if (ImGui::DragFloat2("Size", (float*)&component.Size, 0.05f, 0.01f)) {
+                        UpdateBoxCollider(entity, component.Size);
+                    }
+                },
                 [&](glm::vec2 size) {
                     m_commandQueue.PushBack(Command(
                         [&, newSize = component.Size, uuid = uuidComponent.ID](void* data) {
                             auto& boxCollider = m_currentContext->TryGetEntityByUUID(uuid).GetComponent<Nigozi::BoxColliderComponent>();
+                            UpdateBoxCollider(entity, newSize);
                             boxCollider.Size = newSize;
                         },
                         [&, oldSize = size, uuid = uuidComponent.ID](void* data) {
                             auto& boxCollider = m_currentContext->TryGetEntityByUUID(uuid).GetComponent<Nigozi::BoxColliderComponent>();
+                            UpdateBoxCollider(entity, oldSize);
                             boxCollider.Size = oldSize;
                         }
                     ));
@@ -941,16 +1124,26 @@ void EditorLayer::ShowInspector()
 
             ImGui::PushItemWidth(-10.0f);
             EditValueInInspector<float>(
-                [&]() {  ImGui::DragFloat("##X", &component.Position.x, 0.1f, -INFINITY, INFINITY, "%.2f"); },
+                [&]() 
+                {  
+                    if (ImGui::DragFloat("##X", &component.Position.x, 0.1f, -INFINITY, INFINITY, "%.2f"))
+                        UpdateRigidbodyTransform(entity);
+                },
                 [&](float positionX) {
                     m_commandQueue.PushBack(Command(
                         [&, newPositionX = component.Position.x, uuid = uuidComponent.ID](void* data) {
-                            auto& transform = m_currentContext->TryGetEntityByUUID(uuid).GetComponent<Nigozi::TransformComponent>();
+                            auto entity = m_currentContext->TryGetEntityByUUID(uuid);
+                            auto& transform = entity.GetComponent<Nigozi::TransformComponent>();
                             transform.Position.x = newPositionX;
+                            
+                            UpdateRigidbodyTransform(entity);
                         },
                         [&, oldPositionX = positionX, uuid = uuidComponent.ID](void* data) {
+                            auto entity = m_currentContext->TryGetEntityByUUID(uuid);
                             auto& transform = m_currentContext->TryGetEntityByUUID(uuid).GetComponent<Nigozi::TransformComponent>();
                             transform.Position.x = oldPositionX;
+                            
+                            UpdateRigidbodyTransform(entity);
                         }
                     ));
                 },
@@ -966,16 +1159,26 @@ void EditorLayer::ShowInspector()
 
             ImGui::PushItemWidth(-10.0f);
             EditValueInInspector<float>(
-                [&]() {  ImGui::DragFloat("##Y", &component.Position.y, 0.1f, -INFINITY, INFINITY, "%.2f"); },
+                [&]() 
+                {  
+                    if (ImGui::DragFloat("##Y", &component.Position.y, 0.1f, -INFINITY, INFINITY, "%.2f")); 
+                        UpdateRigidbodyTransform(entity);
+                },
                 [&](float positionY) {
                     m_commandQueue.PushBack(Command(
                         [&, newPositionY = component.Position.y, uuid = uuidComponent.ID](void* data) {
+                            auto entity = m_currentContext->TryGetEntityByUUID(uuid);
                             auto& transform = m_currentContext->TryGetEntityByUUID(uuid).GetComponent<Nigozi::TransformComponent>();
                             transform.Position.y = newPositionY;
+
+                            UpdateRigidbodyTransform(entity);
                         },
                         [&, oldPositionY = positionY, uuid = uuidComponent.ID](void* data) {
+                            auto entity = m_currentContext->TryGetEntityByUUID(uuid);
                             auto& transform = m_currentContext->TryGetEntityByUUID(uuid).GetComponent<Nigozi::TransformComponent>();
                             transform.Position.y = oldPositionY;
+
+                            UpdateRigidbodyTransform(entity);
                         }
                     ));
                 },
@@ -1011,22 +1214,29 @@ void EditorLayer::ShowInspector()
             ImGui::SameLine();
 
             ImGui::PushItemWidth(-10.0f);
-            EditValueInInspector<float>(
-                [&]() {  ImGui::DragFloat("##X", &component.Scale.x, 0.1f); },
-                [&](float scaleX) {
+            EditValueInInspector<glm::vec2>(
+                [&]() 
+                {  
+                    if (ImGui::DragFloat("##X", &component.Scale.x, 0.1f)) {
+                        const bool updateScale = true;
+                    }
+                },
+                [&](glm::vec2 scale) {
                     m_commandQueue.PushBack(Command(
-                        [&, newScaleX = component.Scale.x, uuid = uuidComponent.ID](void* data) {
+                        [&, newScale = component.Scale, uuid = uuidComponent.ID](void* data) {
                             auto& transform = m_currentContext->TryGetEntityByUUID(uuid).GetComponent<Nigozi::TransformComponent>();
-                            transform.Scale.x = newScaleX;
+                            transform.Scale.x = newScale.x;
+                            const bool updateScale = true;
                         },
-                        [&, oldScaleX = scaleX, uuid = uuidComponent.ID](void* data) {
+                        [&, oldScale = scale, uuid = uuidComponent.ID](void* data) {
                             auto& transform = m_currentContext->TryGetEntityByUUID(uuid).GetComponent<Nigozi::TransformComponent>();
-                            transform.Scale.x = oldScaleX;
+                            transform.Scale.x = oldScale.x;
+                            const bool updateScale = true;
                         }
                     ));
                 },
                 uuidComponent.ID,
-                component.Scale.x
+                component.Scale
             );
             ImGui::PopItemWidth();
 
@@ -1036,22 +1246,29 @@ void EditorLayer::ShowInspector()
             ImGui::SameLine();
 
             ImGui::PushItemWidth(-10.0f);
-            EditValueInInspector<float>(
-                [&]() { ImGui::DragFloat("##Y", &component.Scale.y, 0.1f); },
-                [&](float scaleY) {
+            EditValueInInspector<glm::vec2>(
+                [&]()
+                {
+                    if (ImGui::DragFloat("##Y", &component.Scale.y, 0.1f)) {
+                        const bool updateScale = true;
+                    }
+                },
+                [&](glm::vec2 scale) {
                     m_commandQueue.PushBack(Command(
-                        [&, newScaleY = component.Scale.y, uuid = uuidComponent.ID](void* data) {
+                        [&, newScale = component.Scale, uuid = uuidComponent.ID](void* data) {
                             auto& transform = m_currentContext->TryGetEntityByUUID(uuid).GetComponent<Nigozi::TransformComponent>();
-                            transform.Scale.y = newScaleY;
+                            transform.Scale.y = newScale.y;
+                            const bool updateScale = true;
                         },
-                        [&, oldScaleY = scaleY, uuid = uuidComponent.ID](void* data) {
+                        [&, oldScale = scale, uuid = uuidComponent.ID](void* data) {
                             auto& transform = m_currentContext->TryGetEntityByUUID(uuid).GetComponent<Nigozi::TransformComponent>();
-                            transform.Scale.y = oldScaleY;
+                            transform.Scale.y = oldScale.y;
+                            const bool updateScale = true;
                         }
                     ));
                 },
                 uuidComponent.ID,
-                component.Scale.y
+                component.Scale
             );
             ImGui::PopItemWidth();
             ImGui::PopStyleVar();
@@ -1069,16 +1286,19 @@ void EditorLayer::ShowInspector()
             ImGui::TableNextColumn();
             ImGui::PushItemWidth(-10.0f);
             EditValueInInspector<float>(
-                [&]() { ImGui::DragFloat("##ROTATION", &component.Rotation, 0.1f, -360.0f, 360.0f, "%.2f", ImGuiSliderFlags_WrapAround); },
+                [&]() 
+                { ImGui::DragFloat("##ROTATION", &component.Rotation, 0.1f, -360.0f, 360.0f, "%.2f", ImGuiSliderFlags_WrapAround); },
                 [&](float rotation) {
                     m_commandQueue.PushBack(Command(
                         [&, newRotation = component.Rotation, uuid = uuidComponent.ID](void* data) {
                             auto& transform = m_currentContext->TryGetEntityByUUID(uuid).GetComponent<Nigozi::TransformComponent>();
                             transform.Rotation = newRotation;
+                            UpdateRigidbodyTransform(entity);
                         },
                         [&, oldRotation = rotation, uuid = uuidComponent.ID](void* data) {
                             auto& transform = m_currentContext->TryGetEntityByUUID(uuid).GetComponent<Nigozi::TransformComponent>();
                             transform.Rotation = oldRotation;
+                            UpdateRigidbodyTransform(entity);
                         }
                     ));
                 },
@@ -1243,8 +1463,11 @@ void EditorLayer::ShowViewport()
         }
     }
     ImGui::SameLine();
-    if (ImGui::Button("Pause") && m_editorState == EditorState::PLAY) {
-        m_editorState = EditorState::PAUSE;
+    if (ImGui::Button("Pause") && m_editorState != EditorState::EDIT) {
+        if (m_editorState == EditorState::PLAY)
+            m_editorState = EditorState::PAUSE;
+        else
+            m_editorState = EditorState::PLAY;
     }
     ImGui::SameLine();
     if (ImGui::Button("Stop")) {

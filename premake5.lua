@@ -33,6 +33,7 @@ group ""
 
 group "Core"
 	include "NigoziEngine"
+	include "Nigozi-CSharpCore"
 group ""
 
 group "Misc"

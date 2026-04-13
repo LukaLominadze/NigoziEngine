@@ -1,0 +1,14 @@
+E:\Luka\Dev\C++\NigoziEngine\Kakali\src\res\scripts\bin-int\Debug\Nigozi-CSharpCore.csproj.AssemblyReference.cache
+E:\Luka\Dev\C++\NigoziEngine\Kakali\src\res\scripts\bin-int\Debug\Nigozi-CSharpCore.GeneratedMSBuildEditorConfig.editorconfig
+E:\Luka\Dev\C++\NigoziEngine\Kakali\src\res\scripts\bin-int\Debug\Nigozi-CSharpCore.AssemblyInfoInputs.cache
+E:\Luka\Dev\C++\NigoziEngine\Kakali\src\res\scripts\bin-int\Debug\Nigozi-CSharpCore.AssemblyInfo.cs
+E:\Luka\Dev\C++\NigoziEngine\Kakali\src\res\scripts\bin-int\Debug\Nigozi-CSharpCore.csproj.CoreCompileInputs.cache
+E:\Luka\Dev\C++\NigoziEngine\Kakali\src\res\scripts\bin-int\Debug\Nigozi-CSharpCore.sourcelink.json
+E:\Luka\Dev\C++\NigoziEngine\Kakali\src\res\scripts\bin-int\Debug\Nigozi-C.BC2F879C.Up2Date
+E:\Luka\Dev\C++\NigoziEngine\Kakali\src\res\scripts\bin-int\Debug\Nigozi-CSharpCore.dll
+E:\Luka\Dev\C++\NigoziEngine\Kakali\src\res\scripts\bin-int\Debug\refint\Nigozi-CSharpCore.dll
+E:\Luka\Dev\C++\NigoziEngine\Kakali\src\res\scripts\bin-int\Debug\Nigozi-CSharpCore.pdb
+E:\Luka\Dev\C++\NigoziEngine\Kakali\src\res\scripts\Nigozi-CSharpCore.deps.json
+E:\Luka\Dev\C++\NigoziEngine\Kakali\src\res\scripts\Nigozi-CSharpCore.dll
+E:\Luka\Dev\C++\NigoziEngine\Kakali\src\res\scripts\bin-int\Debug\ref\Nigozi-CSharpCore.dll
+E:\Luka\Dev\C++\NigoziEngine\Kakali\src\res\scripts\Nigozi-CSharpCore.pdb

@@ -1,3 +1,5 @@
+include "../vendor/Coral/Premake/DebuggerTypeExtension.lua"
+
 project "Kakali"
 	kind "ConsoleApp"
 	staticruntime "off"
@@ -31,17 +33,19 @@ project "Kakali"
 				  "%{wks.location}/vendor/glm",
 				  "%{wks.location}/vendor/nfd/src/include",
 				  "%{wks.location}/vendor/box2d/include",
-				  "%{prj.location}/../vendor/spdlog/include" }
+				  "%{prj.location}/../vendor/spdlog/include",
+				  "%{wks.location}/vendor/Coral/Coral.Native/Include" }
 
 	links {
 		"box2d",
 		"yaml-cpp",
 		"nfd",
+		"Coral.Native",
 		"NigoziEngine",
 		"GLEW",
 		"GLFW",
 		"STB",
-		"ImGui",
+		"ImGui"
 		 }
 
 	configurations {
@@ -67,7 +71,9 @@ project "Kakali"
 			"{COPYDIR} %{prj.location}/src/Nigozi %{wks.location}/bin/" ..outputdir.. "/%{prj.name}/src/Nigozi",
 			"{COPYDIR} %{prj.location}/src/res %{wks.location}/bin/" ..outputdir.. "/%{prj.name}/src/res",
 			"{COPYDIR} %{prj.location}/kakali-small.png %{wks.location}/bin/" ..outputdir.. "/%{prj.name}/",
-			"{COPYDIR} %{prj.location}/imgui.ini %{wks.location}/bin/" .. outputdir .. "/%{prj.name}/"
+			"{COPYDIR} %{prj.location}/imgui.ini %{wks.location}/bin/" .. outputdir .. "/%{prj.name}/",
+
+			"{COPYDIR} %{wks.location}/vendor/Coral/Build/%{cfg.buildcfg} %{prj.location}/src/res/scripts/"
 		}
 
 		filter "configurations:Distribution"

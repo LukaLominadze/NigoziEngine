@@ -55,6 +55,7 @@ namespace Nigozi
 		Entity TryGetEntityByUUID(UUID uuid);
 		Entity TryGetEntityByTag(const std::string& tag = "");
 		std::vector<Entity> TryGetEntitiesByTag(const std::string& tag = "");
+		void QueueDestroyEntity(Entity entity);
 		bool DestroyEntity(Entity entity);
 
 		CameraComponent* GetMainCamera();
@@ -67,6 +68,7 @@ namespace Nigozi
 		entt::registry m_Registry;
 	private:
 		std::unordered_map<UUID, Entity> m_entityMap;
+		std::vector<Nigozi::Entity> m_destroyQueue;
 		UUID m_sceneRootUUID = UUID::Null;
 
 		std::filesystem::path m_filePath;

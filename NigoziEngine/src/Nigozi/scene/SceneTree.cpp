@@ -86,8 +86,12 @@ namespace Nigozi
             auto& tag = entity.AddComponent<TagComponent>();
             tag.Tag = ent["Tag"]["Tag"].as<std::string>();
 
+            auto& nodeType = entity.AddComponent<NodeTypeComponent>();
+            nodeType.Type = NodeTypeComponent::Types::Node;
+
             if (ent["Scene"]) {
                 auto& scene = entity.AddComponent<SceneComponent>();
+                nodeType.Type = NodeTypeComponent::Types::Scene;
                 if (ent["Scene"]["FilePath"])
                     scene.FilePath = ent["Scene"]["FilePath"].as<std::string>();
                 if (m_entityMap.empty()) {
@@ -116,6 +120,7 @@ namespace Nigozi
 
             if (ent["Camera"]) {
                 auto& camera = entity.AddComponent<CameraComponent>();
+                nodeType.Type = NodeTypeComponent::Types::Camera;
                 if (ent["Camera"]["Current"])
                     camera.Current = ent["Camera"]["Current"].as<bool>();
 
@@ -128,6 +133,7 @@ namespace Nigozi
 
             if (ent["Sprite"]) {
                 auto& sprite = entity.AddComponent<SpriteRendererComponent>();
+                nodeType.Type = NodeTypeComponent::Types::SpriteRenderer;
 
                 std::string texturePath;
                 if (ent["Sprite"]["Texture"] && ent["Sprite"]["Texture"]["FilePath"]) {
@@ -177,6 +183,7 @@ namespace Nigozi
 
             if (ent["Rigidbody"]) {
                 auto& rigidbody = entity.AddComponent<RigidbodyComponent>();
+                nodeType.Type = NodeTypeComponent::Types::Rigidbody;
 
                 if (ent["Rigidbody"]["BodyType"]) {
                     rigidbody.Type = (RigidbodyComponent::BodyType)ent["Rigidbody"]["BodyType"].as<int32_t>();
@@ -208,6 +215,7 @@ namespace Nigozi
 
             if (ent["AudioStreamPlayer"]) {
                 auto& audio = entity.AddComponent<AudioStreamPlayerComponent>();
+                nodeType.Type = NodeTypeComponent::Types::AudioStreamPlayer;
 
                 std::filesystem::path audioPath;
                 if (ent["AudioStreamPlayer"]["FilePath"]) {
@@ -249,6 +257,9 @@ namespace Nigozi
 
         auto& tag = node.GetComponent<TagComponent>();
         ent["Tag"]["Tag"] = tag.Tag;
+
+        auto& nodeType = node.GetComponent<NodeTypeComponent>();
+        ent["Type"] = (uint32_t)nodeType.Type;
 
         if (node.HasComponent<SceneComponent>()) {
             auto& scene = node.GetComponent<SceneComponent>();
@@ -391,6 +402,16 @@ namespace Nigozi
 
     void SceneTree::OnUpdate(float timestep)
     {
+        for (auto entity : m_destroyQueue) {
+            if (!entity.HasComponent<UUIDComponent>()) {
+                continue;
+            }
+            entity.Destroy();
+        }
+        if (m_destroyQueue.size() > 0) {
+            m_destroyQueue.clear();
+        }
+
         m_Registry.sort<UUIDComponent>([&](const auto lhs, const auto rhs) {
             auto lhsEntity = m_entityMap.find(lhs.ID)->second;
             auto rhsEntity = m_entityMap.find(rhs.ID)->second;
@@ -597,22 +618,14 @@ namespace Nigozi
         return entities;
     }
 
+    void SceneTree::QueueDestroyEntity(Entity entity)
+    {
+        m_destroyQueue.push_back(entity);
+    }
+
     bool SceneTree::DestroyEntity(Entity entity)
     {
-        if (!m_Registry.valid(entity.GetHandle())) {
-            return false;
-        }
-
-        if (entity.GetUUID() == m_sceneRootUUID) {
-            m_sceneRootUUID = UUID::Null;
-        }
-
-        entity.SetParentUUID(UUID::Null);
-        for (Entity child : entity.GetChildren()) {
-            DestroyEntity(child);
-        }
-
-        m_Registry.destroy(entity.GetHandle());
+        entity.Destroy();
         return true;
     }
 

@@ -52,6 +52,9 @@ private:
 		COMBO_BOX = 1 << 0
 	};
 
+	void UpdateRigidbodyTransform(Nigozi::Entity entity);
+	void UpdateBoxCollider(Nigozi::Entity entity, glm::vec2 size);
+
 	template<typename T>
 	void EditValueInInspector(const std::function<void()>& imGuiFunction, const std::function<void(T)>& onEditedFunction, Nigozi::UUID uuid, T args, 
 							  EditValueInInspectorFlags flags = EditValueInInspectorFlags::NONE)

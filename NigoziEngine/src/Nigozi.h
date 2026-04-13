@@ -38,4 +38,11 @@
 #include "Nigozi/scene/Entity.h"
 #include "Nigozi/scene/Component.h"
 
+#include "Nigozi/scripts/ScriptEngine.h"
+#include "Nigozi/scripts/ScriptGlue.h"
+
+#include "box2d/b2_body.h"
+#include "box2d/b2_fixture.h"
+#include "box2d/b2_polygon_shape.h"
+
 #include "Nigozi/core/EntryPoint.h"

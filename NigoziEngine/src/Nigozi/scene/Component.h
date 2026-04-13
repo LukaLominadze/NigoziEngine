@@ -18,6 +18,21 @@ namespace Nigozi {
 			:ID(uuid) {}
 	};
 
+	struct NodeTypeComponent {
+		enum class Types
+		{
+			None = 0,
+			Node,
+			Scene,
+			Camera,
+			SpriteRenderer,
+			Rigidbody,
+			AudioStreamPlayer
+		};
+
+		Types Type = Types::None;
+	};
+
 	struct SceneComponent {
 		std::filesystem::path FilePath;
 

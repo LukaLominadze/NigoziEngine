@@ -75,6 +75,8 @@ namespace Nigozi
 				child.Destroy();
 			}
 
+			p_scene->m_entityMap.erase(GetUUID());
+
 			p_scene->m_Registry.destroy(m_entityHandle);
 		}
 

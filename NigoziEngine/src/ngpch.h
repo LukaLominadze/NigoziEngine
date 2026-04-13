@@ -30,6 +30,8 @@
 #include <fstream>
 #include <iomanip>
 
+#include <ranges>
+
 #include "yaml-cpp/yaml.h"
 #include "Nigozi/json/json.hpp"
 #include "Nigozi/entt/entt.hpp"
