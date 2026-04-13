@@ -32,11 +32,13 @@ project "NigoziEngine"
 				  "%{prj.location}/../vendor/glew/include",
 				  "%{prj.location}/../vendor/glfw/include",
 				  "%{prj.location}/../vendor/stb",
+				  "%{wks.location}/vendor/yaml-cpp/include",
 				  "%{prj.location}/../vendor/imgui",
 				  "%{prj.location}/../vendor/glm",
 				  "%{wks.location}/vendor/nfd/src/include",
 				  "%{wks.location}/vendor/box2d/include",
-				  "%{prj.location}/../vendor/spdlog/include" }
+				  "%{prj.location}/../vendor/spdlog/include",
+				  "%{wks.location}/vendor/Coral/Coral.Native/Include" }
 
 	links {
 		"box2d",
@@ -44,7 +46,9 @@ project "NigoziEngine"
 		"GLEW",
 		"GLFW",
 		"STB",
-		"ImGui" }
+		"yaml-cpp",
+		"ImGui",
+		"Coral.Native" }
 
 	configurations {
 		"Debug",

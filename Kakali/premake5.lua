@@ -26,6 +26,7 @@ project "Kakali"
 				  "%{wks.location}/vendor/glew/include",
 				  "%{wks.location}/vendor/glfw/include",
 				  "%{wks.location}/vendor/stb",
+				  "%{wks.location}/vendor/yaml-cpp/include",
 				  "%{wks.location}/vendor/imgui",
 				  "%{wks.location}/vendor/glm",
 				  "%{wks.location}/vendor/nfd/src/include",
@@ -34,8 +35,9 @@ project "Kakali"
 
 	links {
 		"box2d",
-		"NigoziEngine",
+		"yaml-cpp",
 		"nfd",
+		"NigoziEngine",
 		"GLEW",
 		"GLFW",
 		"STB",

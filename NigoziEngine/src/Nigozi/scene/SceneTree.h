@@ -61,7 +61,7 @@ namespace Nigozi
 
 		inline UUID GetSceneRootUUID() const { return m_sceneRootUUID; }
 	private:
-		void SerializeNode(Entity node, nlohmann::json& doc);
+		void SerializeNode(Entity node, YAML::Node& doc);
 	public:
 		friend class Entity;
 		entt::registry m_Registry;

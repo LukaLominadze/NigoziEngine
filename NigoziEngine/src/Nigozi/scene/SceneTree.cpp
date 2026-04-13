@@ -35,15 +35,16 @@ namespace Nigozi
         entity.GetComponent<SceneComponent>().FilePath = filePath;
 
         NG_CORE_LOG_INFO("[Scene Tree] Serializing scene at: {}", filePath.string());
-        
+
         constexpr uint64_t SERIALIZER_VERSION = 0;
 
-        nlohmann::json data;
+        YAML::Node data;
 
-        data["metadata"]["version"] = SERIALIZER_VERSION;
-        data["nodes"] = nlohmann::json::array();
+        data["Metadata"]["Version"] = SERIALIZER_VERSION;
+        YAML::Node nodes;
 
-        SerializeNode(entity, data["nodes"]);
+        SerializeNode(entity, nodes);
+        data["Nodes"] = nodes;
 
         std::ofstream file(filePath);
 
@@ -63,39 +64,32 @@ namespace Nigozi
 
         NG_CORE_LOG_INFO("[Scene Tree] Derializing scene from: {}", filePath.string());
 
-        std::ifstream file(filePath);
-        
-        std::stringstream buffer;
-        buffer << file.rdbuf();
-        
-        std::string content = buffer.str();
-
-        nlohmann::json data = nlohmann::json::parse(content);
-        if (!data.contains("nodes")) {
+        YAML::Node data = YAML::LoadFile(filePath.string());
+        if (!data["Nodes"]) {
             return;
         }
 
-        for (auto& ent : data["nodes"]) {
-            if (ent.contains("scene") && !m_entityMap.empty()) {
-                std::filesystem::path scenePath(ent["scene"]["filePath"].get<std::string>());
+        for (const auto& ent : data["Nodes"]) {
+            if (ent["Scene"] && !m_entityMap.empty()) {
+                std::filesystem::path scenePath(ent["Scene"]["FilePath"].as<std::string>());
                 DeserializeScene(scenePath);
             }
 
             Entity entity = Entity(m_Registry.create(), this);
 
             auto& uuid = entity.AddComponent<Nigozi::UUIDComponent>();
-            uuid.ID = UUID(ent["uuid"]["id"].get<uint64_t>());
+            uuid.ID = UUID(ent["UUID"]["Id"].as<uint64_t>());
 
             auto& name = entity.AddComponent<NameComponent>();
-            name.Name = ent["name"]["name"].get<std::string>();
+            name.Name = ent["Name"]["Name"].as<std::string>();
 
             auto& tag = entity.AddComponent<TagComponent>();
-            tag.Tag = ent["tag"]["tag"].get<std::string>();
+            tag.Tag = ent["Tag"]["Tag"].as<std::string>();
 
-            if (ent.contains("scene")) {
+            if (ent["Scene"]) {
                 auto& scene = entity.AddComponent<SceneComponent>();
-                if (ent["scene"].contains("filePath"))
-                    scene.FilePath = ent["scene"]["filePath"].get<std::string>();
+                if (ent["Scene"]["FilePath"])
+                    scene.FilePath = ent["Scene"]["FilePath"].as<std::string>();
                 if (m_entityMap.empty()) {
                     m_sceneRootUUID = uuid.ID;
                 }
@@ -104,40 +98,40 @@ namespace Nigozi
 
             auto& transform = entity.AddComponent<TransformComponent>();
             transform.Position = glm::vec2(
-                ent["transform"]["position"]["x"].get<float>(),
-                ent["transform"]["position"]["y"].get<float>()
+                ent["Transform"]["Position"]["X"].as<float>(),
+                ent["Transform"]["Position"]["Y"].as<float>()
             );
             transform.Scale = glm::vec2(
-                ent["transform"]["scale"]["x"].get<float>(),
-                ent["transform"]["scale"]["y"].get<float>()
+                ent["Transform"]["Scale"]["X"].as<float>(),
+                ent["Transform"]["Scale"]["Y"].as<float>()
             );
-            transform.Rotation = ent["transform"]["rotation"].get<float>();
+            transform.Rotation = ent["Transform"]["Rotation"].as<float>();
 
             auto& relationship = entity.AddComponent<RelationshipComponent>();
-            relationship.ParentUUID = ent["relationship"]["parentUuid"].get<uint64_t>();
+            relationship.ParentUUID = ent["Relationship"]["ParentUUID"].as<uint64_t>();
 
             if (relationship.ParentUUID.GetUUID() != UUID::Null) {
                 entity.SetParentUUID(relationship.ParentUUID);
             }
 
-            if (ent.contains("camera")) {
+            if (ent["Camera"]) {
                 auto& camera = entity.AddComponent<CameraComponent>();
-                if (ent["camera"].contains("current"))
-                    camera.Current = ent["camera"]["current"].get<bool>();
+                if (ent["Camera"]["Current"])
+                    camera.Current = ent["Camera"]["Current"].as<bool>();
 
-                if (ent["camera"].contains("aspect"))
-                    camera.Aspect = ent["camera"]["aspect"].get<float>();
+                if (ent["Camera"]["Aspect"])
+                    camera.Aspect = ent["Camera"]["Aspect"].as<float>();
 
-                if (ent["camera"].contains("zoom"))
-                    camera.Zoom = ent["camera"]["zoom"].get<float>();
+                if (ent["Camera"]["Zoom"])
+                    camera.Zoom = ent["Camera"]["Zoom"].as<float>();
             }
 
-            if (ent.contains("sprite")) {
+            if (ent["Sprite"]) {
                 auto& sprite = entity.AddComponent<SpriteRendererComponent>();
 
                 std::string texturePath;
-                if (ent["sprite"].contains("texture") && ent["sprite"]["texture"].contains("filePath")) {
-                    texturePath = ent["sprite"]["texture"]["filePath"].get<std::string>();
+                if (ent["Sprite"]["Texture"] && ent["Sprite"]["Texture"]["FilePath"]) {
+                    texturePath = ent["Sprite"]["Texture"]["FilePath"].as<std::string>();
                 }
                 if (std::filesystem::exists(std::filesystem::path(texturePath))) {
                     sprite.SpriteTexture = std::make_shared<Texture>(texturePath);
@@ -148,18 +142,18 @@ namespace Nigozi
                 }
 
                 glm::vec4 color;
-                if (ent["sprite"].contains("color")) {
-                    color.x = ent["sprite"]["color"]["r"].get<float>();
-                    color.y = ent["sprite"]["color"]["g"].get<float>();
-                    color.z = ent["sprite"]["color"]["b"].get<float>();
-                    color.w = ent["sprite"]["color"]["a"].get<float>();
+                if (ent["Sprite"]["Color"]) {
+                    color.x = ent["Sprite"]["Color"]["R"].as<float>();
+                    color.y = ent["Sprite"]["Color"]["G"].as<float>();
+                    color.z = ent["Sprite"]["Color"]["B"].as<float>();
+                    color.w = ent["Sprite"]["Color"]["A"].as<float>();
                 }
 
                 glm::u32vec2 seperator(1);
-                if (ent["sprite"].contains("seperator")) {
+                if (ent["Sprite"]["Seperator"]) {
                     seperator = glm::u32vec2(
-                        ent["sprite"]["seperator"]["x"].get<int32_t>(),
-                        ent["sprite"]["seperator"]["y"].get<int32_t>()
+                        ent["Sprite"]["Seperator"]["X"].as<int32_t>(),
+                        ent["Sprite"]["Seperator"]["Y"].as<int32_t>()
                     );
                 }
 
@@ -170,54 +164,54 @@ namespace Nigozi
                 );
 
                 glm::u32vec2 slot(0);
-                if (ent["sprite"].contains("slot")) {
+                if (ent["Sprite"]["Slot"]) {
                     slot = glm::u32vec2(
-                        ent["sprite"]["slot"]["x"].get<uint32_t>(),
-                        ent["sprite"]["slot"]["y"].get<uint32_t>()
+                        ent["Sprite"]["Slot"]["X"].as<uint32_t>(),
+                        ent["Sprite"]["Slot"]["Y"].as<uint32_t>()
                     );
                 }
-                
+
                 sprite.Sprite = SubTexture(sprite.SpriteTexture, subTextureSize, slot.x, slot.y);
                 sprite.Color = color;
             }
 
-            if (ent.contains("rigidbody")) {
+            if (ent["Rigidbody"]) {
                 auto& rigidbody = entity.AddComponent<RigidbodyComponent>();
 
-                if (ent["rigidbody"].contains("bodyType")) {
-                    rigidbody.Type = (RigidbodyComponent::BodyType)ent["rigidbody"]["bodyType"].get<int32_t>();
+                if (ent["Rigidbody"]["BodyType"]) {
+                    rigidbody.Type = (RigidbodyComponent::BodyType)ent["Rigidbody"]["BodyType"].as<int32_t>();
                 }
-                if (ent["rigidbody"].contains("freezeRotation")) {
-                    rigidbody.FreezeRotation = ent["rigidbody"]["freezeRotation"].get<bool>();
+                if (ent["Rigidbody"]["FreezeRotation"]) {
+                    rigidbody.FreezeRotation = ent["Rigidbody"]["FreezeRotation"].as<bool>();
                 }
             }
 
-            if (ent.contains("boxCollider")) {
+            if (ent["BoxCollider"]) {
                 auto& boxCollider = entity.AddComponent<BoxColliderComponent>();
-                if (ent["boxCollider"].contains("size")) {
-                    boxCollider.Size.x = ent["boxCollider"]["size"]["x"].get<float>();
-                    boxCollider.Size.y = ent["boxCollider"]["size"]["y"].get<float>();
+                if (ent["BoxCollider"]["Size"]) {
+                    boxCollider.Size.x = ent["BoxCollider"]["Size"]["X"].as<float>();
+                    boxCollider.Size.y = ent["BoxCollider"]["Size"]["Y"].as<float>();
                 }
-                if (ent["boxCollider"].contains("density")) {
-                    boxCollider.Density = ent["boxCollider"]["density"].get<float>();
+                if (ent["BoxCollider"]["Density"]) {
+                    boxCollider.Density = ent["BoxCollider"]["Density"].as<float>();
                 }
-                if (ent["boxCollider"].contains("friction")) {
-                    boxCollider.Friction = ent["boxCollider"]["friction"].get<float>();
+                if (ent["BoxCollider"]["Friction"]) {
+                    boxCollider.Friction = ent["BoxCollider"]["Friction"].as<float>();
                 }
-                if (ent["boxCollider"].contains("restitution")) {
-                    boxCollider.Restitution = ent["boxCollider"]["restitution"].get<float>();
+                if (ent["BoxCollider"]["Restitution"]) {
+                    boxCollider.Restitution = ent["BoxCollider"]["Restitution"].as<float>();
                 }
-                if (ent["boxCollider"].contains("restitutionThreshold")) {
-                    boxCollider.RestitutionThreshold = ent["boxCollider"]["restitutionThreshold"].get<float>();
+                if (ent["BoxCollider"]["RestitutionThreshold"]) {
+                    boxCollider.RestitutionThreshold = ent["BoxCollider"]["RestitutionThreshold"].as<float>();
                 }
             }
 
-            if (ent.contains("audioStreamPlayer")) {
+            if (ent["AudioStreamPlayer"]) {
                 auto& audio = entity.AddComponent<AudioStreamPlayerComponent>();
 
                 std::filesystem::path audioPath;
-                if (ent["audioStreamPlayer"].contains("filePath")) {
-                    audioPath = ent["audioStreamPlayer"]["filePath"].get<std::string>();
+                if (ent["AudioStreamPlayer"]["FilePath"]) {
+                    audioPath = ent["AudioStreamPlayer"]["FilePath"].as<std::string>();
                 }
                 if (std::filesystem::exists(audioPath)) {
                     audio.AudioHandle = AudioEngine::LoadAudioFromFile(audioPath);
@@ -226,8 +220,8 @@ namespace Nigozi
                     NG_CORE_LOG_ERROR("[Scene Tree] Couldn't find audio file with path: {}", audioPath.string());
                 }
 
-                if (ent["audioStreamPlayer"].contains("volume")) {
-                    audio.Volume = ent["audioStreamPlayer"]["volume"].get<float>();
+                if (ent["AudioStreamPlayer"]["Volume"]) {
+                    audio.Volume = ent["AudioStreamPlayer"]["Volume"].as<float>();
                 }
             }
         }
@@ -243,22 +237,22 @@ namespace Nigozi
         NG_CORE_LOG_INFO("[Scene Tree] Cleared tree");
     }
 
-    void SceneTree::SerializeNode(Entity node, nlohmann::json& doc) 
+    void SceneTree::SerializeNode(Entity node, YAML::Node& doc)
     {
-        nlohmann::json ent;
+        YAML::Node ent;
 
         auto& uuid = node.GetComponent<UUIDComponent>();
-        ent["uuid"]["id"] = uuid.ID.GetUUID();
+        ent["UUID"]["Id"] = uuid.ID.GetUUID();
 
         auto& name = node.GetComponent<NameComponent>();
-        ent["name"]["name"] = name.Name;
+        ent["Name"]["Name"] = name.Name;
 
         auto& tag = node.GetComponent<TagComponent>();
-        ent["tag"]["tag"] = tag.Tag;
+        ent["Tag"]["Tag"] = tag.Tag;
 
         if (node.HasComponent<SceneComponent>()) {
             auto& scene = node.GetComponent<SceneComponent>();
-            ent["scene"]["filePath"] = std::filesystem::absolute(scene.FilePath).string();
+            ent["Scene"]["FilePath"] = std::filesystem::absolute(scene.FilePath).string();
             if (uuid.ID != m_sceneRootUUID) {
                 // if we are using an external scene, stop serializing
                 doc.push_back(ent);
@@ -267,69 +261,69 @@ namespace Nigozi
         }
 
         auto& transform = node.GetComponent<TransformComponent>();
-        ent["transform"]["position"]["x"] = transform.Position.x;
-        ent["transform"]["position"]["y"] = transform.Position.y;
+        ent["Transform"]["Position"]["X"] = transform.Position.x;
+        ent["Transform"]["Position"]["Y"] = transform.Position.y;
 
-        ent["transform"]["scale"]["x"] = transform.Scale.x;
-        ent["transform"]["scale"]["y"] = transform.Scale.y;
+        ent["Transform"]["Scale"]["X"] = transform.Scale.x;
+        ent["Transform"]["Scale"]["Y"] = transform.Scale.y;
 
-        ent["transform"]["rotation"] = transform.Rotation;
+        ent["Transform"]["Rotation"] = transform.Rotation;
 
         auto& relationship = node.GetComponent<RelationshipComponent>();
 
         // children data will not be saved
         // parent data is enough to load and save entities
-        ent["relationship"]["parentUuid"] = relationship.ParentUUID.GetUUID();
+        ent["Relationship"]["ParentUUID"] = relationship.ParentUUID.GetUUID();
 
         if (node.HasComponent<CameraComponent>()) {
             auto& camera = node.GetComponent<CameraComponent>();
-            ent["camera"]["current"] = camera.Current;
-            ent["camera"]["aspect"] = camera.Aspect;
-            ent["camera"]["zoom"] = camera.Zoom;
+            ent["Camera"]["Current"] = camera.Current;
+            ent["Camera"]["aspect"] = camera.Aspect;
+            ent["Camera"]["zoom"] = camera.Zoom;
         }
 
         if (node.HasComponent<SpriteRendererComponent>()) {
             auto& sprite = node.GetComponent<SpriteRendererComponent>();
-            ent["sprite"]["texture"]["filePath"] = sprite.SpriteTexture->GetPath();
-            
-            ent["sprite"]["color"]["r"] = sprite.Color.x;
-            ent["sprite"]["color"]["g"] = sprite.Color.y;
-            ent["sprite"]["color"]["b"] = sprite.Color.z;
-            ent["sprite"]["color"]["a"] = sprite.Color.w;
+            ent["Sprite"]["Texture"]["FilePath"] = sprite.SpriteTexture->GetPath();
 
-            ent["sprite"]["slot"]["x"] = sprite.Sprite.GetSlotX();
-            ent["sprite"]["slot"]["y"] = sprite.Sprite.GetSlotY();
+            ent["Sprite"]["Color"]["R"] = sprite.Color.x;
+            ent["Sprite"]["Color"]["G"] = sprite.Color.y;
+            ent["Sprite"]["Color"]["B"] = sprite.Color.z;
+            ent["Sprite"]["Color"]["A"] = sprite.Color.w;
+
+            ent["Sprite"]["Slot"]["X"] = sprite.Sprite.GetSlotX();
+            ent["Sprite"]["Slot"]["Y"] = sprite.Sprite.GetSlotY();
 
             glm::i32vec2 seperators = glm::i32vec2((glm::vec2)sprite.Sprite.GetTextureSize() / sprite.Sprite.GetSize());
             if (seperators.x == 0)
                 seperators.x++;
             if (seperators.y == 0)
                 seperators.y++;
-            ent["sprite"]["seperator"]["x"] = (int32_t)(seperators.x);
-            ent["sprite"]["seperator"]["y"] = (int32_t)(seperators.y);
+            ent["Sprite"]["Seperator"]["X"] = (int32_t)(seperators.x);
+            ent["Sprite"]["Seperator"]["Y"] = (int32_t)(seperators.y);
         }
 
         if (node.HasComponent<RigidbodyComponent>()) {
             auto& rigidbody = node.GetComponent<RigidbodyComponent>();
-            ent["rigidbody"]["bodyType"] = (int32_t)rigidbody.Type;
-            ent["rigidbody"]["freezeRotation"] = rigidbody.FreezeRotation;
+            ent["Rigidbody"]["BodyType"] = (int32_t)rigidbody.Type;
+            ent["Rigidbody"]["FreezeRotation"] = rigidbody.FreezeRotation;
         }
 
         if (node.HasComponent<BoxColliderComponent>()) {
             auto& boxCollider = node.GetComponent<BoxColliderComponent>();
-            ent["boxCollider"]["size"]["x"] = boxCollider.Size.x;
-            ent["boxCollider"]["size"]["y"] = boxCollider.Size.y;
+            ent["BoxCollider"]["Size"]["X"] = boxCollider.Size.x;
+            ent["BoxCollider"]["Size"]["Y"] = boxCollider.Size.y;
 
-            ent["boxCollider"]["density"] = boxCollider.Density;
-            ent["boxCollider"]["friction"] = boxCollider.Friction;
-            ent["boxCollider"]["restitution"] = boxCollider.Restitution;
-            ent["boxCollider"]["restitutionThreshold"] = boxCollider.RestitutionThreshold;
+            ent["BoxCollider"]["Density"] = boxCollider.Density;
+            ent["BoxCollider"]["Friction"] = boxCollider.Friction;
+            ent["BoxCollider"]["Restitution"] = boxCollider.Restitution;
+            ent["BoxCollider"]["RestitutionThreshold"] = boxCollider.RestitutionThreshold;
         }
 
         if (node.HasComponent<AudioStreamPlayerComponent>()) {
             auto& audio = node.GetComponent<AudioStreamPlayerComponent>();
-            ent["audioStreamPlayer"]["filePath"] = audio.AudioHandle->GetFilePath();
-            ent["audioStreamPlayer"]["volume"] = audio.Volume;
+            ent["AudioStreamPlayer"]["FilePath"] = audio.AudioHandle->GetFilePath().string();
+            ent["AudioStreamPlayer"]["Volume"] = audio.Volume;
         }
 
         doc.push_back(ent);

@@ -20,3 +20,6 @@
 [submodule "vendor/Coral"]
 	path = vendor/Coral
 	url = https://github.com/StudioCherno/Coral
+[submodule "vendor/yaml-cpp"]
+	path = vendor/yaml-cpp
+	url = https://github.com/TheCherno/yaml-cpp

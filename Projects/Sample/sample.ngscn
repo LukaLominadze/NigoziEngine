@@ -1,394 +1,264 @@
-{
-    "metadata": {
-        "version": 0
-    },
-    "nodes": [
-        {
-            "name": {
-                "name": "World\u0000de"
-            },
-            "relationship": {
-                "parentUuid": 0
-            },
-            "scene": {
-                "filePath": "E:\\Luka\\Dev\\C++\\NigoziEngine\\Projects\\Sample\\sample.ngscn"
-            },
-            "tag": {
-                "tag": "Empty"
-            },
-            "transform": {
-                "position": {
-                    "x": 0.0,
-                    "y": 0.0
-                },
-                "rotation": 0.0,
-                "scale": {
-                    "x": 1.0,
-                    "y": 1.0
-                }
-            },
-            "uuid": {
-                "id": 5162139645558248151
-            }
-        },
-        {
-            "name": {
-                "name": "Ground\u0000e"
-            },
-            "relationship": {
-                "parentUuid": 5162139645558248151
-            },
-            "tag": {
-                "tag": "Empty"
-            },
-            "transform": {
-                "position": {
-                    "x": -0.8999999761581421,
-                    "y": -2.799999952316284
-                },
-                "rotation": 35.20000076293945,
-                "scale": {
-                    "x": 1.0,
-                    "y": 1.0
-                }
-            },
-            "uuid": {
-                "id": 13417082783058435392
-            }
-        },
-        {
-            "name": {
-                "name": "Sprite\u0000e"
-            },
-            "relationship": {
-                "parentUuid": 13417082783058435392
-            },
-            "sprite": {
-                "color": {
-                    "a": 1.0,
-                    "b": 0.2179930955171585,
-                    "g": 0.5385711193084717,
-                    "r": 0.8235294222831726
-                },
-                "seperator": {
-                    "x": 1,
-                    "y": 1
-                },
-                "slot": {
-                    "x": 0,
-                    "y": 0
-                },
-                "texture": {
-                    "filePath": "src/Nigozi/res/textures/flatQuad.png"
-                }
-            },
-            "tag": {
-                "tag": "Empty"
-            },
-            "transform": {
-                "position": {
-                    "x": 0.0,
-                    "y": 0.0
-                },
-                "rotation": 0.0,
-                "scale": {
-                    "x": 9.0,
-                    "y": 1.0
-                }
-            },
-            "uuid": {
-                "id": 4848402729339016890
-            }
-        },
-        {
-            "boxCollider": {
-                "density": 1.0,
-                "friction": 0.5,
-                "restitution": 0.0,
-                "restitutionThreshold": 0.5,
-                "size": {
-                    "x": 4.5,
-                    "y": 0.5
-                }
-            },
-            "name": {
-                "name": "Collider"
-            },
-            "relationship": {
-                "parentUuid": 13417082783058435392
-            },
-            "rigidbody": {
-                "bodyType": 0,
-                "freezeRotation": true
-            },
-            "tag": {
-                "tag": "Empty"
-            },
-            "transform": {
-                "position": {
-                    "x": 0.0,
-                    "y": 0.0
-                },
-                "rotation": 0.0,
-                "scale": {
-                    "x": 1.0,
-                    "y": 1.0
-                }
-            },
-            "uuid": {
-                "id": 1474181051824415628
-            }
-        },
-        {
-            "boxCollider": {
-                "density": 1.0,
-                "friction": 0.5,
-                "restitution": 0.3499999940395355,
-                "restitutionThreshold": 0.5,
-                "size": {
-                    "x": 0.5,
-                    "y": 0.5
-                }
-            },
-            "name": {
-                "name": "Player\u0000e"
-            },
-            "relationship": {
-                "parentUuid": 5162139645558248151
-            },
-            "rigidbody": {
-                "bodyType": 2,
-                "freezeRotation": false
-            },
-            "tag": {
-                "tag": "Empty"
-            },
-            "transform": {
-                "position": {
-                    "x": -0.30000001192092896,
-                    "y": 1.100000023841858
-                },
-                "rotation": -14.800000190734863,
-                "scale": {
-                    "x": 1.0,
-                    "y": 1.0
-                }
-            },
-            "uuid": {
-                "id": 17031323728387277468
-            }
-        },
-        {
-            "name": {
-                "name": "Sprite\u0000e"
-            },
-            "relationship": {
-                "parentUuid": 17031323728387277468
-            },
-            "sprite": {
-                "color": {
-                    "a": 1.0,
-                    "b": 1.0,
-                    "g": 1.0,
-                    "r": 1.0
-                },
-                "seperator": {
-                    "x": 10,
-                    "y": 1
-                },
-                "slot": {
-                    "x": 4,
-                    "y": 0
-                },
-                "texture": {
-                    "filePath": "E:\\Luka\\Dev\\C++\\NigoziEngine\\Kakali\\src\\res\\textures\\Player.png"
-                }
-            },
-            "tag": {
-                "tag": "Empty"
-            },
-            "transform": {
-                "position": {
-                    "x": 0.0,
-                    "y": 0.0
-                },
-                "rotation": 0.0,
-                "scale": {
-                    "x": 1.0,
-                    "y": 1.0
-                }
-            },
-            "uuid": {
-                "id": 12948363427884916129
-            }
-        },
-        {
-            "camera": {
-                "aspect": 1.7777777910232544,
-                "current": false,
-                "zoom": 5.0
-            },
-            "name": {
-                "name": "Camera\u0000e"
-            },
-            "relationship": {
-                "parentUuid": 17031323728387277468
-            },
-            "tag": {
-                "tag": "Empty"
-            },
-            "transform": {
-                "position": {
-                    "x": 0.0,
-                    "y": 0.0
-                },
-                "rotation": 0.0,
-                "scale": {
-                    "x": 1.0,
-                    "y": 1.0
-                }
-            },
-            "uuid": {
-                "id": 10640016771841302969
-            }
-        },
-        {
-            "name": {
-                "name": "Ground2\u0000"
-            },
-            "relationship": {
-                "parentUuid": 5162139645558248151
-            },
-            "tag": {
-                "tag": "Empty"
-            },
-            "transform": {
-                "position": {
-                    "x": 3.5,
-                    "y": -1.399999976158142
-                },
-                "rotation": -45.0,
-                "scale": {
-                    "x": 7.599999904632568,
-                    "y": 1.0
-                }
-            },
-            "uuid": {
-                "id": 7666352744461164943
-            }
-        },
-        {
-            "name": {
-                "name": "Sprite\u0000e"
-            },
-            "relationship": {
-                "parentUuid": 7666352744461164943
-            },
-            "sprite": {
-                "color": {
-                    "a": 1.0,
-                    "b": 0.23390042781829834,
-                    "g": 0.23390042781829834,
-                    "r": 0.7696078419685364
-                },
-                "seperator": {
-                    "x": 1,
-                    "y": 1
-                },
-                "slot": {
-                    "x": 0,
-                    "y": 0
-                },
-                "texture": {
-                    "filePath": "src/Nigozi/res/textures/flatQuad.png"
-                }
-            },
-            "tag": {
-                "tag": "Empty"
-            },
-            "transform": {
-                "position": {
-                    "x": 0.0,
-                    "y": 0.0
-                },
-                "rotation": 0.0,
-                "scale": {
-                    "x": 1.0,
-                    "y": 1.0
-                }
-            },
-            "uuid": {
-                "id": 9462178028978302548
-            }
-        },
-        {
-            "boxCollider": {
-                "density": 1.0,
-                "friction": 0.5,
-                "restitution": 0.0,
-                "restitutionThreshold": 0.5,
-                "size": {
-                    "x": 0.5,
-                    "y": 0.5
-                }
-            },
-            "name": {
-                "name": "Collider"
-            },
-            "relationship": {
-                "parentUuid": 7666352744461164943
-            },
-            "rigidbody": {
-                "bodyType": 0,
-                "freezeRotation": false
-            },
-            "tag": {
-                "tag": "Empty"
-            },
-            "transform": {
-                "position": {
-                    "x": 0.0,
-                    "y": 0.0
-                },
-                "rotation": 0.0,
-                "scale": {
-                    "x": 1.0,
-                    "y": 1.0
-                }
-            },
-            "uuid": {
-                "id": 13234964329535521412
-            }
-        },
-        {
-            "camera": {
-                "aspect": 1.777999997138977,
-                "current": true,
-                "zoom": 5.0
-            },
-            "name": {
-                "name": "New Node"
-            },
-            "relationship": {
-                "parentUuid": 5162139645558248151
-            },
-            "tag": {
-                "tag": "Empty"
-            },
-            "transform": {
-                "position": {
-                    "x": 0.0,
-                    "y": 0.0
-                },
-                "rotation": 0.0,
-                "scale": {
-                    "x": 1.0,
-                    "y": 1.0
-                }
-            },
-            "uuid": {
-                "id": 17229220921010365816
-            }
-        }
-    ]
-}
+Metadata:
+  Version: 0
+Nodes:
+  - UUID:
+      Id: 5162139645558248151
+    Name:
+      Name: "World\x00de"
+    Tag:
+      Tag: Empty
+    Scene:
+      FilePath: E:\Luka\Dev\C++\NigoziEngine\Projects\Sample\sample.ngscn
+    Transform:
+      Position:
+        X: 0
+        Y: 0
+      Scale:
+        X: 1
+        Y: 1
+      Rotation: 0
+    Relationship:
+      ParentUUID: 0
+  - UUID:
+      Id: 13417082783058435392
+    Name:
+      Name: "Ground\x00e"
+    Tag:
+      Tag: Empty
+    Transform:
+      Position:
+        X: -0.899999976
+        Y: -2.79999995
+      Scale:
+        X: 1
+        Y: 1
+      Rotation: 35.2000008
+    Relationship:
+      ParentUUID: 5162139645558248151
+  - UUID:
+      Id: 4848402729339016890
+    Name:
+      Name: "Sprite\x00e"
+    Tag:
+      Tag: Empty
+    Transform:
+      Position:
+        X: 0
+        Y: 0
+      Scale:
+        X: 9
+        Y: 1
+      Rotation: 0
+    Relationship:
+      ParentUUID: 13417082783058435392
+    Sprite:
+      Texture:
+        FilePath: src/Nigozi/res/textures/flatQuad.png
+      Color:
+        R: 0.823529422
+        G: 0.538571119
+        B: 0.217993096
+        A: 1
+      Slot:
+        X: 0
+        Y: 0
+      Seperator:
+        X: 1
+        Y: 1
+  - UUID:
+      Id: 1474181051824415628
+    Name:
+      Name: Collider
+    Tag:
+      Tag: Empty
+    Transform:
+      Position:
+        X: 0
+        Y: 0
+      Scale:
+        X: 1
+        Y: 1
+      Rotation: 0
+    Relationship:
+      ParentUUID: 13417082783058435392
+    Rigidbody:
+      BodyType: 0
+      FreezeRotation: true
+    BoxCollider:
+      Size:
+        X: 4.5
+        Y: 0.5
+      Density: 1
+      Friction: 0.5
+      Restitution: 0
+      RestitutionThreshold: 0.5
+  - UUID:
+      Id: 17031323728387277468
+    Name:
+      Name: "Player\x00e"
+    Tag:
+      Tag: Empty
+    Transform:
+      Position:
+        X: -0.300000012
+        Y: 1.10000002
+      Scale:
+        X: 1
+        Y: 1
+      Rotation: -14.8000002
+    Relationship:
+      ParentUUID: 5162139645558248151
+    Rigidbody:
+      BodyType: 2
+      FreezeRotation: false
+    BoxCollider:
+      Size:
+        X: 0.5
+        Y: 0.5
+      Density: 1
+      Friction: 0.5
+      Restitution: 0.349999994
+      RestitutionThreshold: 0.5
+  - UUID:
+      Id: 12948363427884916129
+    Name:
+      Name: "Sprite\x00e"
+    Tag:
+      Tag: Empty
+    Transform:
+      Position:
+        X: 0
+        Y: 0
+      Scale:
+        X: 1
+        Y: 1
+      Rotation: 0
+    Relationship:
+      ParentUUID: 17031323728387277468
+    Sprite:
+      Texture:
+        FilePath: E:\Luka\Dev\C++\NigoziEngine\Kakali\src\res\textures\Player.png
+      Color:
+        R: 1
+        G: 1
+        B: 1
+        A: 1
+      Slot:
+        X: 4
+        Y: 0
+      Seperator:
+        X: 10
+        Y: 1
+  - UUID:
+      Id: 10640016771841302969
+    Name:
+      Name: "Camera\x00e"
+    Tag:
+      Tag: Empty
+    Transform:
+      Position:
+        X: 0
+        Y: 0
+      Scale:
+        X: 1
+        Y: 1
+      Rotation: 0
+    Relationship:
+      ParentUUID: 17031323728387277468
+    Camera:
+      Current: false
+      aspect: 1.77777779
+      zoom: 5
+  - UUID:
+      Id: 7666352744461164943
+    Name:
+      Name: "Ground2\x00"
+    Tag:
+      Tag: Empty
+    Transform:
+      Position:
+        X: 3.5
+        Y: -1.39999998
+      Scale:
+        X: 7.5999999
+        Y: 1
+      Rotation: -45
+    Relationship:
+      ParentUUID: 5162139645558248151
+  - UUID:
+      Id: 9462178028978302548
+    Name:
+      Name: "Sprite\x00e"
+    Tag:
+      Tag: Empty
+    Transform:
+      Position:
+        X: 0
+        Y: 0
+      Scale:
+        X: 1
+        Y: 1
+      Rotation: 0
+    Relationship:
+      ParentUUID: 7666352744461164943
+    Sprite:
+      Texture:
+        FilePath: src/Nigozi/res/textures/flatQuad.png
+      Color:
+        R: 0.769607842
+        G: 0.233900428
+        B: 0.233900428
+        A: 1
+      Slot:
+        X: 0
+        Y: 0
+      Seperator:
+        X: 1
+        Y: 1
+  - UUID:
+      Id: 13234964329535521412
+    Name:
+      Name: Collider
+    Tag:
+      Tag: Empty
+    Transform:
+      Position:
+        X: 0
+        Y: 0
+      Scale:
+        X: 1
+        Y: 1
+      Rotation: 0
+    Relationship:
+      ParentUUID: 7666352744461164943
+    Rigidbody:
+      BodyType: 0
+      FreezeRotation: false
+    BoxCollider:
+      Size:
+        X: 0.5
+        Y: 0.5
+      Density: 1
+      Friction: 0.5
+      Restitution: 0
+      RestitutionThreshold: 0.5
+  - UUID:
+      Id: 17229220921010365816
+    Name:
+      Name: New Node
+    Tag:
+      Tag: Empty
+    Transform:
+      Position:
+        X: 0
+        Y: 0
+      Scale:
+        X: 1
+        Y: 1
+      Rotation: 0
+    Relationship:
+      ParentUUID: 5162139645558248151
+    Camera:
+      Current: true
+      aspect: 1.77777779
+      zoom: 5
