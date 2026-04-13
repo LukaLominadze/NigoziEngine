@@ -12,6 +12,12 @@ EditorLayer::EditorLayer(Nigozi::FrameBuffer* viewportBuffer)
     p_viewportBuffer = viewportBuffer;
 }
 
+void EditorLayer::OnAttach()
+{
+    ImGuiIO& io = ImGui::GetIO(); (void)io;
+    io.FontDefault = io.Fonts->AddFontFromFileTTF(std::filesystem::path("src/res/fonts/Open_Sans/static/OpenSans-Medium.ttf").string().c_str(), 18.0f);
+}
+
 void EditorLayer::OnEvent(Nigozi::Event& event)
 {
     Nigozi::EventDispatcher dispatcher(event);
@@ -477,7 +483,8 @@ void EditorLayer::DrawSceneHierarchyNode(Nigozi::Entity entity)
     auto& nameComponent = entity.GetComponent<Nigozi::NameComponent>();
 
     ImGuiTreeNodeFlags flags = ((m_selectionContext == entity.GetHandle()) ? ImGuiTreeNodeFlags_Selected : 0)
-        | ((entity.GetChildrenUUIDs().size() == 0) ? ImGuiTreeNodeFlags_Leaf : ImGuiTreeNodeFlags_OpenOnArrow | ImGuiTreeNodeFlags_OpenOnDoubleClick);
+        | ((entity.GetChildrenUUIDs().size() == 0) ? ImGuiTreeNodeFlags_Leaf : ImGuiTreeNodeFlags_OpenOnArrow | ImGuiTreeNodeFlags_OpenOnDoubleClick)
+        | ImGuiTreeNodeFlags_SpanAvailWidth;
 
     bool opened = ImGui::TreeNodeEx((void*)(uint64_t)(uint32_t)entity.GetHandle(), flags, nameComponent.Name.c_str());
 
@@ -499,6 +506,22 @@ void EditorLayer::DrawSceneHierarchyNode(Nigozi::Entity entity)
     }
 }
 
+template<typename T>
+static void DrawComponentInInspector(const std::string& name, Nigozi::Entity entity, entt::entity selectionContext, std::function<void(T&)> func) {
+    ImGuiTreeNodeFlags flags = ImGuiTreeNodeFlags_DefaultOpen | ImGuiTreeNodeFlags_SpanAvailWidth | ImGuiTreeNodeFlags_Framed | ImGuiTreeNodeFlags_FramePadding;
+
+    if (entity.HasComponent<T>() &&
+        ImGui::TreeNodeEx((void*)(typeid(T).hash_code() + (size_t)selectionContext), flags, name.c_str()))
+    {
+        auto& component = entity.GetComponent<T>();
+
+        func(component);
+
+        ImGui::TreePop();
+        ImGui::Separator();
+    }
+}
+
 void EditorLayer::ShowInspector()
 {
     ImGui::Begin("Inspector");
@@ -515,240 +538,215 @@ void EditorLayer::ShowInspector()
     ImGui::InputText("Name", nameComponent.Name.data(), nameComponent.Name.capacity());
     ImGui::InputText("Tag", tagComponent.Tag.data(), tagComponent.Tag.capacity());
 
-    if (entity.HasComponent<Nigozi::CameraComponent>() &&
-        ImGui::TreeNodeEx((void*)(typeid(Nigozi::CameraComponent).hash_code() + (size_t)m_selectionContext),
-            ImGuiTreeNodeFlags_DefaultOpen, "Camera")) {
-        auto& camera = entity.GetComponent<Nigozi::CameraComponent>();
-        ImGui::DragFloat("Zoom", &camera.Zoom, 0.05f, 0.01f);
-        if (ImGui::Checkbox("Current", &camera.Current)) {
-            auto cameraView = m_currentContext->m_Registry.view<Nigozi::CameraComponent>();
-            for (auto [entityHandle, otherCamera] : cameraView.each()) {
-                if (entityHandle == entity.GetHandle()) {
-                    continue;
-                }
-                otherCamera.Current = false;
-            }
-        }
-        ImGui::DragFloat("Aspect", &camera.Aspect, 0.1f, 0.01f);
-
-        ImGui::TreePop();
-        ImGui::Separator();
-    }
-
-    if (entity.HasComponent<Nigozi::SpriteRendererComponent>() &&
-        ImGui::TreeNodeEx((void*)(typeid(Nigozi::SpriteRendererComponent).hash_code() + (size_t)m_selectionContext),
-            ImGuiTreeNodeFlags_DefaultOpen, "Sprite Renderer")) {
-        auto& sprite = entity.GetComponent<Nigozi::SpriteRendererComponent>();
-
-        ImGuiTableFlags flags =
-            ImGuiTableFlags_SizingFixedFit |
-            ImGuiTableFlags_Hideable;
-
-        // TRANSFORM TABLE
-        float availableSizeX = ImGui::GetContentRegionAvail().x;
-        // UV coordinates are often (0.0f, 0.0f) and (1.0f, 1.0f) to display an entire textures.
-        // Here are trying to display only a 32x32 pixels area of the texture, hence the UV computation.
-        // Read about UV coordinates here: https://github.com/ocornut/imgui/wiki/Image-Loading-and-Displaying-Examples
-        ImVec2 size = ImVec2(availableSizeX / 2.0f - 10.0f, availableSizeX / 2.0f - 10.0f);                     // Size of the image we want to make visible
-        ImVec2 uv0 = ImVec2(0.0f, 1.0f);                            // UV coordinates for lower-left
-        ImVec2 uv1 = ImVec2(1.0f, 0.0f);    
-        ImVec4 bg_col = ImVec4(0.0f, 0.0f, 0.0f, 1.0f);             // Black background
-        ImVec4 tint_col = ImVec4(1.0f, 1.0f, 1.0f, 1.0f);           // No tint
-        if (ImGui::ImageButton("Sprite", sprite.SpriteTexture->GetRendererID(), size, uv0, uv1, bg_col, tint_col)) {
-            std::filesystem::path result = Nigozi::FileDialogue::OpenFileDialog("png;jpg;jpeg");
-            if (!result.empty()) {
-                std::string path = result.string();
-
-                sprite.SpriteTexture.reset();
-                sprite.SpriteTexture = std::make_shared<Nigozi::Texture>(path);
-                sprite.Sprite = Nigozi::SubTexture(sprite.SpriteTexture, sprite.SpriteTexture->GetSize());
-            }
-        }
-
-        EditValueInInspector<glm::vec4>(
-            [&]() { ImGui::ColorEdit4("Color", (float*)&sprite.Color); },
-            [&](glm::vec4 color) {
-                m_commandQueue.PushBack(Command(
-                    [&, newColor = sprite.Color, uuid = uuidComponent.ID](void* data) {
-                        auto& sprite = m_currentContext->TryGetEntityByUUID(uuid).GetComponent<Nigozi::SpriteRendererComponent>();
-                        sprite.Color = newColor;
-                    },
-                    [&, oldColor = color, uuid = uuidComponent.ID](void* data) {
-                        auto& sprite = m_currentContext->TryGetEntityByUUID(uuid).GetComponent<Nigozi::SpriteRendererComponent>();
-                        sprite.Color = oldColor;
+    DrawComponentInInspector<Nigozi::CameraComponent>("Camera", entity, m_selectionContext,
+        [&](auto& component) {
+            ImGui::DragFloat("Zoom", &component.Zoom, 0.05f, 0.01f);
+            if (ImGui::Checkbox("Current", &component.Current)) {
+                auto cameraView = m_currentContext->m_Registry.view<Nigozi::CameraComponent>();
+                for (auto [entityHandle, otherCamera] : cameraView.each()) {
+                    if (entityHandle == entity.GetHandle()) {
+                        continue;
                     }
-                ));
-            },
-            uuidComponent.ID,
-            sprite.Color
-        );
-        int zorder = sprite.ZOrder;
-        EditValueInInspector<int>(
-            [&]() { ImGui::SliderInt("Z Order", &zorder, -127, 127); sprite.ZOrder = (int16_t)zorder; },
-            [&](int zorder) {
-                m_commandQueue.PushBack(Command(
-                    [&, newZOrder = sprite.ZOrder, uuid = uuidComponent.ID](void* data) {
-                        sprite.ZOrder = (int16_t)newZOrder;
-                    },
-                    [&, oldZOrder = zorder, uuid = uuidComponent.ID](void* data) {
-                        sprite.ZOrder = (int16_t)oldZOrder;
-                    }
-                ));
-            },
-            uuidComponent.ID,
-            sprite.ZOrder
-        );
-            
-        glm::i32vec2 seperators = glm::i32vec2((glm::vec2)sprite.Sprite.GetTextureSize() / sprite.Sprite.GetSize());
-        glm::i32vec2 lastSeperators = seperators;
-        ImGui::DragInt2("Seperators", (int*)&seperators, 1.0f, 1, 0x7fffffff);
-        if (seperators.x != lastSeperators.x || seperators.y != lastSeperators.y) {
-            glm::vec2 texSize = sprite.Sprite.GetTextureSize();
-            glm::vec2 size(texSize.x / seperators.x, texSize.y / seperators.y);
-            sprite.Sprite.SetSubTexture(size, 0, 0);
-        }
-        glm::u32vec2 slots = { sprite.Sprite.GetSlotX(), sprite.Sprite.GetSlotY() };
-        glm::u32vec2 lastSlots = slots;
-        ImGui::DragInt2("Slot", (int*)&slots, 1.0f, 0, 0x7fffffff);
-        if (slots.x != lastSlots.x || slots.y != lastSlots.y) {
-            sprite.Sprite.SetSlot(slots.x, slots.y);
-        }
-        ImGui::TreePop();
-        ImGui::Separator();
-    }
-
-    if (entity.HasComponent<Nigozi::AudioStreamPlayerComponent>() &&
-        ImGui::TreeNodeEx((void*)(typeid(Nigozi::AudioStreamPlayerComponent).hash_code() + (size_t)m_selectionContext),
-            ImGuiTreeNodeFlags_DefaultOpen, "Audio Stream Player")) {
-        auto& audio = entity.GetComponent<Nigozi::AudioStreamPlayerComponent>();
-
-        if (ImGui::Button("Choose")) {
-            std::filesystem::path result = Nigozi::FileDialogue::OpenFileDialog("wav,mp3,flac");
-            NG_CORE_LOG_INFO("New audio path: {}", result.string());
-            if (!result.empty()) {
-                Nigozi::Audio* newAudio = nullptr;
-                if (audio.AudioHandle) {
-                    newAudio = Nigozi::AudioEngine::LoadAudioFromFile(result, audio.AudioHandle->GetAudioGroupName());
-                }
-                else {
-                    newAudio = Nigozi::AudioEngine::LoadAudioFromFile(result);
-                }
-                NG_CORE_LOG_INFO("New audio: {}", (size_t)newAudio);
-                if (newAudio) {
-                    if (audio.AudioHandle) {
-                        Nigozi::AudioEngine::UnloadAudio(audio.AudioHandle);
-                    }
-                    audio.AudioHandle = newAudio;
-                    audio.AudioHandle->SetVolume(audio.Volume);
-                    NG_CORE_LOG_INFO("Set audio: {}", (size_t)audio.AudioHandle);
-                }
-                else {
-                    NG_CORE_LOG_ERROR("Audio with path: {} couldn't load!", result.string());
+                    otherCamera.Current = false;
                 }
             }
-            else {
-                NG_CORE_LOG_ERROR("Couldn't get audio path: {}", result.string());
+            ImGui::DragFloat("Aspect", &component.Aspect, 0.1f, 0.01f);
+        }
+    );
+    DrawComponentInInspector<Nigozi::SpriteRendererComponent>("Sprite Renderer", entity, m_selectionContext,
+        [&](auto& component) {
+            ImGuiTableFlags flags =
+                ImGuiTableFlags_SizingFixedFit |
+                ImGuiTableFlags_Hideable;
+
+            // TRANSFORM TABLE
+            float availableSizeX = ImGui::GetContentRegionAvail().x;
+            // UV coordinates are often (0.0f, 0.0f) and (1.0f, 1.0f) to display an entire textures.
+            // Here are trying to display only a 32x32 pixels area of the texture, hence the UV computation.
+            // Read about UV coordinates here: https://github.com/ocornut/imgui/wiki/Image-Loading-and-Displaying-Examples
+            ImVec2 size = ImVec2(availableSizeX / 2.0f - 10.0f, availableSizeX / 2.0f - 10.0f);                     // Size of the image we want to make visible
+            ImVec2 uv0 = ImVec2(0.0f, 1.0f);                            // UV coordinates for lower-left
+            ImVec2 uv1 = ImVec2(1.0f, 0.0f);
+            ImVec4 bg_col = ImVec4(0.0f, 0.0f, 0.0f, 1.0f);             // Black background
+            ImVec4 tint_col = ImVec4(1.0f, 1.0f, 1.0f, 1.0f);           // No tint
+            if (ImGui::ImageButton("Sprite", component.SpriteTexture->GetRendererID(), size, uv0, uv1, bg_col, tint_col)) {
+                std::filesystem::path result = Nigozi::FileDialogue::OpenFileDialog("png;jpg;jpeg");
+                if (!result.empty()) {
+                    std::string path = result.string();
+
+                    component.SpriteTexture.reset();
+                    component.SpriteTexture = std::make_shared<Nigozi::Texture>(path);
+                    component.Sprite = Nigozi::SubTexture(component.SpriteTexture, component.SpriteTexture->GetSize());
+                }
             }
-        }
-        std::filesystem::path audioPath("empty");
-        if (audio.AudioHandle) {
-            audioPath = audio.AudioHandle->GetFilePath();
-        }
-        std::string audioPathString = audioPath.string();
-        if (audioPathString.size() > 32) {
-            audioPathString = audioPathString.substr(audioPathString.size() - 32);
-        }
-        ImGui::Text(audioPathString.c_str());
-        if (audio.AudioHandle) {
-            EditValueInInspector<float>(
-                [&]() {
-                    if (ImGui::DragFloat("Volume", &audio.Volume, 0.2f)) {
-                        audio.AudioHandle->SetVolume(audio.Volume);
-                    }
-                },
-                [&](float volume) {
+
+            EditValueInInspector<glm::vec4>(
+                [&]() { ImGui::ColorEdit4("Color", (float*)&component.Color); },
+                [&](glm::vec4 color) {
                     m_commandQueue.PushBack(Command(
-                        [&, newVolume = audio.Volume, uuid = uuidComponent.ID](void* data) {
-                            auto& audio = m_currentContext->TryGetEntityByUUID(uuid).GetComponent<Nigozi::AudioStreamPlayerComponent>();
-                            audio.Volume = newVolume;
-                            audio.AudioHandle->SetVolume(audio.Volume);
+                        [&, newColor = component.Color, uuid = uuidComponent.ID](void* data) {
+                            auto& sprite = m_currentContext->TryGetEntityByUUID(uuid).GetComponent<Nigozi::SpriteRendererComponent>();
+                            sprite.Color = newColor;
                         },
-                        [&, oldVolume = volume, uuid = uuidComponent.ID](void* data) {
-                            auto& audio = m_currentContext->TryGetEntityByUUID(uuid).GetComponent<Nigozi::AudioStreamPlayerComponent>();
-                            audio.Volume = oldVolume;
-                            audio.AudioHandle->SetVolume(audio.Volume);
+                        [&, oldColor = color, uuid = uuidComponent.ID](void* data) {
+                            auto& sprite = m_currentContext->TryGetEntityByUUID(uuid).GetComponent<Nigozi::SpriteRendererComponent>();
+                            sprite.Color = oldColor;
                         }
                     ));
                 },
                 uuidComponent.ID,
-                audio.Volume
+                component.Color
             );
-            bool lastPlayingVal = audio.AudioHandle->IsPlaying();
-            bool playingVal = lastPlayingVal;
-            EditValueInInspector<bool>(
-                [&]() {
-                    if (ImGui::Checkbox("Playing", &playingVal)) {
-                        if (playingVal != lastPlayingVal) {
-                            if (playingVal) {
-                                audio.AudioHandle->Play();
-                            }
-                            else {
-                                audio.AudioHandle->Stop();
-                            }
-                        }
-                    }
-                },
-                [&](bool isPlaying) {
+            int zorder = component.ZOrder;
+            EditValueInInspector<int>(
+                [&]() { ImGui::SliderInt("Z Order", &zorder, -127, 127); component.ZOrder = (int16_t)zorder; },
+                [&](int zorder) {
                     m_commandQueue.PushBack(Command(
-                        [&, newPlaying = audio.AudioHandle->IsPlaying(), uuid = uuidComponent.ID](void* data) {
-                            auto& audio = m_currentContext->TryGetEntityByUUID(uuid).GetComponent<Nigozi::AudioStreamPlayerComponent>();
-                            if (newPlaying)
-                                audio.AudioHandle->Play();
-                            else
-                                audio.AudioHandle->Stop();
+                        [&, newZOrder = component.ZOrder, uuid = uuidComponent.ID](void* data) {
+                            auto& sprite = m_currentContext->TryGetEntityByUUID(uuid).GetComponent<Nigozi::SpriteRendererComponent>();
+                            sprite.ZOrder = (int16_t)newZOrder;
                         },
-                        [&, oldPlaying = isPlaying, uuid = uuidComponent.ID](void* data) {
-                            auto& audio = m_currentContext->TryGetEntityByUUID(uuid).GetComponent<Nigozi::AudioStreamPlayerComponent>();
-                            if (oldPlaying)
-                                audio.AudioHandle->Play();
-                            else
-                                audio.AudioHandle->Stop();
+                        [&, oldZOrder = zorder, uuid = uuidComponent.ID](void* data) {
+                            auto& sprite = m_currentContext->TryGetEntityByUUID(uuid).GetComponent<Nigozi::SpriteRendererComponent>();
+                            sprite.ZOrder = (int16_t)oldZOrder;
                         }
                     ));
                 },
                 uuidComponent.ID,
-                playingVal
+                component.ZOrder
             );
+
+            glm::i32vec2 seperators = glm::i32vec2((glm::vec2)component.Sprite.GetTextureSize() / component.Sprite.GetSize());
+            glm::i32vec2 lastSeperators = seperators;
+            ImGui::DragInt2("Seperators", (int*)&seperators, 1.0f, 1, 0x7fffffff);
+            if (seperators.x != lastSeperators.x || seperators.y != lastSeperators.y) {
+                glm::vec2 texSize = component.Sprite.GetTextureSize();
+                glm::vec2 size(texSize.x / seperators.x, texSize.y / seperators.y);
+                component.Sprite.SetSubTexture(size, 0, 0);
+            }
+            glm::u32vec2 slots = { component.Sprite.GetSlotX(), component.Sprite.GetSlotY() };
+            glm::u32vec2 lastSlots = slots;
+            ImGui::DragInt2("Slot", (int*)&slots, 1.0f, 0, 0x7fffffff);
+            if (slots.x != lastSlots.x || slots.y != lastSlots.y) {
+                component.Sprite.SetSlot(slots.x, slots.y);
+            }
         }
-
-        ImGui::TreePop();
-        ImGui::Separator();
-    }
-
-    if (entity.HasComponent<Nigozi::RigidbodyComponent>()) {
-        if (ImGui::TreeNodeEx((void*)(typeid(Nigozi::RigidbodyComponent).hash_code() + (size_t)m_selectionContext),
-            ImGuiTreeNodeFlags_DefaultOpen, "Rigidbody")) {
-            auto& rigidbody = entity.GetComponent<Nigozi::RigidbodyComponent>();
+    );
+    DrawComponentInInspector<Nigozi::AudioStreamPlayerComponent>("Audio Stream Player", entity, m_selectionContext,
+        [&](auto& component) {
+            if (ImGui::Button("Choose")) {
+                std::filesystem::path result = Nigozi::FileDialogue::OpenFileDialog("wav,mp3,flac");
+                NG_CORE_LOG_INFO("New audio path: {}", result.string());
+                if (!result.empty()) {
+                    Nigozi::Audio* newAudio = nullptr;
+                    if (component.AudioHandle) {
+                        newAudio = Nigozi::AudioEngine::LoadAudioFromFile(result, component.AudioHandle->GetAudioGroupName());
+                    }
+                    else {
+                        newAudio = Nigozi::AudioEngine::LoadAudioFromFile(result);
+                    }
+                    NG_CORE_LOG_INFO("New audio: {}", (size_t)newAudio);
+                    if (newAudio) {
+                        if (component.AudioHandle) {
+                            Nigozi::AudioEngine::UnloadAudio(component.AudioHandle);
+                        }
+                        component.AudioHandle = newAudio;
+                        component.AudioHandle->SetVolume(component.Volume);
+                        NG_CORE_LOG_INFO("Set audio: {}", (size_t)component.AudioHandle);
+                    }
+                    else {
+                        NG_CORE_LOG_ERROR("Audio with path: {} couldn't load!", result.string());
+                    }
+                }
+                else {
+                    NG_CORE_LOG_ERROR("Couldn't get audio path: {}", result.string());
+                }
+            }
+            std::filesystem::path audioPath("empty");
+            if (component.AudioHandle) {
+                audioPath = component.AudioHandle->GetFilePath();
+            }
+            std::string audioPathString = audioPath.string();
+            if (audioPathString.size() > 32) {
+                audioPathString = audioPathString.substr(audioPathString.size() - 32);
+            }
+            ImGui::Text(audioPathString.c_str());
+            if (component.AudioHandle) {
+                EditValueInInspector<float>(
+                    [&]() {
+                        if (ImGui::DragFloat("Volume", &component.Volume, 0.2f)) {
+                            component.AudioHandle->SetVolume(component.Volume);
+                        }
+                    },
+                    [&](float volume) {
+                        m_commandQueue.PushBack(Command(
+                            [&, newVolume = component.Volume, uuid = uuidComponent.ID](void* data) {
+                                auto& audio = m_currentContext->TryGetEntityByUUID(uuid).GetComponent<Nigozi::AudioStreamPlayerComponent>();
+                                audio.Volume = newVolume;
+                                audio.AudioHandle->SetVolume(audio.Volume);
+                            },
+                            [&, oldVolume = volume, uuid = uuidComponent.ID](void* data) {
+                                auto& audio = m_currentContext->TryGetEntityByUUID(uuid).GetComponent<Nigozi::AudioStreamPlayerComponent>();
+                                audio.Volume = oldVolume;
+                                audio.AudioHandle->SetVolume(audio.Volume);
+                            }
+                        ));
+                    },
+                    uuidComponent.ID,
+                    component.Volume
+                );
+                bool lastPlayingVal = component.AudioHandle->IsPlaying();
+                bool playingVal = lastPlayingVal;
+                EditValueInInspector<bool>(
+                    [&]() {
+                        if (ImGui::Checkbox("Playing", &playingVal)) {
+                            if (playingVal != lastPlayingVal) {
+                                if (playingVal) {
+                                    component.AudioHandle->Play();
+                                }
+                                else {
+                                    component.AudioHandle->Stop();
+                                }
+                            }
+                        }
+                    },
+                    [&](bool isPlaying) {
+                        m_commandQueue.PushBack(Command(
+                            [&, newPlaying = component.AudioHandle->IsPlaying(), uuid = uuidComponent.ID](void* data) {
+                                auto& audio = m_currentContext->TryGetEntityByUUID(uuid).GetComponent<Nigozi::AudioStreamPlayerComponent>();
+                                if (newPlaying)
+                                    audio.AudioHandle->Play();
+                                else
+                                    audio.AudioHandle->Stop();
+                            },
+                            [&, oldPlaying = isPlaying, uuid = uuidComponent.ID](void* data) {
+                                auto& audio = m_currentContext->TryGetEntityByUUID(uuid).GetComponent<Nigozi::AudioStreamPlayerComponent>();
+                                if (oldPlaying)
+                                    audio.AudioHandle->Play();
+                                else
+                                    audio.AudioHandle->Stop();
+                            }
+                        ));
+                    },
+                    uuidComponent.ID,
+                    playingVal
+                );
+            }
+        }
+    );
+    DrawComponentInInspector<Nigozi::RigidbodyComponent>("Rigidbody", entity, m_selectionContext,
+        [&](auto& rigidbody) {
+            auto& component = entity.GetComponent<Nigozi::RigidbodyComponent>();
 
             const char* bodyTypeNames[] = {
                 "Static", "Kinematic", "Dynamic"
             };
-            int currentType = (int)rigidbody.Type;
-            // ImGui::Combo("Body Type", &currentType, bodyTypeNames, 3); rigidbody.Type = (Nigozi::RigidbodyComponent::BodyType)currentType;
-            // NG_CLIENT_LOG_INFO("ImGui::IsItemActivated(): {}", ImGui::IsItemActivated());
-            // NG_CLIENT_LOG_INFO("ImGui::IsItemActive(): {}", ImGui::IsItemActive());
-            // NG_CLIENT_LOG_INFO("ImGui::IsItemActivated(): {}", ImGui::IsItemActivated());
-            // NG_CLIENT_LOG_INFO("ImGui::IsItemClicked(): {}", ImGui::IsItemClicked());
-            // NG_CLIENT_LOG_INFO("ImGui::IsItemEdited(): {}", ImGui::IsItemEdited());
-            // NG_CLIENT_LOG_INFO("ImGui::IsItemDeactivated(): {}", ImGui::IsItemDeactivated());
-            // NG_CLIENT_LOG_INFO("ImGui::IsItemDeactivatedAfterEdit(): {}", ImGui::IsItemDeactivatedAfterEdit());
-            // NG_CLIENT_LOG_INFO("ImGui::IsItemFocused(): {}", ImGui::IsItemFocused());
-            // NG_CLIENT_LOG_INFO("ImGui::IsItemHovered(): {}", ImGui::IsItemHovered());
+            int currentType = (int)component.Type;
             EditValueInInspector<Nigozi::RigidbodyComponent::BodyType>(
-                [&]() { ImGui::Combo("Body Type", &currentType, bodyTypeNames, 3); rigidbody.Type = (Nigozi::RigidbodyComponent::BodyType)currentType; },
+                [&]() { ImGui::Combo("Body Type", &currentType, bodyTypeNames, 3); component.Type = (Nigozi::RigidbodyComponent::BodyType)currentType; },
                 [&](Nigozi::RigidbodyComponent::BodyType type) {
                     m_commandQueue.PushBack(Command(
-                        [&, newType = rigidbody.Type, uuid = uuidComponent.ID](void* data) {
+                        [&, newType = component.Type, uuid = uuidComponent.ID](void* data) {
                             auto& rigidbody = m_currentContext->TryGetEntityByUUID(uuid).GetComponent<Nigozi::RigidbodyComponent>();
                             rigidbody.Type = newType;
                         },
@@ -759,15 +757,15 @@ void EditorLayer::ShowInspector()
                     ));
                 },
                 uuidComponent.ID,
-                rigidbody.Type,
+                component.Type,
                 EditValueInInspectorFlags::COMBO_BOX
             );
 
             EditValueInInspector<bool>(
-                [&]() { ImGui::Checkbox("Freeze Rotation", &rigidbody.FreezeRotation); },
+                [&]() { ImGui::Checkbox("Freeze Rotation", &component.FreezeRotation); },
                 [&](bool freezeRotation) {
                     m_commandQueue.PushBack(Command(
-                        [&, newRotation = rigidbody.FreezeRotation, uuid = uuidComponent.ID](void* data) {
+                        [&, newRotation = component.FreezeRotation, uuid = uuidComponent.ID](void* data) {
                             auto& rigidbody = m_currentContext->TryGetEntityByUUID(uuid).GetComponent<Nigozi::RigidbodyComponent>();
                             rigidbody.FreezeRotation = newRotation;
                         },
@@ -778,23 +776,17 @@ void EditorLayer::ShowInspector()
                     ));
                 },
                 uuidComponent.ID,
-                rigidbody.FreezeRotation
+                component.FreezeRotation
             );
-
-            ImGui::TreePop();
         }
-    }
-
-    if (entity.HasComponent<Nigozi::BoxColliderComponent>()) {
-        if (ImGui::TreeNodeEx((void*)(typeid(Nigozi::BoxColliderComponent).hash_code() + (size_t)m_selectionContext),
-            ImGuiTreeNodeFlags_DefaultOpen, "Box Collider")) {
-            auto& boxCollider = entity.GetComponent<Nigozi::BoxColliderComponent>();
-
+    );
+    DrawComponentInInspector<Nigozi::BoxColliderComponent>("Box Collider", entity, m_selectionContext,
+        [&](auto& component) {
             EditValueInInspector<glm::vec2>(
-                [&]() { ImGui::DragFloat2("Size", (float*)&boxCollider.Size, 0.05f, 0.01f); },
+                [&]() { ImGui::DragFloat2("Size", (float*)&component.Size, 0.05f, 0.01f); },
                 [&](glm::vec2 size) {
                     m_commandQueue.PushBack(Command(
-                        [&, newSize = boxCollider.Size, uuid = uuidComponent.ID](void* data) {
+                        [&, newSize = component.Size, uuid = uuidComponent.ID](void* data) {
                             auto& boxCollider = m_currentContext->TryGetEntityByUUID(uuid).GetComponent<Nigozi::BoxColliderComponent>();
                             boxCollider.Size = newSize;
                         },
@@ -805,13 +797,13 @@ void EditorLayer::ShowInspector()
                     ));
                 },
                 uuidComponent.ID,
-                boxCollider.Size
+                component.Size
             );
             EditValueInInspector<glm::vec2>(
-                [&]() { ImGui::DragFloat2("Offset", (float*)&boxCollider.Offset, 0.05f); },
+                [&]() { ImGui::DragFloat2("Offset", (float*)&component.Offset, 0.05f); },
                 [&](glm::vec2 offset) {
                     m_commandQueue.PushBack(Command(
-                        [&, newOffset = boxCollider.Offset, uuid = uuidComponent.ID](void* data) {
+                        [&, newOffset = component.Offset, uuid = uuidComponent.ID](void* data) {
                             auto& boxCollider = m_currentContext->TryGetEntityByUUID(uuid).GetComponent<Nigozi::BoxColliderComponent>();
                             boxCollider.Offset = newOffset;
                         },
@@ -822,14 +814,14 @@ void EditorLayer::ShowInspector()
                     ));
                 },
                 uuidComponent.ID,
-                boxCollider.Offset
+                component.Offset
             );
 
             EditValueInInspector<float>(
-                [&]() { ImGui::DragFloat("Density", &boxCollider.Density, 0.05f); },
+                [&]() { ImGui::DragFloat("Density", &component.Density, 0.05f); },
                 [&](float density) {
                     m_commandQueue.PushBack(Command(
-                        [&, newDensity = boxCollider.Density, uuid = uuidComponent.ID](void* data) {
+                        [&, newDensity = component.Density, uuid = uuidComponent.ID](void* data) {
                             auto& boxCollider = m_currentContext->TryGetEntityByUUID(uuid).GetComponent<Nigozi::BoxColliderComponent>();
                             boxCollider.Density = newDensity;
                         },
@@ -840,13 +832,13 @@ void EditorLayer::ShowInspector()
                     ));
                 },
                 uuidComponent.ID,
-                boxCollider.Density
+                component.Density
             );
             EditValueInInspector<float>(
-                [&]() { ImGui::DragFloat("Friction", &boxCollider.Friction, 0.05f); },
+                [&]() { ImGui::DragFloat("Friction", &component.Friction, 0.05f); },
                 [&](float friction) {
                     m_commandQueue.PushBack(Command(
-                        [&, newFriction = boxCollider.Friction, uuid = uuidComponent.ID](void* data) {
+                        [&, newFriction = component.Friction, uuid = uuidComponent.ID](void* data) {
                             auto& boxCollider = m_currentContext->TryGetEntityByUUID(uuid).GetComponent<Nigozi::BoxColliderComponent>();
                             boxCollider.Friction = newFriction;
                         },
@@ -857,13 +849,13 @@ void EditorLayer::ShowInspector()
                     ));
                 },
                 uuidComponent.ID,
-                boxCollider.Friction
+                component.Friction
             );
             EditValueInInspector<float>(
-                [&]() { ImGui::DragFloat("Restitution", &boxCollider.Restitution, 0.05f); },
+                [&]() { ImGui::DragFloat("Restitution", &component.Restitution, 0.05f); },
                 [&](float restitution) {
                     m_commandQueue.PushBack(Command(
-                        [&, newRestitution = boxCollider.Restitution, uuid = uuidComponent.ID](void* data) {
+                        [&, newRestitution = component.Restitution, uuid = uuidComponent.ID](void* data) {
                             auto& boxCollider = m_currentContext->TryGetEntityByUUID(uuid).GetComponent<Nigozi::BoxColliderComponent>();
                             boxCollider.Restitution = newRestitution;
                         },
@@ -874,13 +866,13 @@ void EditorLayer::ShowInspector()
                     ));
                 },
                 uuidComponent.ID,
-                boxCollider.Restitution
+                component.Restitution
             );
             EditValueInInspector<float>(
-                [&]() { ImGui::DragFloat("Restitution Threshold", &boxCollider.RestitutionThreshold, 0.05f); },
+                [&]() { ImGui::DragFloat("Restitution Threshold", &component.RestitutionThreshold, 0.05f); },
                 [&](float restitutionThreshold) {
                     m_commandQueue.PushBack(Command(
-                        [&, newRestitutionThreshold = boxCollider.RestitutionThreshold, uuid = uuidComponent.ID](void* data) {
+                        [&, newRestitutionThreshold = component.RestitutionThreshold, uuid = uuidComponent.ID](void* data) {
                             auto& boxCollider = m_currentContext->TryGetEntityByUUID(uuid).GetComponent<Nigozi::BoxColliderComponent>();
                             boxCollider.RestitutionThreshold = newRestitutionThreshold;
                         },
@@ -891,225 +883,218 @@ void EditorLayer::ShowInspector()
                     ));
                 },
                 uuidComponent.ID,
-                boxCollider.RestitutionThreshold
+                component.RestitutionThreshold
             );
-
-            ImGui::TreePop();
         }
-    }
+    );
+    DrawComponentInInspector<Nigozi::TransformComponent>("Transform", entity, m_selectionContext,
+        [&](auto& component) {
+            ImGui::Text("Parent");
+            ImGui::SameLine();
+            Nigozi::UUID parentUUID = Nigozi::UUID::Null;
+            Nigozi::Entity parent = entity.GetParent();
+            if (entity.GetParent() != Nigozi::Entity()) {
+                parentUUID = parent.GetUUID();
+            }
+            ImGui::Button(std::to_string(parentUUID).c_str());
 
-    if (ImGui::TreeNodeEx((void*)(typeid(Nigozi::TransformComponent).hash_code() + (size_t)m_selectionContext),
-        ImGuiTreeNodeFlags_DefaultOpen, "Transform")) {
-        auto& transform = entity.GetComponent<Nigozi::TransformComponent>();
+            ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2{ 0, 0 });
+            ImGui::PushStyleVar(ImGuiStyleVar_CellPadding, ImVec2{ 10.0f, 4.0f });
 
-        ImGui::Text("Parent");
-        ImGui::SameLine();
-        Nigozi::UUID parentUUID = Nigozi::UUID::Null;
-        Nigozi::Entity parent = entity.GetParent();
-        if (entity.GetParent() != Nigozi::Entity()) {
-            parentUUID = parent.GetUUID();
+            ImGuiTableFlags flags =
+                ImGuiTableFlags_SizingFixedFit |
+                ImGuiTableFlags_Hideable;
+
+            // TRANSFORM TABLE
+            ImGui::BeginTable("transform_table", 2, flags);
+
+            ImGui::TableSetupColumn("##TRANSFORM_LABEL", ImGuiTableColumnFlags_WidthFixed);
+            ImGui::TableSetupColumn("##TRANSFORM_PARAMS", ImGuiTableColumnFlags_WidthStretch);
+            // --POSITION ROW
+            ImGui::TableNextRow();
+
+            // --(0)POSITION TITLE COLUMN
+            // ImGui::SetColumnWidth(0, 100);
+            ImGui::TableNextColumn();
+            ImGui::Text("Position");
+
+            ImGui::TableNextColumn();
+
+            // --(1)POSITION TABLE COLUMN
+            ImGuiTableFlags innerFlags =
+                ImGuiTableFlags_NoPadInnerX |
+                ImGuiTableFlags_NoPadOuterX |
+                ImGuiTableFlags_Hideable;
+            ImGui::BeginTable("position_value_table", 2, innerFlags);
+
+            ImGui::TableSetupColumn("##TRANSFORM_POS_X", ImGuiTableColumnFlags_WidthStretch);
+            ImGui::TableSetupColumn("##TRANSFORM_POS_Y", ImGuiTableColumnFlags_WidthStretch);
+
+            // ----POSITION ROW
+            ImGui::TableNextRow();
+
+            // ----(0)POSITION_X COLUMN
+            ImGui::TableNextColumn();
+            ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2{ 10.0f, 0.0f });
+            ImGui::Text("X");
+            ImGui::SameLine();
+
+            ImGui::PushItemWidth(-10.0f);
+            EditValueInInspector<float>(
+                [&]() {  ImGui::DragFloat("##X", &component.Position.x, 0.1f, -INFINITY, INFINITY, "%.2f"); },
+                [&](float positionX) {
+                    m_commandQueue.PushBack(Command(
+                        [&, newPositionX = component.Position.x, uuid = uuidComponent.ID](void* data) {
+                            auto& transform = m_currentContext->TryGetEntityByUUID(uuid).GetComponent<Nigozi::TransformComponent>();
+                            transform.Position.x = newPositionX;
+                        },
+                        [&, oldPositionX = positionX, uuid = uuidComponent.ID](void* data) {
+                            auto& transform = m_currentContext->TryGetEntityByUUID(uuid).GetComponent<Nigozi::TransformComponent>();
+                            transform.Position.x = oldPositionX;
+                        }
+                    ));
+                },
+                uuidComponent.ID,
+                component.Position.x
+            );
+            ImGui::PopItemWidth();
+
+            // ----(1)POSITION_Y COLUMN
+            ImGui::TableNextColumn();
+            ImGui::Text("Y");
+            ImGui::SameLine();
+
+            ImGui::PushItemWidth(-10.0f);
+            EditValueInInspector<float>(
+                [&]() {  ImGui::DragFloat("##Y", &component.Position.y, 0.1f, -INFINITY, INFINITY, "%.2f"); },
+                [&](float positionY) {
+                    m_commandQueue.PushBack(Command(
+                        [&, newPositionY = component.Position.y, uuid = uuidComponent.ID](void* data) {
+                            auto& transform = m_currentContext->TryGetEntityByUUID(uuid).GetComponent<Nigozi::TransformComponent>();
+                            transform.Position.y = newPositionY;
+                        },
+                        [&, oldPositionY = positionY, uuid = uuidComponent.ID](void* data) {
+                            auto& transform = m_currentContext->TryGetEntityByUUID(uuid).GetComponent<Nigozi::TransformComponent>();
+                            transform.Position.y = oldPositionY;
+                        }
+                    ));
+                },
+                uuidComponent.ID,
+                component.Position.y
+            );
+            ImGui::PopItemWidth();
+
+            // --(1)POSITION TABLE END COLUMN
+            ImGui::EndTable();
+
+            // --SCALE ROW
+            ImGui::TableNextRow();
+
+            // --(0)SCALE TITLE COLUMN
+            ImGui::TableNextColumn();
+            ImGui::Text("Scale");
+
+            ImGui::TableNextColumn();
+
+            // --(1)SCALE TABLE COLUMN
+            ImGui::BeginTable("scale_value_table", 2, innerFlags);
+
+            ImGui::TableSetupColumn("##TRANSFORM_SCALE_X", ImGuiTableColumnFlags_WidthStretch);
+            ImGui::TableSetupColumn("##TRANSFORM_SCALE_Y", ImGuiTableColumnFlags_WidthStretch);
+
+            // ----SCALE ROW
+            ImGui::TableNextRow();
+
+            // ----(0)SCALE_X COLUMN
+            ImGui::TableNextColumn();
+            ImGui::Text("X");
+            ImGui::SameLine();
+
+            ImGui::PushItemWidth(-10.0f);
+            EditValueInInspector<float>(
+                [&]() {  ImGui::DragFloat("##X", &component.Scale.x, 0.1f); },
+                [&](float scaleX) {
+                    m_commandQueue.PushBack(Command(
+                        [&, newScaleX = component.Scale.x, uuid = uuidComponent.ID](void* data) {
+                            auto& transform = m_currentContext->TryGetEntityByUUID(uuid).GetComponent<Nigozi::TransformComponent>();
+                            transform.Scale.x = newScaleX;
+                        },
+                        [&, oldScaleX = scaleX, uuid = uuidComponent.ID](void* data) {
+                            auto& transform = m_currentContext->TryGetEntityByUUID(uuid).GetComponent<Nigozi::TransformComponent>();
+                            transform.Scale.x = oldScaleX;
+                        }
+                    ));
+                },
+                uuidComponent.ID,
+                component.Scale.x
+            );
+            ImGui::PopItemWidth();
+
+            // ----(1)SCALE_Y COLUMN
+            ImGui::TableNextColumn();
+            ImGui::Text("Y");
+            ImGui::SameLine();
+
+            ImGui::PushItemWidth(-10.0f);
+            EditValueInInspector<float>(
+                [&]() { ImGui::DragFloat("##Y", &component.Scale.y, 0.1f); },
+                [&](float scaleY) {
+                    m_commandQueue.PushBack(Command(
+                        [&, newScaleY = component.Scale.y, uuid = uuidComponent.ID](void* data) {
+                            auto& transform = m_currentContext->TryGetEntityByUUID(uuid).GetComponent<Nigozi::TransformComponent>();
+                            transform.Scale.y = newScaleY;
+                        },
+                        [&, oldScaleY = scaleY, uuid = uuidComponent.ID](void* data) {
+                            auto& transform = m_currentContext->TryGetEntityByUUID(uuid).GetComponent<Nigozi::TransformComponent>();
+                            transform.Scale.y = oldScaleY;
+                        }
+                    ));
+                },
+                uuidComponent.ID,
+                component.Scale.y
+            );
+            ImGui::PopItemWidth();
+            ImGui::PopStyleVar();
+
+            // --(1)SCALE TABLE END COLUMN
+            ImGui::EndTable();
+
+            // ----SCALE ROW
+            ImGui::TableNextRow();
+
+            // ----(0)SCALE_X COLUMN
+            ImGui::TableNextColumn();
+            ImGui::Text("Rotation");
+
+            ImGui::TableNextColumn();
+            ImGui::PushItemWidth(-10.0f);
+            EditValueInInspector<float>(
+                [&]() { ImGui::DragFloat("##ROTATION", &component.Rotation, 0.1f, -360.0f, 360.0f, "%.2f", ImGuiSliderFlags_WrapAround); },
+                [&](float rotation) {
+                    m_commandQueue.PushBack(Command(
+                        [&, newRotation = component.Rotation, uuid = uuidComponent.ID](void* data) {
+                            auto& transform = m_currentContext->TryGetEntityByUUID(uuid).GetComponent<Nigozi::TransformComponent>();
+                            transform.Rotation = newRotation;
+                        },
+                        [&, oldRotation = rotation, uuid = uuidComponent.ID](void* data) {
+                            auto& transform = m_currentContext->TryGetEntityByUUID(uuid).GetComponent<Nigozi::TransformComponent>();
+                            transform.Rotation = oldRotation;
+                        }
+                    ));
+                },
+                uuidComponent.ID,
+                component.Rotation
+            );
+            // ImGui::DragFloat("##ROTATION", &transform.Rotation, 0.1f, -360.0f, 360.0f, "%.2f", ImGuiSliderFlags_WrapAround);
+            ImGui::PopItemWidth();
+
+            // TRANSFORM TABLE END
+            ImGui::EndTable();
+
+            ImGui::PopStyleVar();
+            ImGui::PopStyleVar();
         }
-        ImGui::Button(std::to_string(parentUUID).c_str());
-
-        ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2{ 0, 0 });
-        ImGui::PushStyleVar(ImGuiStyleVar_CellPadding, ImVec2{ 10.0f, 4.0f });
-
-        ImGuiTableFlags flags =
-            ImGuiTableFlags_SizingFixedFit |
-            ImGuiTableFlags_Hideable;
-
-        // TRANSFORM TABLE
-        ImGui::BeginTable("transform_table", 2, flags);
-
-        ImGui::TableSetupColumn("##TRANSFORM_LABEL", ImGuiTableColumnFlags_WidthFixed);
-        ImGui::TableSetupColumn("##TRANSFORM_PARAMS", ImGuiTableColumnFlags_WidthStretch);
-        // --POSITION ROW
-        ImGui::TableNextRow();
-
-        // --(0)POSITION TITLE COLUMN
-        // ImGui::SetColumnWidth(0, 100);
-        ImGui::TableNextColumn();
-        ImGui::Text("Position");
-
-        ImGui::TableNextColumn();
-
-        // --(1)POSITION TABLE COLUMN
-        ImGuiTableFlags innerFlags =
-            ImGuiTableFlags_NoPadInnerX |
-            ImGuiTableFlags_NoPadOuterX |
-            ImGuiTableFlags_Hideable;
-        ImGui::BeginTable("position_value_table", 2, innerFlags);
-
-        ImGui::TableSetupColumn("##TRANSFORM_POS_X", ImGuiTableColumnFlags_WidthStretch);
-        ImGui::TableSetupColumn("##TRANSFORM_POS_Y", ImGuiTableColumnFlags_WidthStretch);
-
-        // ----POSITION ROW
-        ImGui::TableNextRow();
-
-        // ----(0)POSITION_X COLUMN
-        ImGui::TableNextColumn();
-        ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2{ 10.0f, 0.0f });
-        ImGui::Text("X");
-        ImGui::SameLine();
-
-        ImGui::PushItemWidth(-10.0f);
-        EditValueInInspector<float>(
-            [&]() {  ImGui::DragFloat("##X", &transform.Position.x, 0.1f, -INFINITY, INFINITY, "%.2f"); },
-            [&](float positionX) {
-                m_commandQueue.PushBack(Command(
-                    [&, newPositionX = transform.Position.x, uuid = uuidComponent.ID](void* data) {
-                        auto& transform = m_currentContext->TryGetEntityByUUID(uuid).GetComponent<Nigozi::TransformComponent>();
-                        transform.Position.x = newPositionX;
-                    },
-                    [&, oldPositionX = positionX, uuid = uuidComponent.ID](void* data) {
-                        auto& transform = m_currentContext->TryGetEntityByUUID(uuid).GetComponent<Nigozi::TransformComponent>();
-                        transform.Position.x = oldPositionX;
-                    }
-                ));
-            },
-            uuidComponent.ID,
-            transform.Position.x
-        );
-        ImGui::PopItemWidth();
-
-        // ----(1)POSITION_Y COLUMN
-        ImGui::TableNextColumn();
-        ImGui::Text("Y");
-        ImGui::SameLine();
-
-        ImGui::PushItemWidth(-10.0f);
-        EditValueInInspector<float>(
-            [&]() {  ImGui::DragFloat("##Y", &transform.Position.y, 0.1f, -INFINITY, INFINITY, "%.2f"); },
-            [&](float positionY) {
-                m_commandQueue.PushBack(Command(
-                    [&, newPositionY = transform.Position.y, uuid = uuidComponent.ID](void* data) {
-                        auto& transform = m_currentContext->TryGetEntityByUUID(uuid).GetComponent<Nigozi::TransformComponent>();
-                        transform.Position.y = newPositionY;
-                    },
-                    [&, oldPositionY = positionY, uuid = uuidComponent.ID](void* data) {
-                        auto& transform = m_currentContext->TryGetEntityByUUID(uuid).GetComponent<Nigozi::TransformComponent>();
-                        transform.Position.y = oldPositionY;
-                    }
-                ));
-            },
-            uuidComponent.ID,
-            transform.Position.y
-        );
-        ImGui::PopItemWidth();
-
-        // --(1)POSITION TABLE END COLUMN
-        ImGui::EndTable();
-
-        // --SCALE ROW
-        ImGui::TableNextRow();
-
-        // --(0)SCALE TITLE COLUMN
-        ImGui::TableNextColumn();
-        ImGui::Text("Scale");
-
-        ImGui::TableNextColumn();
-
-        // --(1)SCALE TABLE COLUMN
-        ImGui::BeginTable("scale_value_table", 2, innerFlags);
-
-        ImGui::TableSetupColumn("##TRANSFORM_SCALE_X", ImGuiTableColumnFlags_WidthStretch);
-        ImGui::TableSetupColumn("##TRANSFORM_SCALE_Y", ImGuiTableColumnFlags_WidthStretch);
-
-        // ----SCALE ROW
-        ImGui::TableNextRow();
-
-        // ----(0)SCALE_X COLUMN
-        ImGui::TableNextColumn();
-        ImGui::Text("X");
-        ImGui::SameLine();
-
-        ImGui::PushItemWidth(-10.0f);
-        EditValueInInspector<float>(
-            [&]() {  ImGui::DragFloat("##X", &transform.Scale.x, 0.1f); },
-            [&](float scaleX) {
-                m_commandQueue.PushBack(Command(
-                    [&, newScaleX = transform.Scale.x, uuid = uuidComponent.ID](void* data) {
-                        auto& transform = m_currentContext->TryGetEntityByUUID(uuid).GetComponent<Nigozi::TransformComponent>();
-                        transform.Scale.x = newScaleX;
-                    },
-                    [&, oldScaleX = scaleX, uuid = uuidComponent.ID](void* data) {
-                        auto& transform = m_currentContext->TryGetEntityByUUID(uuid).GetComponent<Nigozi::TransformComponent>();
-                        transform.Scale.x = oldScaleX;
-                    }
-                ));
-            },
-            uuidComponent.ID,
-            transform.Scale.x
-        );
-        ImGui::PopItemWidth();
-
-        // ----(1)SCALE_Y COLUMN
-        ImGui::TableNextColumn();
-        ImGui::Text("Y");
-        ImGui::SameLine();
-
-        ImGui::PushItemWidth(-10.0f);
-        EditValueInInspector<float>(
-            [&]() { ImGui::DragFloat("##Y", &transform.Scale.y, 0.1f); },
-            [&](float scaleY) {
-                m_commandQueue.PushBack(Command(
-                    [&, newScaleY = transform.Scale.y, uuid = uuidComponent.ID](void* data) {
-                        auto& transform = m_currentContext->TryGetEntityByUUID(uuid).GetComponent<Nigozi::TransformComponent>();
-                        transform.Scale.y = newScaleY;
-                    },
-                    [&, oldScaleY = scaleY, uuid = uuidComponent.ID](void* data) {
-                        auto& transform = m_currentContext->TryGetEntityByUUID(uuid).GetComponent<Nigozi::TransformComponent>();
-                        transform.Scale.y = oldScaleY;
-                    }
-                ));
-            },
-            uuidComponent.ID,
-            transform.Scale.y
-        );
-        ImGui::PopItemWidth();
-        ImGui::PopStyleVar();
-
-        // --(1)SCALE TABLE END COLUMN
-        ImGui::EndTable();
-
-        // ----SCALE ROW
-        ImGui::TableNextRow();
-
-        // ----(0)SCALE_X COLUMN
-        ImGui::TableNextColumn();
-        ImGui::Text("Rotation");
-
-        ImGui::TableNextColumn();
-        ImGui::PushItemWidth(-10.0f);
-        EditValueInInspector<float>(
-            [&]() { ImGui::DragFloat("##ROTATION", &transform.Rotation, 0.1f, -360.0f, 360.0f, "%.2f", ImGuiSliderFlags_WrapAround); },
-            [&](float rotation) {
-                m_commandQueue.PushBack(Command(
-                    [&, newRotation = transform.Rotation, uuid = uuidComponent.ID](void* data) {
-                        auto& transform = m_currentContext->TryGetEntityByUUID(uuid).GetComponent<Nigozi::TransformComponent>();
-                        transform.Rotation = newRotation;
-                    },
-                    [&, oldRotation = rotation, uuid = uuidComponent.ID](void* data) {
-                        auto& transform = m_currentContext->TryGetEntityByUUID(uuid).GetComponent<Nigozi::TransformComponent>();
-                        transform.Rotation = oldRotation;
-                    }
-                ));
-            },
-            uuidComponent.ID,
-            transform.Rotation
-        );
-        // ImGui::DragFloat("##ROTATION", &transform.Rotation, 0.1f, -360.0f, 360.0f, "%.2f", ImGuiSliderFlags_WrapAround);
-        ImGui::PopItemWidth();
-
-        // TRANSFORM TABLE END
-        ImGui::EndTable();
-
-        ImGui::PopStyleVar();
-        ImGui::PopStyleVar();
-
-        ImGui::TreePop();
-        ImGui::Separator();
-    }
+    );
 
     ImGui::End();
 }

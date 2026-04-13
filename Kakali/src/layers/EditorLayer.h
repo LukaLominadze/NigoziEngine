@@ -25,6 +25,7 @@ class EditorLayer : public Nigozi::Layer
 public:
 	EditorLayer(Nigozi::FrameBuffer* viewportBuffer);
 
+	void OnAttach() override;
 	void OnEvent(Nigozi::Event& event) override;
 	void OnUpdate(float timestep) override;
 	void OnRender() override;
