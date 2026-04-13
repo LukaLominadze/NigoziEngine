@@ -17,3 +17,6 @@
 [submodule "vendor/box2d"]
 	path = vendor/box2d
 	url = https://github.com/TheCherno/box2d
+[submodule "vendor/Coral"]
+	path = vendor/Coral
+	url = https://github.com/StudioCherno/Coral
