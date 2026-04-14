@@ -13,7 +13,7 @@
     <DebugSymbols>true</DebugSymbols>
     <Optimize>false</Optimize>
     <OutputPath>..\..\Resources\Build\</OutputPath>
-    <IntermediateOutputPath>..\..\Resource\Intermediates\Debug\</IntermediateOutputPath>
+    <IntermediateOutputPath>..\..\Resources\Intermediates\Debug\</IntermediateOutputPath>
     <DefineConstants></DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
@@ -28,7 +28,7 @@
     <DebugSymbols>true</DebugSymbols>
     <Optimize>true</Optimize>
     <OutputPath>..\..\Resources\Build\</OutputPath>
-    <IntermediateOutputPath>..\..\Resource\Intermediates\Release\</IntermediateOutputPath>
+    <IntermediateOutputPath>..\..\Resources\Intermediates\Release\</IntermediateOutputPath>
     <DefineConstants></DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>

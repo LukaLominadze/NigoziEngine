@@ -149,6 +149,7 @@ void EditorLayer::OnUpdate(float timestep)
             m_editorCamera.OnUpdate(timestep);
         }
         m_currentContext->OnEditorUpdate(timestep);
+        Hotkeys();
         return;
     }
     if (m_editorState == EditorState::PAUSE) {
@@ -316,6 +317,38 @@ bool EditorLayer::OnMoveMouseButtonPressed(Nigozi::MouseButtonPressedEvent& even
         m_movingSelectionContext = m_selectionContext;
     }
     return false;
+}
+
+void EditorLayer::Hotkeys()
+{
+    // Undo - CTRL+Z
+    if (Nigozi::Input::IsKeyPressed(NG_KEY_LEFT_CONTROL) &&
+        Nigozi::Input::IsKeyJustPressed(NG_KEY_Z)) {
+        m_commandQueue.RevertBack();
+        return;
+    }
+    // Redo - CTRL+SHIFT+Z CTRL+Y
+    if ((Nigozi::Input::IsKeyPressed(NG_KEY_LEFT_CONTROL) &&
+        Nigozi::Input::IsKeyPressed(NG_KEY_LEFT_SHIFT) &&
+        Nigozi::Input::IsKeyJustPressed(NG_KEY_Z)) ||
+        (Nigozi::Input::IsKeyPressed(NG_KEY_LEFT_CONTROL) &&
+        Nigozi::Input::IsKeyJustPressed(NG_KEY_Y))) {
+        m_commandQueue.RedoBack();
+        return;
+    }
+    // Save - CTRL+S
+    if (Nigozi::Input::IsKeyPressed(NG_KEY_LEFT_CONTROL) &&
+        Nigozi::Input::IsKeyJustPressed(NG_KEY_S)) {
+        SaveCurrentScene();
+        return;
+    }
+    // Save All - CTRL+SHIFT+S
+    if (Nigozi::Input::IsKeyPressed(NG_KEY_LEFT_CONTROL) &&
+        Nigozi::Input::IsKeyPressed(NG_KEY_LEFT_SHIFT) &&
+        Nigozi::Input::IsKeyJustPressed(NG_KEY_S)) {
+        SaveAllScenes();
+        return;
+    }
 }
 
 bool EditorLayer::OnMouseMoved(Nigozi::MouseMovedEvent& event)
@@ -503,9 +536,7 @@ void EditorLayer::DockViewportWithMenuBar()
         if (ImGui::BeginMenu("File")) {
             if (ImGui::MenuItem("Save", "Ctrl+S")) {
                 SaveCurrentScene();
-                Nigozi::ScriptEngine::Deinitialize();
-                Nigozi::ScriptEngine::Initialize("src/res/scripts");
-                Nigozi::ScriptEngine::LoadProjectAssembly();
+                Nigozi::ScriptEngine::ReloadAssemblies();
             }
             if (ImGui::MenuItem("Save As...", "Ctrl+Shift+S")) {
                 SaveCurrentSceneAs();
@@ -1426,6 +1457,7 @@ void EditorLayer::ShowAddNodeModal()
 
                     auto& nodeType = entity.GetComponent<Nigozi::NodeTypeComponent>();
 
+                    // TODO:
                     if (entity.GetUUID() == m_currentContext->GetSceneRootUUID())
                         nodeType.Type = Nigozi::NodeTypeComponent::Types::Scene;
                     else if (itemSelectedIndex == NodeTypes::NODE_2D)
@@ -1493,10 +1525,13 @@ void EditorLayer::ShowViewport()
     if (ImGui::Button("Play") && m_currentContext->GetSceneRootUUID().GetUUID() != Nigozi::UUID::Null) {
         if (SaveAllScenes()) {
             m_lastContext = m_currentContext;
+            
+            Nigozi::ScriptEngine::ReloadAssemblies();
+
             m_currentContext = std::make_shared<Nigozi::SceneTree>();
             m_currentContext->DeserializeScene(m_lastContext->GetFilePath());
             Nigozi::ScriptEngine::SetCurrentSceneTree(m_currentContext);
-            Nigozi::ScriptEngine::StartRuntime();
+
             m_currentContext->OnAttach();
 
             m_selectionContext = entt::null;
@@ -1515,13 +1550,13 @@ void EditorLayer::ShowViewport()
     }
     ImGui::SameLine();
     if (ImGui::Button("Stop")) {
+        m_currentContext->OnDetach();
+
         m_currentContext.reset();
         m_currentContext = m_lastContext;
 
         m_selectionContext = entt::null;
         m_movingSelectionContext = entt::null;
-
-        Nigozi::ScriptEngine::EndRuntime();
 
         m_editorState = EditorState::EDIT;
     }
@@ -1638,10 +1673,6 @@ void EditorLayer::ShowCreateOrOpenProjectModal()
                     ImGui::CloseCurrentPopup();
                 }
             }
-            ImGui::SameLine();
-            if (ImGui::Button("Exit")) {
-                Nigozi::Application::Close();
-            }
         }
         else {
             std::filesystem::path finalPath = Nigozi::Project::s_ProjectDir / Nigozi::Project::s_ProjectName;
@@ -1666,10 +1697,10 @@ void EditorLayer::ShowCreateOrOpenProjectModal()
                 Nigozi::ScriptEngine::Initialize("src/res/scripts");
                 ImGui::CloseCurrentPopup();
             }
-            ImGui::SameLine();
-            if (ImGui::Button("Exit")) {
-                Nigozi::Application::Close();
-            }
+        }
+        ImGui::SameLine();
+        if (ImGui::Button("Exit")) {
+            Nigozi::Application::Close();
         }
         ImGui::EndPopup();
     }

@@ -76,6 +76,21 @@ void SandboxLayer::OnUpdate(float timestep)
 			1.2f
 			});
 	}
+	if (Nigozi::Input::IsKeyJustPressed(GLFW_KEY_5)) {
+		NG_CLIENT_LOG_INFO("5 Just pressed!");
+	}
+	if (Nigozi::Input::IsKeyJustPressed(GLFW_KEY_LEFT)) {
+		NG_CLIENT_LOG_INFO("< Just pressed!");
+	}
+	if (Nigozi::Input::IsKeyJustPressed(GLFW_KEY_RIGHT)) {
+		NG_CLIENT_LOG_INFO("> Just pressed!");
+	}
+	if (Nigozi::Input::IsKeyJustPressed(GLFW_KEY_DOWN)) {
+		NG_CLIENT_LOG_INFO("v Just pressed!");
+	}
+	if (Nigozi::Input::IsKeyJustPressed(GLFW_KEY_UP)) {
+		NG_CLIENT_LOG_INFO("^ Just pressed!");
+	}
 	m_mouseDelta = Nigozi::Input::GetMousePositionDelta();
 	m_mousePosition = Nigozi::Input::GetMousePosition();
 	m_particleSystem.OnUpdate(timestep);

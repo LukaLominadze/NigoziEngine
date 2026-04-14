@@ -78,5 +78,32 @@ namespace Nigozi
             left.Y /= right.Y;
             return left;
         }
+
+        public static Vector2 operator *(float left, Vector2 right)
+        {
+            right.X *= left;
+            right.Y *= left;
+            return right;
+        }
+
+        public static Vector2 operator *(Vector2 left, float right)
+        {
+            left.X *= right;
+            left.Y *= right;
+            return left;
+        }
+
+        public static Vector2 operator /(float left, Vector2 right)
+        {
+            right.X /= left;
+            right.Y /= left;
+            return right;
+        }
+        public static Vector2 operator /(Vector2 left, float right)
+        {
+            left.X /= right;
+            left.Y /= right;
+            return left;
+        }
     }
 }

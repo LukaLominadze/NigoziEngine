@@ -7,7 +7,7 @@ project "First"
 	clr "Unsafe"
 
     targetdir("../../Resources/Build")
-    objdir("../../Resource/Intermediates")
+    objdir("../../Resources/Intermediates")
 	
     -- Don't specify architecture here. (see https://github.com/premake/premake-core/issues/1758)
 
@@ -19,7 +19,7 @@ project "First"
 	}
 
     files {
-        "Source/**.cs"
+        "**.cs"
     }
     
     links { "Coral.Managed", "Nigozi-CSharpCore" }

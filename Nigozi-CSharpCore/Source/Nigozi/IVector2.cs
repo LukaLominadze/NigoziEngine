@@ -78,5 +78,32 @@ namespace Nigozi
             left.Y /= right.Y;
             return left;
         }
+
+        public static IVector2 operator *(int left, IVector2 right)
+        {
+            right.X *= left;
+            right.Y *= left;
+            return right;
+        }
+
+        public static IVector2 operator *(IVector2 left, int right)
+        {
+            left.X *= right;
+            left.Y *= right;
+            return left;
+        }
+
+        public static IVector2 operator /(int left, IVector2 right)
+        {
+            right.X /= left;
+            right.Y /= left;
+            return right;
+        }
+        public static IVector2 operator /(IVector2 left, int right)
+        {
+            left.X /= right;
+            left.Y /= right;
+            return left;
+        }
     }
 }

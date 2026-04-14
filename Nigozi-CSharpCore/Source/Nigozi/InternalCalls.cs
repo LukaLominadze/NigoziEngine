@@ -22,7 +22,19 @@ namespace Nigozi
         internal static delegate* unmanaged<ulong, void> SceneTree_DestroyNode;
         #endregion
 
-        #region Entity
+        #region Input
+        internal static delegate* unmanaged<int, byte> Input_IsKeyPressed;
+        internal static delegate* unmanaged<int, byte> Input_IsKeyJustPressed;
+        internal static delegate* unmanaged<int, byte> Input_IsKeyReleased;
+        internal static delegate* unmanaged<int, byte> Input_IsKeyJustReleased;
+
+        internal static delegate* unmanaged<int, byte> Input_IsMouseButtonPressed;
+        internal static delegate* unmanaged<int, byte> Input_IsMouseButtonJustPressed;
+        internal static delegate* unmanaged<int, byte> Input_IsMouseButtonReleased;
+        internal static delegate* unmanaged<int, byte> Input_IsMouseButtonJustReleased;
+
+        internal static delegate* unmanaged<int, int, float> Input_GetAxis;
+        internal static delegate* unmanaged<IVector2, IVector2, Vector2> Input_GetVec2Axis;
         #endregion
 
         #region NameComponent
@@ -63,6 +75,8 @@ namespace Nigozi
         internal static delegate* unmanaged<ulong, ushort, void> RigidbodyComponent_SetBodyType;
         internal static delegate* unmanaged<ulong, bool> RigidbodyComponent_GetFreezeRotation;
         internal static delegate* unmanaged<ulong, bool, void> RigidbodyComponent_SetFreezeRotation;
+        internal static delegate* unmanaged<ulong, Vector2, void> RigidbodyComponent_ApplyForce;
+        internal static delegate* unmanaged<ulong, Vector2, void> RigidbodyComponent_ApplyImpulse;
         #endregion
 
         #region BoxColliderComponent

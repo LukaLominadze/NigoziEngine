@@ -10,6 +10,7 @@
 #include "Nigozi/layers/Layer.h"
 
 #include "Nigozi/core/Application.h"
+#include "Nigozi/core/InputKeyMap.h"
 #include "Nigozi/core/Input.h"
 
 #include "Nigozi/glcore/Renderer2D.h"

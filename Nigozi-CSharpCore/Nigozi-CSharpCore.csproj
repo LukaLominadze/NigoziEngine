@@ -38,6 +38,7 @@
   <ItemGroup>
     <Compile Include="Source\Nigozi\IScriptBehaviour.cs" />
     <Compile Include="Source\Nigozi\IVector2.cs" />
+    <Compile Include="Source\Nigozi\Input.cs" />
     <Compile Include="Source\Nigozi\InternalCalls.cs" />
     <Compile Include="Source\Nigozi\Log.cs" />
     <Compile Include="Source\Nigozi\Nodes\AudioStreamPlayerNode.cs" />

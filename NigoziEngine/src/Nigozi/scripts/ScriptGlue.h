@@ -29,6 +29,21 @@ namespace Nigozi
 		void SceneTree_DestroyNode(uint64_t id);
 #pragma endregion
 
+#pragma region Input
+		bool Input_IsKeyPressed(int32_t inKeyCode);
+		bool Input_IsKeyJustPressed(int32_t inKeyCode);
+		bool Input_IsKeyReleased(int32_t inKeyCode);
+		bool Input_IsKeyJustReleased(int32_t inKeyCode);
+
+		bool Input_IsMouseButtonPressed(int32_t inButton);
+		bool Input_IsMouseButtonJustPressed(int32_t inButton);
+		bool Input_IsMouseButtonReleased(int32_t inButton);
+		bool Input_IsMouseButtonJustReleased(int32_t inButton);
+
+		float Input_GetAxis(int32_t inNegativeKeyCode, int32_t inPositiveKeyCode);
+		glm::vec2 Input_GetVec2Axis(glm::i32vec2 inXKeyCodes, glm::i32vec2 inYKeyCodes);
+#pragma endregion
+
 #pragma region NameComponent
 		Coral::String NameComponent_GetName(uint64_t id);
 		void NameComponent_SetName(uint64_t id, Coral::String inName);
@@ -74,6 +89,8 @@ namespace Nigozi
 		void RigidbodyComponent_SetBodyType(uint64_t id, uint16_t inBodyType);
 		bool RigidbodyComponent_GetFreezeRotation(uint64_t id);
 		void RigidbodyComponent_SetFreezeRotation(uint64_t id, bool inFreezeRotation);
+		void RigidbodyComponent_ApplyForce(uint64_t id, glm::vec2 inForce);
+		void RigidbodyComponent_ApplyImpulse(uint64_t id, glm::vec2 inImpulse);
 #pragma endregion
 
 #pragma region BoxColliderComponent

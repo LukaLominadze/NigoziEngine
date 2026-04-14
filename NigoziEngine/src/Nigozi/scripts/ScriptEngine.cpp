@@ -119,80 +119,18 @@ namespace Nigozi
 		sp_coreAssembly = &s_loadContext.LoadAssembly(assemblyPath.string());
 
 		ScriptGlue::RegisterGlue(*sp_coreAssembly);
-
-		// std::vector<std::string> typeNames{
-		// 	"Nigozi.Node",
-		// 	"Nigozi.SceneNode",
-		// 	"Nigozi.CameraNode",
-		// 	"Nigozi.SpriteNode",
-		// 	"Nigozi.Vector2",
-		// 	"Nigozi.IVector2",
-		// 	"Nigozi.Transform",
-		// 	"Nigozi.SceneTree",
-		// };
-		// 
-		// for (const auto& typeName : typeNames) {
-		// 	auto& type = sp_coreAssembly->.GetLocalType(typeName);
-		// 	NG_CORE_LOG_INFO("Scanning Type: {}", typeName);
-		// 	NG_CORE_LOG_INFO("{}", std::string(type.GetFullName()));
-		// 
-		// 	auto fields = type.GetFields();
-		// 	for (const auto& field : fields) {
-		// 		NG_CORE_LOG_INFO("{0}, {1}", std::string(field.GetName()), (uint32_t)field.GetAccessibility());
-		// 	}
-		// 
-		// 	auto properties = type.GetProperties();
-		// 	for (const auto& property : properties) {
-		// 		NG_CORE_LOG_INFO("{0}", std::string(property.GetName()));
-		// 	}
-		// 
-		// 	NG_CORE_LOG_INFO("Base Type: {}", std::string(type.GetBaseType().GetFullName()));
-		// 	
-		// 	auto methods = type.GetMethods();
-		// 	for (const auto& method : methods) {
-		// 		NG_CORE_LOG_INFO("Method: {}", std::string(method.GetName()));
-		// 	}
-		// 
-		// 	auto interfaces = type.GetInterfaceTypes();
-		// 	for (const auto& interface : interfaces) {
-		// 		NG_CORE_LOG_INFO("Interface {}", std::string(interface->GetFullName()));
-		// 	}
-		// }
-		// 
-		// // Get a reference to the ExampleClass type
-		// auto& exampleType = sp_coreAssembly->GetLocalType("Nigozi.Test");
-		// 
-		// auto fields = exampleType.GetFields();
-		// auto properties = exampleType.GetProperties();
-		// 
-		// // Call the static method "StaticMethod" with value 50
-		// Coral::String msg = Coral::String::New("Message from engine");
-		// exampleType.InvokeStaticMethod("StaticLogFromCpp", msg);
-		// Coral::String::Free(msg);
-		// 
-		// s_currentScene = std::make_shared<SceneTree>();
-		// s_currentScene->CreateEntity("Scene Root", "Empty");
-		// 
-		// // Create an instance of type Example.Managed.ExampleClass and pass 50 to the constructor
-		// auto exampleInstance = exampleType.CreateInstance();
-		// 
-		// // Invoke the method named "MemberMethod" with a MyVec3 argument (doesn't return anything)
-		// exampleInstance.InvokeMethod("LogFromCpp");
-		// exampleInstance.InvokeMethod("LogTest");
-		// 
-		// exampleInstance.Destroy();
-		// 
-		// s_currentScene->ClearSceneTree();
-		// s_currentScene.reset();
-
-		// auto& sceneTreeType = assembly.GetLocalType("Nigozi.SceneTree");
-
-		// sceneTreeType.InvokeStaticMethod("Node CreateNode()");
 	}
 
 	void ScriptEngine::LoadProjectAssembly()
 	{
 		sp_projectAssembly = &s_loadContext.LoadAssembly((Project::s_ProjectAssemblyDir / (Project::s_ProjectName + ".dll")).string());
+	}
+
+	void ScriptEngine::ReloadAssemblies()
+	{
+		UnloadCoreAssembly();
+		LoadCoreAssembly();
+		LoadProjectAssembly();
 	}
 
 	void ScriptEngine::UnloadCoreAssembly()

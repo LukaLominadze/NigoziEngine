@@ -4,6 +4,9 @@
 #include "scene/SceneTree.h"
 #include "scene/Component.h"
 #include "core/Log.h"
+#include "core/InputKeyMap.h"
+#include "core/Input.h"
+
 #include <box2d/b2_body.h>
 #include <box2d/b2_fixture.h>
 #include <box2d/b2_polygon_shape.h>
@@ -27,6 +30,17 @@ namespace Nigozi
 
 		NG_REGISTER_INTERNAL_CALL(SceneTree_CreateNode);
 		NG_REGISTER_INTERNAL_CALL(SceneTree_DestroyNode);
+
+		NG_REGISTER_INTERNAL_CALL(Input_IsKeyPressed);
+		NG_REGISTER_INTERNAL_CALL(Input_IsKeyJustPressed);
+		NG_REGISTER_INTERNAL_CALL(Input_IsKeyReleased);
+		NG_REGISTER_INTERNAL_CALL(Input_IsKeyJustReleased);
+		NG_REGISTER_INTERNAL_CALL(Input_IsMouseButtonPressed);
+		NG_REGISTER_INTERNAL_CALL(Input_IsMouseButtonJustPressed);
+		NG_REGISTER_INTERNAL_CALL(Input_IsMouseButtonReleased);
+		NG_REGISTER_INTERNAL_CALL(Input_IsMouseButtonJustReleased);
+		NG_REGISTER_INTERNAL_CALL(Input_GetAxis);
+		NG_REGISTER_INTERNAL_CALL(Input_GetVec2Axis);
 
 		NG_REGISTER_INTERNAL_CALL(NameComponent_GetName);
 		NG_REGISTER_INTERNAL_CALL(NameComponent_SetName);
@@ -55,6 +69,8 @@ namespace Nigozi
 		NG_REGISTER_INTERNAL_CALL(RigidbodyComponent_SetBodyType);
 		NG_REGISTER_INTERNAL_CALL(RigidbodyComponent_GetFreezeRotation);
 		NG_REGISTER_INTERNAL_CALL(RigidbodyComponent_SetFreezeRotation);
+		NG_REGISTER_INTERNAL_CALL(RigidbodyComponent_ApplyForce);
+		NG_REGISTER_INTERNAL_CALL(RigidbodyComponent_ApplyImpulse);
 
 		NG_REGISTER_INTERNAL_CALL(BoxColliderComponent_GetSize);
 		NG_REGISTER_INTERNAL_CALL(BoxColliderComponent_SetSize);
@@ -79,25 +95,25 @@ namespace Nigozi
 		void Log_Info(Coral::String msgIn)
 		{
 			std::string msg(msgIn);
-			NG_CORE_LOG_INFO(msg);
+			NG_CLIENT_LOG_INFO(msg);
 		}
 
 		void Log_Warn(Coral::String msgIn)
 		{
 			std::string msg(msgIn);
-			NG_CORE_LOG_WARN(msg);
+			NG_CLIENT_LOG_WARN(msg);
 		}
 
 		void Log_Error(Coral::String msgIn)
 		{
 			std::string msg(msgIn);
-			NG_CORE_LOG_ERROR(msg);
+			NG_CLIENT_LOG_ERROR(msg);
 		}
 
 		void Log_Critical(Coral::String msgIn)
 		{
 			std::string msg(msgIn);
-			NG_CORE_LOG_CRITICAL(msg);
+			NG_CLIENT_LOG_CRITICAL(msg);
 		}
 
 		uint64_t SceneTree_CreateNode(uint16_t nodeType)
@@ -124,8 +140,58 @@ namespace Nigozi
 			NG_CORE_LOG_INFO("Callback destroying node {}", id);
 			Entity entity = ScriptEngine::GetCurrentSceneTree()->TryGetEntityByUUID(UUID(id));
 			if (entity != Entity()) {
-				entity.Destroy();
+				ScriptEngine::GetCurrentSceneTree()->QueueDestroyEntity(entity);
 			}
+		}
+
+		bool Input_IsKeyPressed(int32_t inKeyCode)
+		{
+			return Input::IsKeyPressed(inKeyCode);
+		}
+
+		bool Input_IsKeyJustPressed(int32_t inKeyCode)
+		{
+			return Input::IsKeyJustPressed(inKeyCode);
+		}
+
+		bool Input_IsKeyReleased(int32_t inKeyCode)
+		{
+			return Input::IsKeyReleased(inKeyCode);
+		}
+
+		bool Input_IsKeyJustReleased(int32_t inKeyCode)
+		{
+			return Input::IsKeyJustReleased(inKeyCode);
+		}
+
+		bool Input_IsMouseButtonPressed(int32_t inButton)
+		{
+			return Input::IsMouseButtonPressed(inButton);
+		}
+
+		bool Input_IsMouseButtonJustPressed(int32_t inButton)
+		{
+			return Input::IsMouseButtonJustPressed(inButton);
+		}
+
+		bool Input_IsMouseButtonReleased(int32_t inButton)
+		{
+			return Input::IsMouseButtonReleased(inButton);
+		}
+
+		bool Input_IsMouseButtonJustReleased(int32_t inButton)
+		{
+			return Input::IsMouseButtonJustReleased(inButton);
+		}
+
+		float Input_GetAxis(int32_t inNegativeKeyCode, int32_t inPositiveKeyCode)
+		{
+			return Input::GetAxis(inNegativeKeyCode, inPositiveKeyCode);
+		}
+
+		glm::vec2 Input_GetVec2Axis(glm::i32vec2 inXKeyCodes, glm::i32vec2 inYKeyCodes)
+		{
+			return Input::GetAxis(inXKeyCodes, inYKeyCodes);
 		}
 
 		Coral::String NameComponent_GetName(uint64_t id)
@@ -447,6 +513,30 @@ namespace Nigozi
 			b2Body* body = (b2Body*)rigidbody.RuntimeBody;
 			body->SetFixedRotation(rigidbody.FreezeRotation);
 			body->SetAwake(true);
+		}
+
+		void RigidbodyComponent_ApplyForce(uint64_t id, glm::vec2 inForce)
+		{
+			Entity entity = ScriptEngine::GetCurrentSceneTree()->TryGetEntityByUUID(UUID(id));
+			if (entity == Entity()) {
+				return;
+			}
+
+			auto& rigidbody = entity.GetComponent<RigidbodyComponent>();
+			b2Body* body = (b2Body*)rigidbody.RuntimeBody;
+			body->ApplyForceToCenter(*(b2Vec2*)&inForce, true);
+		}
+
+		void RigidbodyComponent_ApplyImpulse(uint64_t id, glm::vec2 inImpulse)
+		{
+			Entity entity = ScriptEngine::GetCurrentSceneTree()->TryGetEntityByUUID(UUID(id));
+			if (entity == Entity()) {
+				return;
+			}
+
+			auto& rigidbody = entity.GetComponent<RigidbodyComponent>();
+			b2Body* body = (b2Body*)rigidbody.RuntimeBody;
+			body->ApplyLinearImpulseToCenter(*(b2Vec2*)&inImpulse, true);
 		}
 
 		glm::vec2 BoxColliderComponent_GetSize(uint64_t id)

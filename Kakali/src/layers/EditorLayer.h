@@ -40,6 +40,8 @@ private:
 	bool OnMouseButtonReleased(Nigozi::MouseButtonReleasedEvent& event);
 	bool OnMoveMouseButtonPressed(Nigozi::MouseButtonPressedEvent& event);
 private:
+	void Hotkeys();
+
 	void DockViewportWithMenuBar();
 	void ShowSceneHierarchy();
 	void DrawSceneHierarchyNode(Nigozi::Entity entity);

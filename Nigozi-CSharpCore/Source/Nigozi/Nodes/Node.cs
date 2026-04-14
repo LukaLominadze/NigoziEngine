@@ -10,7 +10,7 @@ namespace Nigozi
     public class Node : INodeType
     {
         public readonly ulong ID;
-
+        
         private Transform Transform
         {
             get
@@ -142,6 +142,12 @@ namespace Nigozi
         {
             ID = id;
         }
+
+        public void OnStart() { }
+        public void OnUpdate(float timestep) { }
+        public void OnRender() { }
+        public void OnImGuiRender() { }
+        public void OnDestroy() { }
 
         public static NodeTypes GetNodeType()
         {

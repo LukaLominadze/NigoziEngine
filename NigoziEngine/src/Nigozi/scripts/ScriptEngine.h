@@ -20,6 +20,8 @@ namespace Nigozi
 		static inline void SetCurrentSceneTree(const std::shared_ptr<SceneTree>& sceneTree) { s_currentScene = sceneTree; }
 
 		static void LoadProjectAssembly();
+		static void ReloadAssemblies();
+
 		static void StartRuntime();
 		static void EndRuntime();
 	private:

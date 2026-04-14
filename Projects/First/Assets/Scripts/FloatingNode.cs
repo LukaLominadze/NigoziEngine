@@ -21,7 +21,6 @@ namespace First
         public void OnUpdate(float timestep)
         {
             Position = Position + new Vector2(timestep, 0);
-            Log.Info($"FMoving! {timestep}");
         }
 
         public void OnRender()

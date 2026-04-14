@@ -65,6 +65,16 @@ namespace Nigozi
         {
         }
 
+        public void ApplyForce(Vector2 force)
+        {
+            unsafe { InternalCalls.RigidbodyComponent_ApplyForce(ID, force); }
+        }
+
+        public void ApplyImpulse(Vector2 force)
+        {
+            unsafe { InternalCalls.RigidbodyComponent_ApplyImpulse(ID, force); }
+        }
+
         public static new NodeTypes GetNodeType()
         {
             return NodeTypes.Rigidbody;

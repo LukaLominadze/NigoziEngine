@@ -394,6 +394,8 @@ namespace Nigozi
             }
         }
 
+        ScriptEngine::StartRuntime();
+
         auto scriptView = m_Registry.view<ScriptComponent>();
         for (auto entity : scriptView)
         {
@@ -404,8 +406,16 @@ namespace Nigozi
 
     void SceneTree::OnDetach()
     {
+        auto scriptView = m_Registry.view<ScriptComponent>();
+        for (auto entity : scriptView)
+        {
+            auto& script = m_Registry.get<ScriptComponent>(entity);
+            script.ManagedScriptObject.InvokeMethod("OnDestroy");
+        }
         delete p_physicsWorld;
         p_physicsWorld = nullptr;
+
+        Nigozi::ScriptEngine::EndRuntime();
     }
 
     void SceneTree::OnEvent(Event& event)
@@ -423,6 +433,10 @@ namespace Nigozi
         for (auto entity : m_destroyQueue) {
             if (!entity.HasComponent<UUIDComponent>()) {
                 continue;
+            }
+            if (entity.HasComponent<ScriptComponent>()) {
+                auto& script = entity.GetComponent<ScriptComponent>();
+                script.ManagedScriptObject.InvokeMethod("OnDestroy");
             }
             entity.Destroy();
         }
@@ -480,6 +494,13 @@ namespace Nigozi
         m_Registry.sort<SpriteRendererComponent>([](const SpriteRendererComponent& a, const SpriteRendererComponent& b) {
             return a.ZOrder < b.ZOrder;
             });
+
+        auto scriptView = m_Registry.view<ScriptComponent>();
+        for (auto entity : scriptView)
+        {
+            auto& script = m_Registry.get<ScriptComponent>(entity);
+            script.ManagedScriptObject.InvokeMethod("OnRender");
+        }
         
         auto cameraView = m_Registry.view<TransformComponent, CameraComponent>();
         cameraView.each([this](auto entity, auto& transform, auto& camera) {
@@ -509,7 +530,12 @@ namespace Nigozi
 
     void SceneTree::OnImGuiRender()
     {
-        
+        auto scriptView = m_Registry.view<ScriptComponent>();
+        for (auto entity : scriptView)
+        {
+            auto& script = m_Registry.get<ScriptComponent>(entity);
+            script.ManagedScriptObject.InvokeMethod("OnImGuiRender");
+        }
     }
 
     void SceneTree::OnEditorEvent(Event& event)
