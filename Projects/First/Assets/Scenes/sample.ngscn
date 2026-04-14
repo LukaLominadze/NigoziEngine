@@ -1,0 +1,213 @@
+Metadata:
+  Version: 0
+Nodes:
+  - UUID:
+      Id: 16263393079222648445
+    Name:
+      Name: New Node
+    Tag:
+      Tag: Empty
+    Type: 2
+    Scene:
+      FilePath: E:\Luka\Dev\C++\NigoziEngine\Projects\First\Assets\Scenes\sample.ngscn
+    Transform:
+      Position:
+        X: 0
+        Y: 0
+      Scale:
+        X: 1
+        Y: 1
+      Rotation: 0
+    Relationship:
+      ParentUUID: 0
+  - UUID:
+      Id: 14773634446792760491
+    Name:
+      Name: New Node
+    Tag:
+      Tag: Empty
+    Type: 3
+    Transform:
+      Position:
+        X: 0
+        Y: 0
+      Scale:
+        X: 1
+        Y: 1
+      Rotation: 0
+    Relationship:
+      ParentUUID: 16263393079222648445
+    Camera:
+      Current: true
+      aspect: 1.77777779
+      zoom: 5
+  - UUID:
+      Id: 6865870161092433648
+    Name:
+      Name: "Player\x00e"
+    Tag:
+      Tag: Empty
+    Type: 5
+    Transform:
+      Position:
+        X: 0
+        Y: 0
+      Scale:
+        X: 1
+        Y: 1
+      Rotation: 0
+    Relationship:
+      ParentUUID: 16263393079222648445
+    Script:
+      FilePath: E:\Luka\Dev\C++\NigoziEngine\Projects\First\Assets\Scripts\Player.cs
+    Rigidbody:
+      BodyType: 2
+      FreezeRotation: false
+    BoxCollider:
+      Size:
+        X: 0.5
+        Y: 0.5
+      Density: 1
+      Friction: 0.5
+      Restitution: 0
+      RestitutionThreshold: 0.5
+  - UUID:
+      Id: 4911013455060555289
+    Name:
+      Name: New Node
+    Tag:
+      Tag: Empty
+    Type: 4
+    Transform:
+      Position:
+        X: 0
+        Y: 0
+      Scale:
+        X: 1
+        Y: 1
+      Rotation: 0
+    Relationship:
+      ParentUUID: 6865870161092433648
+    Sprite:
+      Texture:
+        FilePath: src/Nigozi/res/textures/flatQuad.png
+      Color:
+        R: 0.792569637
+        G: 0.252738923
+        B: 0.252738923
+        A: 1
+      Slot:
+        X: 0
+        Y: 0
+      Seperator:
+        X: 1
+        Y: 1
+  - UUID:
+      Id: 14513708882760024317
+    Name:
+      Name: New Node
+    Tag:
+      Tag: Empty
+    Type: 5
+    Transform:
+      Position:
+        X: 0
+        Y: -4
+      Scale:
+        X: 1
+        Y: 1
+      Rotation: 0
+    Relationship:
+      ParentUUID: 16263393079222648445
+    Rigidbody:
+      BodyType: 0
+      FreezeRotation: false
+    BoxCollider:
+      Size:
+        X: 5.30000019
+        Y: 0.5
+      Density: 1
+      Friction: 0.5
+      Restitution: 0
+      RestitutionThreshold: 0.5
+  - UUID:
+      Id: 16540331774055648730
+    Name:
+      Name: New Node
+    Tag:
+      Tag: Empty
+    Type: 4
+    Transform:
+      Position:
+        X: 0
+        Y: 0
+      Scale:
+        X: 10.6000004
+        Y: 1
+      Rotation: 0
+    Relationship:
+      ParentUUID: 14513708882760024317
+    Sprite:
+      Texture:
+        FilePath: src/Nigozi/res/textures/flatQuad.png
+      Color:
+        R: 1
+        G: 1
+        B: 1
+        A: 1
+      Slot:
+        X: 0
+        Y: 0
+      Seperator:
+        X: 1
+        Y: 1
+  - UUID:
+      Id: 3663266970609662869
+    Name:
+      Name: New Node
+    Tag:
+      Tag: Empty
+    Type: 1
+    Transform:
+      Position:
+        X: -1.89999998
+        Y: 2.20000005
+      Scale:
+        X: 1
+        Y: 1
+      Rotation: 0
+    Relationship:
+      ParentUUID: 16263393079222648445
+    Script:
+      FilePath: E:\Luka\Dev\C++\NigoziEngine\Projects\First\Assets\Scripts\FloatingNode.cs
+  - UUID:
+      Id: 2381767741487031193
+    Name:
+      Name: New Node
+    Tag:
+      Tag: Empty
+    Type: 4
+    Transform:
+      Position:
+        X: 0
+        Y: 0
+      Scale:
+        X: 1
+        Y: 1
+      Rotation: 0
+    Relationship:
+      ParentUUID: 3663266970609662869
+    Sprite:
+      Texture:
+        FilePath: src/Nigozi/res/textures/flatQuad.png
+      Color:
+        R: 1
+        G: 1
+        B: 1
+        A: 1
+      Slot:
+        X: 0
+        Y: 0
+      Seperator:
+        X: 1
+        Y: 1

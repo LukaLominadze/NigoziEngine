@@ -2,11 +2,12 @@
 
 #include <Nigozi.h>
 #include "layers/EditorLayer.h"
+#include "EditorParmas.h"
 
 class KakaliApplication : public Nigozi::Application
 {
 public:
-	KakaliApplication(const Nigozi::ApplicationProps& props);
+	KakaliApplication(const Nigozi::ApplicationProps& props, const EditorParams& params);
 	~KakaliApplication();
 protected:
 	void OnRender() override;

@@ -1,0 +1,16 @@
+E:\Luka\Dev\C++\NigoziEngine\Projects\First\Resources\Build\First.deps.json
+E:\Luka\Dev\C++\NigoziEngine\Projects\First\Resources\Build\First.runtimeconfig.json
+E:\Luka\Dev\C++\NigoziEngine\Projects\First\Resources\Build\First.dll
+E:\Luka\Dev\C++\NigoziEngine\Projects\First\Resources\Build\First.pdb
+E:\Luka\Dev\C++\NigoziEngine\Projects\First\Resource\Intermediates\Debug\First.csproj.AssemblyReference.cache
+E:\Luka\Dev\C++\NigoziEngine\Projects\First\Resource\Intermediates\Debug\First.GeneratedMSBuildEditorConfig.editorconfig
+E:\Luka\Dev\C++\NigoziEngine\Projects\First\Resource\Intermediates\Debug\First.AssemblyInfoInputs.cache
+E:\Luka\Dev\C++\NigoziEngine\Projects\First\Resource\Intermediates\Debug\First.AssemblyInfo.cs
+E:\Luka\Dev\C++\NigoziEngine\Projects\First\Resource\Intermediates\Debug\First.csproj.CoreCompileInputs.cache
+E:\Luka\Dev\C++\NigoziEngine\Projects\First\Resource\Intermediates\Debug\First.sourcelink.json
+E:\Luka\Dev\C++\NigoziEngine\Projects\First\Resource\Intermediates\Debug\First.csproj.Up2Date
+E:\Luka\Dev\C++\NigoziEngine\Projects\First\Resource\Intermediates\Debug\First.dll
+E:\Luka\Dev\C++\NigoziEngine\Projects\First\Resource\Intermediates\Debug\refint\First.dll
+E:\Luka\Dev\C++\NigoziEngine\Projects\First\Resource\Intermediates\Debug\First.pdb
+E:\Luka\Dev\C++\NigoziEngine\Projects\First\Resource\Intermediates\Debug\First.genruntimeconfig.cache
+E:\Luka\Dev\C++\NigoziEngine\Projects\First\Resource\Intermediates\Debug\ref\First.dll

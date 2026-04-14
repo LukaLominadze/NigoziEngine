@@ -4,6 +4,7 @@
 #include "EditorCamera.h"
 #include "command/CommandQueue.h"
 #include <new>
+#include "EditorParmas.h"
 
 enum class Tool
 {
@@ -23,7 +24,7 @@ enum class EditorState
 class EditorLayer : public Nigozi::Layer
 {
 public:
-	EditorLayer(Nigozi::FrameBuffer* viewportBuffer);
+	EditorLayer(const EditorParams& params, Nigozi::FrameBuffer* viewportBuffer);
 
 	void OnAttach() override;
 	void OnEvent(Nigozi::Event& event) override;
@@ -45,6 +46,8 @@ private:
 	void ShowInspector();
 	void ShowAddNodeModal();
 	void ShowViewport();
+
+	void ShowCreateOrOpenProjectModal();
 
 	enum EditValueInInspectorFlags 
 	{
@@ -94,6 +97,8 @@ private:
 private:
 	static bool s_showDemoWindow;
 private:
+	EditorParams m_editorParams;
+
 	std::vector<std::shared_ptr<Nigozi::SceneTree>> m_sceneTreeContexts;
 	std::shared_ptr<Nigozi::SceneTree> m_lastContext;
 	std::shared_ptr<Nigozi::SceneTree> m_currentContext;

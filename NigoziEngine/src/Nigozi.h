@@ -45,4 +45,6 @@
 #include "box2d/b2_fixture.h"
 #include "box2d/b2_polygon_shape.h"
 
+#include "project/Project.h"
+
 #include "Nigozi/core/EntryPoint.h"

@@ -2,6 +2,7 @@
 
 #include <Nigozi.h>
 #include "KakaliApplication.h"
+#include "EditorParmas.h"
 
 Nigozi::Application* CreateApplication() {
 	Nigozi::ApplicationProps props;
@@ -11,6 +12,10 @@ Nigozi::Application* CreateApplication() {
 	props.VSync = true;
 	props.Fullscreen = false;
 	props.IconPath = "kakali-small.png";
-	KakaliApplication* app = new KakaliApplication(props);
+
+	EditorParams params;
+	params.CoralAssembliesPath = std::filesystem::current_path() / "src" / "res" / "scripts";
+
+	KakaliApplication* app = new KakaliApplication(props, params);
 	return app;
 }

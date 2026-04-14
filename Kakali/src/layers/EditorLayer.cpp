@@ -2,9 +2,10 @@
 
 bool EditorLayer::s_showDemoWindow = false;
 
-EditorLayer::EditorLayer(Nigozi::FrameBuffer* viewportBuffer)
+EditorLayer::EditorLayer(const EditorParams& params, Nigozi::FrameBuffer* viewportBuffer)
     :m_mouseOldPosition(0.0f), m_viewportPosition(0.0f), m_windowPosition(0.0f),
-    m_editorCamera(viewportBuffer->GetWidth() / (float)viewportBuffer->GetHeight(), 5.0f)
+    m_editorCamera(viewportBuffer->GetWidth() / (float)viewportBuffer->GetHeight(), 5.0f),
+    m_editorParams(params)
 {
     m_currentContext = std::make_shared<Nigozi::SceneTree>();
     m_sceneTreeContexts.push_back(m_currentContext);
@@ -229,6 +230,7 @@ void EditorLayer::OnImGuiRender()
     if (s_showDemoWindow) {
         ImGui::ShowDemoWindow(&s_showDemoWindow);
     }
+    ShowCreateOrOpenProjectModal();
 }
 
 bool EditorLayer::OnSelectMouseButtonPressed(Nigozi::MouseButtonPressedEvent& event)
@@ -501,6 +503,9 @@ void EditorLayer::DockViewportWithMenuBar()
         if (ImGui::BeginMenu("File")) {
             if (ImGui::MenuItem("Save", "Ctrl+S")) {
                 SaveCurrentScene();
+                Nigozi::ScriptEngine::Deinitialize();
+                Nigozi::ScriptEngine::Initialize("src/res/scripts");
+                Nigozi::ScriptEngine::LoadProjectAssembly();
             }
             if (ImGui::MenuItem("Save As...", "Ctrl+Shift+S")) {
                 SaveCurrentSceneAs();
@@ -671,6 +676,9 @@ void EditorLayer::UpdateRigidbodyTransform(Nigozi::Entity entity) {
 
 void EditorLayer::UpdateBoxCollider(Nigozi::Entity entity, glm::vec2 size)
 {
+    if (m_editorState == EditorState::EDIT) {
+        return;
+    }
     auto& boxCollider = entity.GetComponent<Nigozi::BoxColliderComponent>();
     b2Fixture* oldFixture = (b2Fixture*)boxCollider.RuntimeFixture;
 
@@ -714,6 +722,24 @@ void EditorLayer::ShowInspector()
     ImGui::InputText("Name", nameComponent.Name.data(), nameComponent.Name.capacity());
     ImGui::InputText("Tag", tagComponent.Tag.data(), tagComponent.Tag.capacity());
 
+    if (!entity.HasComponent<Nigozi::ScriptComponent>()) {
+        if (ImGui::Button("Add Script +")) {
+            entity.AddComponent<Nigozi::ScriptComponent>();
+        }
+    }
+    DrawComponentInInspector<Nigozi::ScriptComponent>("Script", entity, m_selectionContext,
+        [&](auto& component) {
+            auto name = component.ScriptPath.string();
+            if (name.empty()) {
+                name = "***";
+            }
+            if (ImGui::Button(name.c_str())) {
+                std::filesystem::path newPath = Nigozi::FileDialogue::OpenFileDialog("cs");
+                if (!newPath.empty()) {
+                    component.ScriptPath = newPath;
+                }
+            }
+        });
     DrawComponentInInspector<Nigozi::CameraComponent>("Camera", entity, m_selectionContext,
         [&](auto& component) {
             ImGui::DragFloat("Zoom", &component.Zoom, 0.05f, 0.01f);
@@ -1398,6 +1424,21 @@ void EditorLayer::ShowAddNodeModal()
                     AddComponent<Nigozi::AudioStreamPlayerComponent>(entity, itemSelectedIndex == NodeTypes::AUDIO_STREAM_PLAYER);
                     AddComponent<Nigozi::CameraComponent>(entity, itemSelectedIndex == NodeTypes::CAMERA);
 
+                    auto& nodeType = entity.GetComponent<Nigozi::NodeTypeComponent>();
+
+                    if (entity.GetUUID() == m_currentContext->GetSceneRootUUID())
+                        nodeType.Type = Nigozi::NodeTypeComponent::Types::Scene;
+                    else if (itemSelectedIndex == NodeTypes::NODE_2D)
+                        nodeType.Type = Nigozi::NodeTypeComponent::Types::Node;
+                    else if (itemSelectedIndex == NodeTypes::CAMERA)
+                        nodeType.Type = Nigozi::NodeTypeComponent::Types::Camera;
+                    else if (itemSelectedIndex == NodeTypes::SPRITE_RENDERER)
+                        nodeType.Type = Nigozi::NodeTypeComponent::Types::SpriteRenderer;
+                    else if (itemSelectedIndex == NodeTypes::RIGID_BODY)
+                        nodeType.Type = Nigozi::NodeTypeComponent::Types::Rigidbody;
+                    else if (itemSelectedIndex == NodeTypes::AUDIO_STREAM_PLAYER)
+                        nodeType.Type = Nigozi::NodeTypeComponent::Types::AudioStreamPlayer;
+
                     if (itemSelectedIndex == NodeTypes::CAMERA) {
                         auto cameraView = m_currentContext->m_Registry.view<Nigozi::CameraComponent>();
                         for (auto [entityHandle, otherCamera] : cameraView.each()) {
@@ -1454,11 +1495,14 @@ void EditorLayer::ShowViewport()
             m_lastContext = m_currentContext;
             m_currentContext = std::make_shared<Nigozi::SceneTree>();
             m_currentContext->DeserializeScene(m_lastContext->GetFilePath());
+            Nigozi::ScriptEngine::SetCurrentSceneTree(m_currentContext);
+            Nigozi::ScriptEngine::StartRuntime();
             m_currentContext->OnAttach();
 
             m_selectionContext = entt::null;
             m_movingSelectionContext = entt::null;
-            
+
+
             m_editorState = EditorState::PLAY;
         }
     }
@@ -1476,6 +1520,8 @@ void EditorLayer::ShowViewport()
 
         m_selectionContext = entt::null;
         m_movingSelectionContext = entt::null;
+
+        Nigozi::ScriptEngine::EndRuntime();
 
         m_editorState = EditorState::EDIT;
     }
@@ -1556,6 +1602,77 @@ void EditorLayer::ShowViewport()
     
     m_viewportHovered = ImGui::IsWindowHovered() && !buttonHovered;
     ImGui::End();
+}
+
+void EditorLayer::ShowCreateOrOpenProjectModal()
+{
+    if (Nigozi::Project::s_ProjectDir.empty() && !ImGui::IsPopupOpen("Load project...")) {
+        ImGui::OpenPopup("Load project...");
+    }
+
+    ImVec2 center = ImGui::GetMainViewport()->GetCenter();
+    ImGui::SetNextWindowPos(center, ImGuiCond_Appearing, ImVec2(0.5f, 0.5f));
+
+    if (ImGui::BeginPopupModal("Load project...", NULL, ImGuiWindowFlags_AlwaysAutoResize)) {
+        
+        ImGui::Text("No projects found to load");
+
+        if (Nigozi::Project::s_ProjectDir.empty()) {
+            if (ImGui::Button("Create Project")) {
+                std::filesystem::path projectDir = Nigozi::FileDialogue::OpenFolderDialog();
+                if (!projectDir.empty() && std::filesystem::is_directory(projectDir)) {
+                    Nigozi::Project::s_ProjectDir = projectDir;
+                }
+            }
+            ImGui::SameLine();
+            if (ImGui::Button("Load Project")) {
+                std::filesystem::path projectDir = Nigozi::FileDialogue::OpenFolderDialog();
+                if (!projectDir.empty() && std::filesystem::is_directory(projectDir)) {
+                    Nigozi::Project::s_ProjectDir = projectDir;
+                    Nigozi::Project::s_ProjectAssemblyDir = Nigozi::Project::s_ProjectDir / "Resources" / "Build";
+
+                    Nigozi::Project::DeserializeProjectMetadata();
+                    Nigozi::ScriptEngine::Initialize("src/res/scripts");
+
+
+                    ImGui::CloseCurrentPopup();
+                }
+            }
+            ImGui::SameLine();
+            if (ImGui::Button("Exit")) {
+                Nigozi::Application::Close();
+            }
+        }
+        else {
+            std::filesystem::path finalPath = Nigozi::Project::s_ProjectDir / Nigozi::Project::s_ProjectName;
+            ImGui::Text("Project dir: ");
+            ImGui::Text(finalPath.string().c_str());
+
+            if (Nigozi::Project::s_ProjectName.capacity() < 96)
+                Nigozi::Project::s_ProjectName.reserve(96);
+            if (ImGui::InputText("Project Name", Nigozi::Project::s_ProjectName.data(), Nigozi::Project::s_ProjectName.capacity()))
+            {
+                Nigozi::Project::s_ProjectName.resize(strlen(Nigozi::Project::s_ProjectName.data()));
+            }
+            if (ImGui::Button("Create") && !Nigozi::Project::s_ProjectName.empty()) {
+                finalPath = Nigozi::Project::s_ProjectDir / Nigozi::Project::s_ProjectName;
+                Nigozi::Project::s_ProjectDir = finalPath;
+                Nigozi::Project::s_ProjectAssemblyDir = Nigozi::Project::s_ProjectDir / "Resources" / "Build";
+                
+                std::filesystem::create_directories(Nigozi::Project::s_ProjectAssemblyDir);
+                
+                Nigozi::Project::SerializeProjectMetadata();
+
+                Nigozi::ScriptEngine::Initialize("src/res/scripts");
+                ImGui::CloseCurrentPopup();
+            }
+            ImGui::SameLine();
+            if (ImGui::Button("Exit")) {
+                Nigozi::Application::Close();
+            }
+        }
+        ImGui::EndPopup();
+    }
 }
 
 void EditorLayer::CloseSceneTab(const std::shared_ptr<Nigozi::SceneTree>& sceneContext)

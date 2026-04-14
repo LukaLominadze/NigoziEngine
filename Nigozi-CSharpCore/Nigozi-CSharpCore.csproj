@@ -4,14 +4,14 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <TargetFramework>net9.0</TargetFramework>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-    <Configurations>Debug;Release;Distribution</Configurations>
+    <Configurations>Debug;Release</Configurations>
     <EnableDefaultCompileItems>false</EnableDefaultCompileItems>
     <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
     <Nullable>enable</Nullable>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <PlatformTarget>AnyCPU</PlatformTarget>
-    <DebugType>portable</DebugType>
+    <DebugType>pdbonly</DebugType>
     <DebugSymbols>true</DebugSymbols>
     <Optimize>false</Optimize>
     <OutputPath>..\Kakali\src\res\scripts\</OutputPath>
@@ -24,20 +24,9 @@
     <PlatformTarget>AnyCPU</PlatformTarget>
     <DebugType>portable</DebugType>
     <DebugSymbols>true</DebugSymbols>
-    <Optimize>false</Optimize>
+    <Optimize>true</Optimize>
     <OutputPath>..\Kakali\src\res\scripts\</OutputPath>
     <IntermediateOutputPath>..\Kakali\src\res\scripts\bin-int\Release\</IntermediateOutputPath>
-    <DefineConstants></DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Distribution|AnyCPU' ">
-    <PlatformTarget>AnyCPU</PlatformTarget>
-    <DebugType>portable</DebugType>
-    <DebugSymbols>true</DebugSymbols>
-    <Optimize>false</Optimize>
-    <OutputPath>..\Kakali\src\res\scripts\</OutputPath>
-    <IntermediateOutputPath>..\Kakali\src\res\scripts\bin-int\Distribution\</IntermediateOutputPath>
     <DefineConstants></DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
@@ -46,12 +35,10 @@
   </ItemGroup>
   <ItemGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
   </ItemGroup>
-  <ItemGroup Condition=" '$(Configuration)|$(Platform)' == 'Distribution|AnyCPU' ">
-  </ItemGroup>
   <ItemGroup>
-    <Compile Include="Source\Nigozi\InternalCalls.cs" />
     <Compile Include="Source\Nigozi\IScriptBehaviour.cs" />
     <Compile Include="Source\Nigozi\IVector2.cs" />
+    <Compile Include="Source\Nigozi\InternalCalls.cs" />
     <Compile Include="Source\Nigozi\Log.cs" />
     <Compile Include="Source\Nigozi\Nodes\AudioStreamPlayerNode.cs" />
     <Compile Include="Source\Nigozi\Nodes\CameraNode.cs" />

@@ -7,6 +7,10 @@
 #include "Nigozi/audio/AudioEngine.h"
 #include "Nigozi/glcore/OrthographicCamera.h"
 #include "UUID.h"
+#include <Coral/HostInstance.hpp>
+#include <Coral/GC.hpp>
+#include <Coral/Array.hpp>
+#include <Coral/Attribute.hpp>
 
 namespace Nigozi {
 	struct UUIDComponent {
@@ -148,13 +152,11 @@ namespace Nigozi {
 
 	// TODO: Maybe figure out a way to not have scripts heap allocated?
 	struct ScriptComponent {
-		std::shared_ptr<Script> ScriptHandle;
+		std::filesystem::path ScriptPath;
+		Coral::ManagedObject ManagedScriptObject;
 
 		ScriptComponent() = default;
 		ScriptComponent(const ScriptComponent& other) = default;
-		ScriptComponent(const std::shared_ptr<Script>& script) {
-			ScriptHandle = script;
-		}
 	};
 
 	struct RigidbodyComponent {

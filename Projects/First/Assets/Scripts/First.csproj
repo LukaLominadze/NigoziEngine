@@ -1,0 +1,58 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <TargetFramework>net9.0</TargetFramework>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <Configurations>Debug;Release</Configurations>
+    <EnableDefaultCompileItems>false</EnableDefaultCompileItems>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <DebugType>pdbonly</DebugType>
+    <DebugSymbols>true</DebugSymbols>
+    <Optimize>false</Optimize>
+    <OutputPath>..\..\Resources\Build\</OutputPath>
+    <IntermediateOutputPath>..\..\Resource\Intermediates\Debug\</IntermediateOutputPath>
+    <DefineConstants></DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
+    <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
+    <EnableDynamicLoading>true</EnableDynamicLoading>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <DebugType>portable</DebugType>
+    <DebugSymbols>true</DebugSymbols>
+    <Optimize>true</Optimize>
+    <OutputPath>..\..\Resources\Build\</OutputPath>
+    <IntermediateOutputPath>..\..\Resource\Intermediates\Release\</IntermediateOutputPath>
+    <DefineConstants></DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
+    <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
+    <EnableDynamicLoading>true</EnableDynamicLoading>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+  <ItemGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+  </ItemGroup>
+  <ItemGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="FloatingNode.cs" />
+    <Compile Include="Player.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\..\vendor\Coral\Coral.Managed\Coral.Managed.csproj">
+      <Project>{11178401-7DD7-FF37-4612-49B5B2914414}</Project>
+      <Name>Coral.Managed</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\..\Nigozi-CSharpCore\Nigozi-CSharpCore.csproj">
+      <Project>{AC2F12FD-1846-1093-61BD-9BB4CD12E11A}</Project>
+      <Name>Nigozi-CSharpCore</Name>
+    </ProjectReference>
+  </ItemGroup>
+</Project>

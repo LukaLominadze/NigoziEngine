@@ -14,7 +14,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("Nigozi-CSharpCore")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+d6bda72b2f8f81d2edcce3b9541fa22170affa0d")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+0cc2f11b944be04dcf5229dd3de8bb238c4c1f42")]
 [assembly: System.Reflection.AssemblyProductAttribute("Nigozi-CSharpCore")]
 [assembly: System.Reflection.AssemblyTitleAttribute("Nigozi-CSharpCore")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

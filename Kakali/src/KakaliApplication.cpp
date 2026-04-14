@@ -1,9 +1,9 @@
 #include "KakaliApplication.h"
 
-KakaliApplication::KakaliApplication(const Nigozi::ApplicationProps& props)
+KakaliApplication::KakaliApplication(const Nigozi::ApplicationProps& props, const EditorParams& params)
 	: Application(props),
 	  m_viewportBuffer({ props.Width, props.Height }), 
-	  m_editorLayer(&m_viewportBuffer)
+	  m_editorLayer(params, &m_viewportBuffer)
 {
 	PushOverlay(&m_editorLayer);
 

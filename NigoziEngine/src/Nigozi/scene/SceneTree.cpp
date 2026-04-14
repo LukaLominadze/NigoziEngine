@@ -2,6 +2,7 @@
 #include "SceneTree.h"
 #include "Entity.h"
 #include "Component.h"
+#include "scripts/ScriptEngine.h"
 
 #include "box2d/b2_world.h"
 #include "box2d/b2_body.h"
@@ -99,6 +100,11 @@ namespace Nigozi
                 }
             }
             m_entityMap[uuid.ID] = entity;
+
+            if (ent["Script"]) {
+                auto& script = entity.AddComponent<ScriptComponent>();
+                script.ScriptPath = ent["Script"]["FilePath"].as<std::string>();
+            }
 
             auto& transform = entity.AddComponent<TransformComponent>();
             transform.Position = glm::vec2(
@@ -293,6 +299,11 @@ namespace Nigozi
             ent["Camera"]["zoom"] = camera.Zoom;
         }
 
+        if (node.HasComponent<ScriptComponent>()) {
+            auto& script = node.GetComponent<ScriptComponent>();
+            ent["Script"]["FilePath"] = script.ScriptPath.string();
+        }
+
         if (node.HasComponent<SpriteRendererComponent>()) {
             auto& sprite = node.GetComponent<SpriteRendererComponent>();
             ent["Sprite"]["Texture"]["FilePath"] = sprite.SpriteTexture->GetPath();
@@ -382,6 +393,13 @@ namespace Nigozi
                 boxCollider.RuntimeFixture = (void*)body->CreateFixture(&fixtureDef);
             }
         }
+
+        auto scriptView = m_Registry.view<ScriptComponent>();
+        for (auto entity : scriptView)
+        {
+            auto& script = m_Registry.get<ScriptComponent>(entity);
+            script.ManagedScriptObject.InvokeMethod("OnStart");
+        }
     }
 
     void SceneTree::OnDetach()
@@ -396,7 +414,7 @@ namespace Nigozi
         for (auto entity : scriptView)
         {
             auto& script = m_Registry.get<ScriptComponent>(entity);
-            script.ScriptHandle->OnEvent(event);
+            // script.ManagedScriptObject.InvokeMethod("")
         }
     }
 
@@ -417,15 +435,17 @@ namespace Nigozi
             auto rhsEntity = m_entityMap.find(rhs.ID)->second;
             return lhsEntity.GetHandle() < rhsEntity.GetHandle();
             });
+        
+        auto scriptView = m_Registry.view<ScriptComponent>();
+        for (auto entity : scriptView)
+        {
+            auto& script = m_Registry.get<ScriptComponent>(entity);
+            script.ManagedScriptObject.InvokeMethod("OnUpdate", timestep);
+        }
 
         auto audioView = m_Registry.view<AudioStreamPlayerComponent>();
         audioView.each([](auto audio) {
             audio.AudioHandle->Update();
-            });
-
-        auto scriptView = m_Registry.view<ScriptComponent>();
-        scriptView.each([timestep](auto script) {
-            script.ScriptHandle->OnUpdate(timestep);
             });
 
         const int32_t velocityIterations = 6;
@@ -456,10 +476,6 @@ namespace Nigozi
 
     void SceneTree::OnRender()
     {
-        auto scriptView = m_Registry.view<ScriptComponent>();
-        scriptView.each([](auto script) {
-            script.ScriptHandle->OnRender();
-            });
 
         m_Registry.sort<SpriteRendererComponent>([](const SpriteRendererComponent& a, const SpriteRendererComponent& b) {
             return a.ZOrder < b.ZOrder;
@@ -493,10 +509,7 @@ namespace Nigozi
 
     void SceneTree::OnImGuiRender()
     {
-        auto scriptView = m_Registry.view<ScriptComponent>();
-        scriptView.each([](auto script) {
-            script.ScriptHandle->OnImGuiRender();
-            });
+        
     }
 
     void SceneTree::OnEditorEvent(Event& event)
@@ -583,6 +596,7 @@ namespace Nigozi
 
         entity.AddComponent<TransformComponent>();
         entity.AddComponent<RelationshipComponent>();
+        entity.AddComponent<NodeTypeComponent>();
 
         return entity;
     }

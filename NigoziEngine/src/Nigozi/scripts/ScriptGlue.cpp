@@ -219,6 +219,7 @@ namespace Nigozi
 
 		void TransformComponent_GetTransform(uint64_t id, Transform* outTransform)
 		{
+			// NG_CORE_LOG_INFO("Transform callback get! {}: {}, {}", id, outTransform->Position.x, outTransform->Position.y);
 			Entity entity = ScriptEngine::GetCurrentSceneTree()->TryGetEntityByUUID(UUID(id));
 			if (entity == Entity()) {
 				return;
@@ -232,6 +233,7 @@ namespace Nigozi
 
 		void TransformComponent_SetTransform(uint64_t id, Transform* inTransform)
 		{
+			// NG_CORE_LOG_INFO("Transform callback set! {}: {}, {}", id, inTransform->Position.x, inTransform->Position.y);
 			Entity entity = ScriptEngine::GetCurrentSceneTree()->TryGetEntityByUUID(UUID(id));
 			if (entity == Entity()) {
 				return;
