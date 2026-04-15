@@ -262,7 +262,7 @@ namespace Nigozi
         Joystick14 = 13,
         Joystick15 = 14,
         Joystick16 = 15,
-        JOYSTICK_LAST = Joystick16,
+        JoystickLast = Joystick16,
 
         GamepadButtonA = 0,
         GamepadButtonB = 1,
