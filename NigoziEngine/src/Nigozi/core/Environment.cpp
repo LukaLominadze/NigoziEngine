@@ -1,5 +1,5 @@
 #include "ngpch.h"
-#if NG_PLATFORM_WINDOWS
+#ifdef NG_PLATFORM_WINDOWS
     #include <Windows.h>
     #include <ShObjIdl_core.h>
 #endif

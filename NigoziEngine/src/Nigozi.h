@@ -6,6 +6,7 @@
 #include "Nigozi/core/Log.h"
 
 #include "Nigozi/core/Environment.h"
+#include "Nigozi/core/SubProcess.h"
 
 #include "Nigozi/Benchmarking/Timer.h"
 

@@ -98,7 +98,7 @@ ProjectUtils::Error ProjectUtils::CreateProject(const std::filesystem::path& pro
 
 	#ifdef NG_PLATFORM_WINDOWS
 		std::string premakeScript = "CreateScriptProject.bat";
-		std::string sysCommand = "cd " + Nigozi::Project::s_ProjectDir.string() + " && ";
+		std::string sysCommand = "cmd.exe /C cd " + Nigozi::Project::s_ProjectDir.string() + " && ";
 		sysCommand += premakeScript;
 	#else
 		std::string premakeScript = "CreateScriptProject.sh";
@@ -118,42 +118,9 @@ ProjectUtils::Error ProjectUtils::CreateProject(const std::filesystem::path& pro
 	std::filesystem::copy_file(std::filesystem::path("src/res/scripts") / premakeScript, Nigozi::Project::s_ProjectDir / premakeScript);
 	std::filesystem::copy_file(std::filesystem::path("src/res/scripts") / ".editorconfig", Nigozi::Project::s_ProjectDir / ".editorconfig");
 
-#ifdef NG_PLATFORM_WINDOWS
-	STARTUPINFO si;
-	PROCESS_INFORMATION pi;
-
-	ZeroMemory(&si, sizeof(si));
-	si.cb = sizeof(si);
-	ZeroMemory(&pi, sizeof(pi));
-
-	std::wstring wsysCommand = L"cmd.exe /C " + std::filesystem::path(sysCommand).wstring();
-
-	// Start the child process. 
-	if (!CreateProcess(NULL,   // No module name (use command line)
-		wsysCommand.data(),    // Command line
-		NULL,           // Process handle not inheritable
-		NULL,           // Thread handle not inheritable
-		TRUE,          // Set handle inheritance to TRUE
-		CREATE_UNICODE_ENVIRONMENT | CREATE_NO_WINDOW, // No creation flags
-		NULL,           // Use parent's environment block
-		NULL,           // Use parent's starting directory 
-		&si,            // Pointer to STARTUPINFO structure
-		&pi)           // Pointer to PROCESS_INFORMATION structure
-		)
-	{
-		printf("CreateProcess failed (%d).\n", GetLastError());
-		return Error::SubprocessFailed;
+	if (!Nigozi::SubProcess::Run(sysCommand)) {
+		return ProjectUtils::Error::SubprocessFailed;
 	}
-
-	// Wait until child process exits.
-	WaitForSingleObject(pi.hProcess, INFINITE);
-
-	// Close process and thread handles. 
-	CloseHandle(pi.hProcess);
-	CloseHandle(pi.hThread);
-#else
-	std::system(sysCommand.c_str());
-#endif
 
 	SerializeProjectMetadata();
 
@@ -178,50 +145,15 @@ void ProjectUtils::RecreateScriptsProject()
 
 	#ifdef NG_PLATFORM_WINDOWS
 		std::string premakeScript = "CreateScriptProject.bat";
-		std::string sysCommand = "cd " + Nigozi::Project::s_ProjectDir.string() + " && ";
-		sysCommand += (Nigozi::Project::s_ProjectDir / premakeScript).string();
+		std::string sysCommand = "cmd.exe /C cd " + Nigozi::Project::s_ProjectDir.string() + " && ";
+		sysCommand += premakeScript;
 	#else
 		std::string premakeScript = "CreateScriptProject.sh";
 		std::string sysCommand = "cd " + Nigozi::Project::s_ProjectDir.string() + " && ";
 		sysCommand += ("sh" + (Nigozi::Project::s_ProjectDir / premakeScript).string();
 	#endif
 
-#ifdef NG_PLATFORM_WINDOWS
-		STARTUPINFO si;
-		PROCESS_INFORMATION pi;
-
-		ZeroMemory(&si, sizeof(si));
-		si.cb = sizeof(si);
-		ZeroMemory(&pi, sizeof(pi));
-
-		std::wstring wsysCommand = L"cmd.exe /C " + std::filesystem::path(sysCommand).wstring();
-
-		// Start the child process. 
-		if (!CreateProcess(NULL,   // No module name (use command line)
-			wsysCommand.data(),    // Command line
-			NULL,           // Process handle not inheritable
-			NULL,           // Thread handle not inheritable
-			TRUE,          // Set handle inheritance to TRUE
-			CREATE_UNICODE_ENVIRONMENT, // No creation flags
-			NULL,           // Use parent's environment block
-			NULL,           // Use parent's starting directory 
-			&si,            // Pointer to STARTUPINFO structure
-			&pi)           // Pointer to PROCESS_INFORMATION structure
-			)
-		{
-			printf("CreateProcess failed (%d).\n", GetLastError());
-			return;
-		}
-
-		// Wait until child process exits.
-		WaitForSingleObject(pi.hProcess, INFINITE);
-
-		// Close process and thread handles. 
-		CloseHandle(pi.hProcess);
-		CloseHandle(pi.hThread);
-#else
-		std::system(sysCommand.c_str());
-#endif
+	Nigozi::SubProcess::Run(sysCommand);
 }
 
 void ProjectUtils::SerializeProjectMetadata()
