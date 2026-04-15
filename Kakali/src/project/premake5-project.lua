@@ -1,4 +1,4 @@
-project "First"
+project "%{PROJECT_NAME}"
     language "C#"
     dotnetframework "net9.0"
     kind "SharedLib"
@@ -20,4 +20,4 @@ project "First"
         "**.cs"
     }
 
-    links { "E:/Luka/Dev/C++/NigoziEngine/Kakali/src/res/scripts/Coral.Managed", "E:/Luka/Dev/C++/NigoziEngine/Kakali/src/res/scripts/Nigozi-CSharpCore" }
+    links { "%{NIGOZI_CSHARP_CORE_BIN}/Coral.Managed", "%{NIGOZI_CSHARP_CORE_BIN}/Nigozi-CSharpCore" }

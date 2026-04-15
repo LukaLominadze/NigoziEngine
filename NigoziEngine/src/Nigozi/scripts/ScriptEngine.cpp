@@ -123,12 +123,16 @@ namespace Nigozi
 
 	void ScriptEngine::LoadProjectAssembly()
 	{
+		if (!std::filesystem::exists(Project::s_ProjectAssemblyDir / (Project::s_ProjectName + ".dll"))) {
+			return;
+		}
 		sp_projectAssembly = &s_loadContext.LoadAssembly((Project::s_ProjectAssemblyDir / (Project::s_ProjectName + ".dll")).string());
 	}
 
 	void ScriptEngine::ReloadAssemblies()
 	{
 		UnloadCoreAssembly();
+		LoadHostInstance();
 		LoadCoreAssembly();
 		LoadProjectAssembly();
 	}

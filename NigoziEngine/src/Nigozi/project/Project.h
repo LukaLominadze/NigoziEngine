@@ -1,16 +1,13 @@
-#pragma once
 #include <filesystem>
+#include <string>
 
 namespace Nigozi
 {
 	static class Project
 	{
 	public:
-		static void SerializeProjectMetadata();
-		static void DeserializeProjectMetadata();
-		
-		static std::filesystem::path s_ProjectDir;
-		static std::filesystem::path s_ProjectAssemblyDir;
-		static std::string s_ProjectName;
+		inline static std::filesystem::path s_ProjectDir;
+		inline static std::filesystem::path s_ProjectAssemblyDir;
+		inline static std::string s_ProjectName;
 	};
 }

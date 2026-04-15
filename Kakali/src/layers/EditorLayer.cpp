@@ -1,4 +1,5 @@
 #include "EditorLayer.h"
+#include "project/ProjectUtils.h"
 
 bool EditorLayer::s_showDemoWindow = false;
 
@@ -342,11 +343,19 @@ void EditorLayer::Hotkeys()
         SaveCurrentScene();
         return;
     }
-    // Save All - CTRL+SHIFT+S
+    // Save As - CTRL+SHIFT+S
     if (Nigozi::Input::IsKeyPressed(NG_KEY_LEFT_CONTROL) &&
         Nigozi::Input::IsKeyPressed(NG_KEY_LEFT_SHIFT) &&
         Nigozi::Input::IsKeyJustPressed(NG_KEY_S)) {
-        SaveAllScenes();
+        SaveCurrentSceneAs();
+        return;
+    }
+    // Save All - CTRL+SHIFT+S
+    if (Nigozi::Input::IsKeyPressed(NG_KEY_LEFT_CONTROL) &&
+        Nigozi::Input::IsKeyPressed(NG_KEY_LEFT_ALT) &&
+        Nigozi::Input::IsKeyPressed(NG_KEY_LEFT_SHIFT) &&
+        Nigozi::Input::IsKeyJustPressed(NG_KEY_S)) {
+        SaveCurrentSceneAs();
         return;
     }
 }
@@ -689,20 +698,21 @@ static void DrawComponentInInspector(const std::string& name, Nigozi::Entity ent
 }
 
 void EditorLayer::UpdateRigidbodyTransform(Nigozi::Entity entity) {
-    if (m_editorState != EditorState::EDIT) {
-        if (!entity.HasComponent<Nigozi::RigidbodyComponent>()) {
-            return;
-        }
-        auto& transform = entity.GetComponent<Nigozi::TransformComponent>();
-        auto& rigidbody = entity.GetComponent<Nigozi::RigidbodyComponent>();
-        b2Body* body = (b2Body*)rigidbody.RuntimeBody;
-        auto rTransform = body->GetTransform();
-        auto worldTransform = m_currentContext->GetWorldSpaceTransform(entity);
-        rTransform.p.x = worldTransform.Position.x;
-        rTransform.p.y = worldTransform.Position.y;
-        body->SetTransform(rTransform.p, glm::radians(-worldTransform.Rotation));
-        body->SetAwake(true);
+    if (m_editorState == EditorState::EDIT) {
+        return;
     }
+    if (!entity.HasComponent<Nigozi::RigidbodyComponent>()) {
+        return;
+    }
+    auto& transform = entity.GetComponent<Nigozi::TransformComponent>();
+    auto& rigidbody = entity.GetComponent<Nigozi::RigidbodyComponent>();
+    b2Body* body = (b2Body*)rigidbody.RuntimeBody;
+    auto rTransform = body->GetTransform();
+    auto worldTransform = m_currentContext->GetWorldSpaceTransform(entity);
+    rTransform.p.x = worldTransform.Position.x;
+    rTransform.p.y = worldTransform.Position.y;
+    body->SetTransform(rTransform.p, glm::radians(-worldTransform.Rotation));
+    body->SetAwake(true);
 }
 
 void EditorLayer::UpdateBoxCollider(Nigozi::Entity entity, glm::vec2 size)
@@ -1664,11 +1674,9 @@ void EditorLayer::ShowCreateOrOpenProjectModal()
                 std::filesystem::path projectDir = Nigozi::FileDialogue::OpenFolderDialog();
                 if (!projectDir.empty() && std::filesystem::is_directory(projectDir)) {
                     Nigozi::Project::s_ProjectDir = projectDir;
-                    Nigozi::Project::s_ProjectAssemblyDir = Nigozi::Project::s_ProjectDir / "Resources" / "Build";
 
-                    Nigozi::Project::DeserializeProjectMetadata();
+                    ProjectUtils::DeserializeProjectMetadata();
                     Nigozi::ScriptEngine::Initialize("src/res/scripts");
-
 
                     ImGui::CloseCurrentPopup();
                 }
@@ -1686,16 +1694,17 @@ void EditorLayer::ShowCreateOrOpenProjectModal()
                 Nigozi::Project::s_ProjectName.resize(strlen(Nigozi::Project::s_ProjectName.data()));
             }
             if (ImGui::Button("Create") && !Nigozi::Project::s_ProjectName.empty()) {
-                finalPath = Nigozi::Project::s_ProjectDir / Nigozi::Project::s_ProjectName;
-                Nigozi::Project::s_ProjectDir = finalPath;
-                Nigozi::Project::s_ProjectAssemblyDir = Nigozi::Project::s_ProjectDir / "Resources" / "Build";
-                
-                std::filesystem::create_directories(Nigozi::Project::s_ProjectAssemblyDir);
-                
-                Nigozi::Project::SerializeProjectMetadata();
-
-                Nigozi::ScriptEngine::Initialize("src/res/scripts");
-                ImGui::CloseCurrentPopup();
+                ProjectUtils::Error error = ProjectUtils::CreateProject(Nigozi::Project::s_ProjectDir, Nigozi::Project::s_ProjectName);
+                if (error == ProjectUtils::Error::InvalidProjectDir) {
+                    NG_CLIENT_LOG_ERROR("Invalid project directory!");
+                }
+                else if (error == ProjectUtils::Error::ProjectPathAlreadyExists) {
+                    NG_CLIENT_LOG_ERROR("Project path already exists!");
+                }
+                else {
+                    Nigozi::ScriptEngine::Initialize("src/res/scripts");
+                    ImGui::CloseCurrentPopup();
+                }
             }
         }
         ImGui::SameLine();

@@ -11,7 +11,7 @@ workspace "Nigozi-CSharpCore"
 		optimize "On"
 		symbols "Default"
 
-	filter "configurations:Dist"
+	filter "configurations:Distribution"
 		optimize "Full"
 		symbols "Off"
 

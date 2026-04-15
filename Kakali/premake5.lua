@@ -72,6 +72,11 @@ project "Kakali"
 			"{COPYDIR} %{prj.location}/src/res %{wks.location}/bin/" ..outputdir.. "/%{prj.name}/src/res",
 			"{COPYDIR} %{prj.location}/kakali-small.png %{wks.location}/bin/" ..outputdir.. "/%{prj.name}/",
 			"{COPYDIR} %{prj.location}/imgui.ini %{wks.location}/bin/" .. outputdir .. "/%{prj.name}/",
+			"{COPYDIR} %{prj.location}/premake5.exe %{wks.location}/bin/" .. outputdir .. "/%{prj.name}/",
+
+			"{MKDIR} %{wks.location}/bin/" ..outputdir.. "/%{prj.name}/src/project",
+			"{COPYDIR} %{prj.location}/src/project/premake5-workspace.lua %{wks.location}/bin/" ..outputdir.. "/%{prj.name}/src/project/",
+			"{COPYDIR} %{prj.location}/src/project/premake5-project.lua %{wks.location}/bin/" ..outputdir.. "/%{prj.name}/src/project/",
 
 			"{COPYDIR} %{wks.location}/vendor/Coral/Build/%{cfg.buildcfg} %{prj.location}/src/res/scripts/"
 		}
@@ -96,7 +101,10 @@ project "Kakali"
 			"{COPYDIR} %{prj.location}/src/Nigozi %{wks.location}/bin/" ..outputdir.. "/%{prj.name}/src",
 			"{COPYDIR} %{prj.location}/src/res %{wks.location}/bin/" ..outputdir.. "/%{prj.name}/src",
 			"{COPYDIR} %{prj.location}/kakali-small.png %{wks.location}/bin/" ..outputdir.. "/%{prj.name}/",
-			"{COPYDIR} %{prj.location}/imgui.ini %{wks.location}/bin/" .. outputdir .. "/%{prj.name}/"
+			"{COPYDIR} %{prj.location}/imgui.ini %{wks.location}/bin/" .. outputdir .. "/%{prj.name}/",
+			"{COPYDIR} %{prj.location}/premake5.exe %{wks.location}/bin/" .. outputdir .. "/%{prj.name}/",
+
+			"{COPYDIR} %{wks.location}/vendor/Coral/Build/%{cfg.buildcfg} %{prj.location}/src/res/scripts/"
 		}
 
 	filter {"system:linux", "options:linux_backend=gtk3"}

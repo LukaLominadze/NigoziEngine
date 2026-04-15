@@ -1,4 +1,4 @@
-workspace "First"
+workspace "%{PROJECT_NAME}"
 	configurations { "Debug", "Release" }
 
 	filter "configurations:Debug or configurations:Debug-AS"

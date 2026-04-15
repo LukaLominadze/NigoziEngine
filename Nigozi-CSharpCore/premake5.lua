@@ -9,6 +9,8 @@ project "Nigozi-CSharpCore"
 	targetdir "%{wks.location}/Kakali/src/res/scripts"
 	objdir "%{wks.location}/Kakali/src/res/scripts/bin-int"
 
+	configmap { ["Distribution"] = "Release" }
+
 	links {
 		"Coral.Managed"
 	}
