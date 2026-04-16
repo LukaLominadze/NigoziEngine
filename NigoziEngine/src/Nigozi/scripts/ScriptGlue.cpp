@@ -152,7 +152,7 @@ namespace Nigozi
 
 		bool SceneTree_SetParent(uint64_t childId, uint64_t newParentId)
 		{
-			Entity entity = ScriptEngine::GetCurrentSceneTree()->TryGetEntityByUUID(UUID(childId);
+			Entity entity = ScriptEngine::GetCurrentSceneTree()->TryGetEntityByUUID(UUID(childId));
 			if (entity == Entity()) {
 				return false;
 			}
