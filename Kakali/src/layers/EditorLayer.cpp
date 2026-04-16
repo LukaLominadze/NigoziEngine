@@ -1676,6 +1676,11 @@ void EditorLayer::ShowCreateOrOpenProjectModal()
                     Nigozi::Project::s_ProjectDir = projectDir;
 
                     ProjectUtils::DeserializeProjectMetadata();
+                    std::filesystem::path slnPath = Nigozi::Project::s_ProjectDir / (Nigozi::Project::s_ProjectName + ".sln");
+                    if (!std::filesystem::exists(slnPath)) {
+                        ProjectUtils::RecreateScriptsProject();
+                    }
+
                     Nigozi::ScriptEngine::Initialize("src/res/scripts");
 
                     ImGui::CloseCurrentPopup();
@@ -1700,6 +1705,9 @@ void EditorLayer::ShowCreateOrOpenProjectModal()
                 }
                 else if (error == ProjectUtils::Error::ProjectPathAlreadyExists) {
                     NG_CLIENT_LOG_ERROR("Project path already exists!");
+                }
+                else if (error == ProjectUtils::Error::SubprocessFailed) {
+                    NG_CLIENT_LOG_ERROR("Premake subprocess failed!");
                 }
                 else {
                     Nigozi::ScriptEngine::Initialize("src/res/scripts");

@@ -19,6 +19,8 @@ namespace Nigozi
 
         #region SceneTree
         internal static delegate* unmanaged<ushort, ulong> SceneTree_CreateNode;
+        internal static delegate* unmanaged<ulong, ulong> SceneTree_GetParent;
+        internal static delegate* unmanaged<ulong, ulong, byte> SceneTree_SetParent;
         internal static delegate* unmanaged<ulong, void> SceneTree_DestroyNode;
         #endregion
 

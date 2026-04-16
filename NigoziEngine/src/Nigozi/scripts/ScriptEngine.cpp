@@ -70,7 +70,9 @@ namespace Nigozi
 
 			auto scriptType = sp_projectAssembly->GetLocalType(scriptAssemblyName);
 
-			scriptComponent.ManagedScriptObject = scriptType.CreateInstance((uint64_t)entity.GetUUID());
+			scriptComponent.ManagedScriptObject = scriptType.CreateInstance();
+			scriptComponent.ManagedScriptObject.InvokeMethod("SetID", (uint64_t)entity.GetUUID());
+			scriptComponent.ManagedScriptObject.GetType();
 		}
 	}
 

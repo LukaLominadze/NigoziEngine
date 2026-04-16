@@ -65,6 +65,8 @@ namespace Nigozi
         {
         }
 
+        public RigidbodyNode() { }
+
         public void ApplyForce(Vector2 force)
         {
             unsafe { InternalCalls.RigidbodyComponent_ApplyForce(ID, force); }

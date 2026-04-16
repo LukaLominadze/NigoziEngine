@@ -7,7 +7,7 @@ ProjectUtils::Error ProjectUtils::CreateProject(const std::filesystem::path& pro
 		return ProjectUtils::Error::InvalidProjectDir;
 	}
 
-	std::filesystem::path fullPath = projectDir / projectName;
+	std::filesystem::path fullPath = std::filesystem::absolute(projectDir) / projectName;
 	if (std::filesystem::exists(fullPath)) {
 		return ProjectUtils::Error::ProjectPathAlreadyExists;
 	}
@@ -140,7 +140,7 @@ void ProjectUtils::RecreateScriptsProject()
 		#endif
 
 		premakePath = std::filesystem::absolute(std::filesystem::path(premakeBin)).string();
-		Nigozi::Environment::SetLocalVariable("premake", premakePath);
+		Nigozi::Environment::SetLocalVariable("premake5", premakePath);
 	}
 
 	#ifdef NG_PLATFORM_WINDOWS
@@ -161,7 +161,7 @@ void ProjectUtils::SerializeProjectMetadata()
 	YAML::Node data;
 
 	data["Project"]["Name"] = Nigozi::Project::s_ProjectName;
-	data["Project"]["AssemblyDir"] = std::filesystem::absolute(Nigozi::Project::s_ProjectAssemblyDir.relative_path()).string();
+	data["Project"]["AssemblyDir"] = Nigozi::Project::s_ProjectAssemblyDir.string();
 
 	std::ofstream outFile(Nigozi::Project::s_ProjectDir / (Nigozi::Project::s_ProjectName + ".ngprj"));
 	outFile << std::setw(4) << data << std::endl;
@@ -176,11 +176,7 @@ void ProjectUtils::DeserializeProjectMetadata()
 		if (std::filesystem::is_directory(entry)) {
 			continue;
 		}
-		auto tokens = Nigozi::StringUtils::SplitString(entry.path().filename().string(), ".");
-		if (tokens.size() < 2) {
-			continue;
-		}
-		if (tokens[1] == "ngprj") {
+		if (entry.path().extension() == ".ngprj") {
 			YAML::Node data = YAML::LoadFile(entry.path().string());
 			Nigozi::Project::s_ProjectName = data["Project"]["Name"].as<std::string>();
 			Nigozi::Project::s_ProjectAssemblyDir = data["Project"]["AssemblyDir"].as<std::string>();

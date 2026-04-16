@@ -22,10 +22,17 @@
 
 *.log
 
-!Kakali
-!Kakali/imgui.ini
-
-/Kakali/src/res/scripts/
+/Kakali/src/res/scripts/*
 Projects/First/Resource/Intermediates/
 Projects/First/Resources/Build/
 Projects/First/Resources/Intermediates/Debug/
+
+!Kakali
+!Kakali/imgui.ini
+
+!Kakali/src/res/scripts/*.bat
+!Kakali/src/res/scripts/.editorconfig
+
+!Projects/**/*.vcxproj
+!Projects/**/*.vcxproj.filters
+!Projects/**/*.sln

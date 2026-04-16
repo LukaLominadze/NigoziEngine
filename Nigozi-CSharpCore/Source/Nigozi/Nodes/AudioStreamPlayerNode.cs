@@ -54,6 +54,8 @@ namespace Nigozi
         {
         }
 
+        public AudioStreamPlayerNode() { }
+
         public static new NodeTypes GetNodeType()
         {
             return NodeTypes.AudioStreamPlayer;

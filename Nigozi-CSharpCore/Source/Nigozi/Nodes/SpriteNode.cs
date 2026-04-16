@@ -36,6 +36,8 @@ namespace Nigozi
         {
         }
 
+        public SpriteNode() { }
+
         public static new NodeTypes GetNodeType()
         {
             return NodeTypes.SpriteRenderer;

@@ -10,6 +10,8 @@ namespace Nigozi
     {
         public SceneNode(ulong id) : base(id) { }
 
+        public SceneNode() { }
+
         public static new NodeTypes GetNodeType()
         {
             return NodeTypes.Scene;

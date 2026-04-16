@@ -9,8 +9,42 @@ namespace Nigozi
 {
     public class Node : INodeType
     {
-        public readonly ulong ID;
-        
+        private ulong id;
+        public ulong ID
+        {
+            get => id;
+        }
+        public Node? Parent
+        {
+            get
+            {
+                ulong parentId = 0;
+                unsafe { parentId = InternalCalls.SceneTree_GetParent(id); }
+
+                if (parentId == 0)
+                {
+                    return null;
+                }
+
+                return new Node(parentId);
+            }
+            set
+            {
+                ulong newParentId = 0;
+                if (value != null)
+                {
+                    newParentId = value.ID;
+                }
+                unsafe
+                {
+                    if (InternalCalls.SceneTree_SetParent(id, newParentId) == 1)
+                    {
+                        id = newParentId;
+                    }
+                }
+            }
+        }
+
         private Transform Transform
         {
             get
@@ -140,18 +174,42 @@ namespace Nigozi
 
         public Node(ulong id)
         {
-            ID = id;
+            this.id = id;
         }
 
+        public Node() { }
+
+        public T As<T>() where T : Node
+        {
+            return (this as T)!;
+        }
         public void OnStart() { }
         public void OnUpdate(float timestep) { }
         public void OnRender() { }
         public void OnImGuiRender() { }
         public void OnDestroy() { }
+        private void SetID(ulong id)
+        {
+            this.id = id;
+        }
 
         public static NodeTypes GetNodeType()
         {
             return NodeTypes.Node;
+        }
+
+        private static Type NodeTypeToType(NodeTypes type)
+        {
+            switch(type)
+            {
+                case NodeTypes.Node: return typeof(Node);
+                case NodeTypes.Scene: return typeof(SceneNode);
+                case NodeTypes.Camera: return typeof(CameraNode);
+                case NodeTypes.SpriteRenderer: return typeof(SpriteNode);
+                case NodeTypes.Rigidbody: return typeof(RigidbodyNode);
+                case NodeTypes.AudioStreamPlayer: return typeof(AudioStreamPlayerNode);
+            }
+            return typeof(Node);
         }
     }
 }

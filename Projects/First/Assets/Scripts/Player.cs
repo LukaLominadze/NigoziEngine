@@ -9,11 +9,6 @@ namespace First
 {
     internal class Player : RigidbodyNode
     {
-        public Player(ulong id) : base(id)
-        {
-            Log.Info("Constructor!");
-        }
-
         public void OnStart()
         {
             Log.Info("Game on!");

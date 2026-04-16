@@ -49,6 +49,8 @@ namespace Nigozi
         {
         }
 
+        public CameraNode() { }
+
         public static new NodeTypes GetNodeType()
         {
             return NodeTypes.Camera;

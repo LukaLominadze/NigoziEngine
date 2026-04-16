@@ -26,6 +26,8 @@ namespace Nigozi
 
 #pragma region SceneTree
 		uint64_t SceneTree_CreateNode(uint16_t nodeType);
+		uint64_t SceneTree_GetParent(uint64_t childId);
+		bool SceneTree_SetParent(uint64_t childId, uint64_t newParentId);
 		void SceneTree_DestroyNode(uint64_t id);
 #pragma endregion
 

@@ -19,13 +19,17 @@ namespace Nigozi
 
 		std::wstring wsysCommand = std::filesystem::path(command).wstring();
 
+		INT flags = CREATE_UNICODE_ENVIRONMENT;
+		#ifdef DISTRIBUTION
+			flags |= CREATE_NO_WINDOW;
+		#endif
 		// Start the child process. 
 		if (!CreateProcess(NULL,   // No module name (use command line)
 			wsysCommand.data(),    // Command line
 			NULL,           // Process handle not inheritable
 			NULL,           // Thread handle not inheritable
 			TRUE,          // Set handle inheritance to TRUE
-			CREATE_UNICODE_ENVIRONMENT | CREATE_NO_WINDOW, // No creation flags
+			flags, // No creation flags
 			NULL,           // Use parent's environment block
 			NULL,           // Use parent's starting directory 
 			&si,            // Pointer to STARTUPINFO structure
