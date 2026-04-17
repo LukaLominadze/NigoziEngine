@@ -814,7 +814,7 @@ void EditorLayer::DrawFileTreeDirectory(std::filesystem::path& dirPath)
 void EditorLayer::ShowFileTreeExplorer()
 {
     ImGui::Begin("File Explorer");
-    if (Nigozi::Project::s_ProjectDir.empty() || !std::filesystem::exists(Nigozi::Project::s_ProjectDir)) {
+    if (Nigozi::Project::s_ProjectDir.empty() || !std::filesystem::exists(Nigozi::Project::s_ProjectDir / "Assets")) {
         ImGui::End();
         return;
     }
