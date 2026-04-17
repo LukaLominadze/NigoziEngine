@@ -380,8 +380,8 @@ namespace Nigozi
                 auto& boxCollider = entity.GetComponent<BoxColliderComponent>();
 
                 b2PolygonShape polygonShape;
-                polygonShape.SetAsBox(boxCollider.Size.x * worldTransform.Scale.x,
-                                      boxCollider.Size.y * worldTransform.Scale.y);
+                polygonShape.SetAsBox(boxCollider.Size.x,
+                                      boxCollider.Size.y);
 
                 b2FixtureDef fixtureDef;
                 fixtureDef.shape = &polygonShape;

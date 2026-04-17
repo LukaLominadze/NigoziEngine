@@ -213,6 +213,22 @@ endSelectionGizmoRender:
             color
         );
     }
+
+    auto boxColliderView = m_currentContext->m_Registry.view<Nigozi::TransformComponent, Nigozi::BoxColliderComponent>();
+    for (auto [entityHandle, transform, boxCollider] : boxColliderView.each()) {
+        auto worldTransform = m_currentContext->GetWorldSpaceTransform(Nigozi::Entity(entityHandle, m_currentContext.get()));
+        glm::vec4 color(0.0f, 0.7f, 0.1f, 1.0f);
+        if (m_selectionContext == entityHandle) {
+            color = glm::vec4(0.0f, 1.0f, 0.2f, 1.0f);
+        }
+        Nigozi::Renderer2D::DrawRotatedQuad(
+            worldTransform.Position,
+            glm::vec2(boxCollider.Size.x * 2.0f, boxCollider.Size.y * 2.0f),
+            glm::radians(worldTransform.Rotation),
+            Nigozi::Renderer2D::GetData()->Textures[0],
+            color
+        );
+    }
     Nigozi::Renderer2D::Flush();
     GLCall(glPolygonMode(GL_FRONT_AND_BACK, GL_FILL));
 }
@@ -221,7 +237,9 @@ void EditorLayer::OnImGuiRender()
 {
     DockViewportWithMenuBar();
     ShowSceneHierarchy();
+    ShowFileTreeExplorer();
     ShowInspector();
+    ShowViewportPanel();
     ShowViewport();
     if (m_editorState == EditorState::EDIT) {
         m_currentContext->OnEditorImGuiRender();
@@ -672,13 +690,137 @@ void EditorLayer::DrawSceneHierarchyNode(Nigozi::Entity entity)
         }
     }
 
+    if (ImGui::IsItemHovered() && ImGui::BeginDragDropTarget()) {
+        Nigozi::UUID dragChildUUID = *(uint64_t*)ImGui::GetDragDropPayload()->Data;
+        if (dragChildUUID != entity.GetUUID()) {
+            Nigozi::Entity child = m_currentContext->TryGetEntityByUUID(dragChildUUID);
+            child.SetParentUUID(entity.GetUUID());
+        }
+        ImGui::EndDragDropTarget();
+    }
+
+    // don't allow drag dropping root node
+    if (ImGui::BeginDragDropSource() && entity.GetParent() != Nigozi::Entity()) {
+        uint64_t uuidHandle = entity.GetUUID();
+        ImGui::SetDragDropPayload("SCENE_HIERARCHY_NODE_DRAG_DROP", &uuidHandle, sizeof(uint64_t), ImGuiCond_Once);
+        ImGui::EndDragDropSource();
+    }
+
     if (opened) {
         for (Nigozi::Entity child : entity.GetChildren()) {
             DrawSceneHierarchyNode(child);
         }
-
         ImGui::TreePop();
     }
+}
+
+void EditorLayer::DrawFileTreeDirectory(std::filesystem::path& dirPath)
+{
+    std::array<std::string, 1> ignoreExtensions{
+        ".csproj"
+    };
+    std::array<std::string, 1> ignoreFiles{
+        "premake5.lua"
+    };
+    std::array<std::string, 1> ignoreDirectories{
+        "obj"
+    };
+
+    for (const auto& entry : std::filesystem::directory_iterator(dirPath)) {
+        std::filesystem::path entryPath = entry.path();
+        std::filesystem::path entryPathRelative = entryPath.lexically_relative(dirPath);
+
+        std::string extension = entryPath.extension().string();
+        std::string filename = entryPath.filename().string();
+
+        bool ignored = false;
+        for (const auto& ignore : ignoreExtensions) {
+            if (extension == ignore) {
+                ignored = true;
+                break;
+            }
+        }
+        for (const auto& ignore : ignoreFiles) {
+            if (filename == ignore) {
+                ignored = true;
+                break;
+            }
+        }
+        for (const auto& ignore : ignoreDirectories) {
+            if (filename == ignore) {
+                ignored = true;
+                break;
+            }
+        }
+        if (ignored) {
+            continue;
+        }
+
+        bool isDirectory = std::filesystem::is_directory(entryPath);
+
+        ImGuiTreeNodeFlags flags = ImGuiTreeNodeFlags_SpanAvailWidth;
+        if (!isDirectory) {
+            flags |= ImGuiTreeNodeFlags_Leaf;
+        }
+        if (ImGui::TreeNodeEx(entryPath.string().c_str(), flags, entryPathRelative.filename().string().c_str())) {
+            if (isDirectory) {
+                if (ImGui::IsItemClicked(ImGuiMouseButton_Right)) {
+                    ImGui::OpenPopup("##FileTreeDirectoryPopup");
+                }
+                if (ImGui::BeginPopup("##FileTreeDirectoryPopup")) {
+                    constexpr int CREATE_DIR_ID = 0;
+                    constexpr int DELETE_DIR_ID = 1;
+                    std::array<const char*, 2> names = { 
+                        "Create Directory",
+                        "Delete Directory"
+                    };
+                    static int selectedDirOperation = 0;
+                    for (size_t i = 0; i < names.size(); i++) {
+                        if (ImGui::Selectable(names[i])) {
+                            selectedDirOperation = i;
+                        }
+                    }
+                    if (selectedDirOperation == CREATE_DIR_ID) {
+                        
+                    }
+                    else if (selectedDirOperation == DELETE_DIR_ID) {
+
+                    }
+                    ImGui::EndPopup();
+                }
+                DrawFileTreeDirectory(entryPath);
+            }
+            else {
+                // This drag drop will be targeting veiwport
+                // To find that snippet of code, CTRL + F
+                // VIEWPORT_FILE_TREE_ITEM_DRAG_DROP
+                if (ImGui::BeginDragDropSource()) {
+                    std::string entryPathString = entryPath.string();
+                    ImGui::SetDragDropPayload("FILE_TREE_ITEM", entryPathString.data(), (entryPathString.size() + 1), ImGuiCond_Once);
+                    m_isDragDropping = true;
+                    ImGui::EndDragDropSource();
+                }
+                if (ImGui::IsMouseDoubleClicked(ImGuiMouseButton_Left)) {
+                    if (entryPath.extension() == ".ngscn") {
+                        LoadScene(entryPath);
+                    }
+                }
+            }
+            ImGui::TreePop();
+        }
+    }
+}
+
+void EditorLayer::ShowFileTreeExplorer()
+{
+    ImGui::Begin("File Explorer");
+    if (Nigozi::Project::s_ProjectDir.empty() || !std::filesystem::exists(Nigozi::Project::s_ProjectDir)) {
+        ImGui::End();
+        return;
+    }
+    std::filesystem::path projectPath = Nigozi::Project::s_ProjectDir / "Assets";
+    DrawFileTreeDirectory(projectPath);
+    ImGui::End();
 }
 
 template<typename T>
@@ -1511,11 +1653,14 @@ void EditorLayer::ShowAddNodeModal()
     }
 }
 
-void EditorLayer::ShowViewport()
+void EditorLayer::ShowViewportPanel()
 {
-    // TODO: Make multiple tools: Select, Move, Rotate
+    ImGuiWindowFlags flags =
+        ImGuiWindowFlags_NoDecoration |
+        ImGuiWindowFlags_NoScrollbar |
+        ImGuiWindowFlags_NoScrollWithMouse;
+    ImGui::Begin("##Viewport_Panel", nullptr, flags);
     bool buttonHovered = false;
-    ImGui::Begin("Viewport");
     if (ImGui::Button("Select Tool")) {
         buttonHovered = true;
         m_tool = Tool::SELECT;
@@ -1535,7 +1680,7 @@ void EditorLayer::ShowViewport()
     if (ImGui::Button("Play") && m_currentContext->GetSceneRootUUID().GetUUID() != Nigozi::UUID::Null) {
         if (SaveAllScenes()) {
             m_lastContext = m_currentContext;
-            
+
             Nigozi::ScriptEngine::ReloadAssemblies();
 
             m_currentContext = std::make_shared<Nigozi::SceneTree>();
@@ -1571,7 +1716,12 @@ void EditorLayer::ShowViewport()
         m_editorState = EditorState::EDIT;
     }
     if (ImGui::IsItemHovered()) buttonHovered = true;
+    ImGui::End();
+}
 
+void EditorLayer::ShowViewport()
+{
+    ImGui::Begin("Viewport");
     ImGuiTabBarFlags tab_bar_flags = 
         ImGuiTabBarFlags_AutoSelectNewTabs | 
         ImGuiTabBarFlags_Reorderable | 
@@ -1645,7 +1795,32 @@ void EditorLayer::ShowViewport()
     
     ImGui::Image((uint64_t)(p_viewportBuffer->GetColorAttachment()), m_viewportSize, ImVec2(0, 1), ImVec2(1, 0));
     
-    m_viewportHovered = ImGui::IsWindowHovered() && !buttonHovered;
+    // VIEWPORT_FILE_TREE_ITEM_DRAG_DROP
+    if (ImGui::IsWindowHovered(ImGuiHoveredFlags_AllowWhenBlockedByActiveItem) && ImGui::GetMouseDragDelta(ImGuiMouseButton_Left).x != 0.0f) {
+
+        ImVec2 min = ImGui::GetWindowPos();
+        ImVec2 max = { min.x + ImGui::GetWindowWidth(), min.y + ImGui::GetWindowHeight() };
+        
+        ImVec4* col = ImGui::GetStyle().Colors;
+        ImVec4 frameBg = col[ImGuiCol_TabSelectedOverline];
+        frameBg.x *= 255.0f;
+        frameBg.y *= 255.0f;
+        frameBg.z *= 255.0f;
+        frameBg.w *= 255.0f;
+
+        ImGui::GetForegroundDrawList()->AddRect(min, max, IM_COL32(frameBg.x, frameBg.y, frameBg.z, frameBg.w), 0.0f, 0, 2.0f);
+    }
+    if (ImGui::IsWindowHovered() && ImGui::BeginDragDropTarget()) {
+
+        std::filesystem::path filePath((char*)ImGui::GetDragDropPayload()->Data);
+        if (!filePath.empty() && filePath.extension() == ".ngscn") {
+            LoadScene(filePath);
+        }
+        ImGui::EndDragDropTarget();
+    }
+
+    m_viewportHovered = ImGui::IsWindowHovered();
+
     ImGui::End();
 }
 
@@ -1808,6 +1983,37 @@ bool EditorLayer::SaveCurrentSceneAs()
 void EditorLayer::LoadScene()
 {
     std::filesystem::path scenePath = Nigozi::FileDialogue::OpenFileDialog("ngscn");
+    if (scenePath.empty()) {
+        return;
+    }
+    for (const auto& context : m_sceneTreeContexts) {
+        if (context->GetFilePath() == scenePath) {
+            return;
+        }
+    }
+
+    m_commandQueue.PushBack(Command(
+        [&, filePath = scenePath](void* data) {
+            auto sceneContext = std::make_shared<Nigozi::SceneTree>();
+            m_currentContext = sceneContext;
+            m_sceneTreeContexts.push_back(m_currentContext);
+            m_currentContext->DeserializeScene(filePath);
+        },
+        [&, filePath = scenePath](void* data) {
+            for (auto it = m_sceneTreeContexts.begin(); it < m_sceneTreeContexts.end(); ++it) {
+                if ((*it)->GetFilePath() == filePath) {
+                    m_sceneTreeContexts.erase(it);
+                    m_selectionContext = entt::null;
+                    m_movingSelectionContext = entt::null;
+                    break;
+                }
+            }
+        })
+    );
+}
+
+void EditorLayer::LoadScene(std::filesystem::path& scenePath)
+{
     if (scenePath.empty()) {
         return;
     }

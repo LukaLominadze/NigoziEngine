@@ -14,7 +14,7 @@ namespace First
             Log.Info("Game on!");
         }
 
-        public void OnUpdate(float timestep)
+        void OnUpdate(float timestep)
         {
             float horizontalAxis = Input.GetAxis(Keys.A, Keys.D);
             Position += new Vector2(horizontalAxis * 5.0f * timestep, 0.0f);
@@ -25,7 +25,7 @@ namespace First
             }
         }
 
-        public void OnDestroy()
+        void OnDestroy()
         {
             Log.Warn($"Destroyed {ID}");
         }

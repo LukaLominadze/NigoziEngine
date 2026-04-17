@@ -45,8 +45,11 @@ private:
 	void DockViewportWithMenuBar();
 	void ShowSceneHierarchy();
 	void DrawSceneHierarchyNode(Nigozi::Entity entity);
+	void DrawFileTreeDirectory(std::filesystem::path& dirPath);
+	void ShowFileTreeExplorer();
 	void ShowInspector();
 	void ShowAddNodeModal();
+	void ShowViewportPanel();
 	void ShowViewport();
 
 	void ShowCreateOrOpenProjectModal();
@@ -88,6 +91,7 @@ private:
 	bool SaveCurrentScene();
 	bool SaveCurrentSceneAs();
 	void LoadScene();
+	void LoadScene(std::filesystem::path& scenePath);
 
 	template<typename T>
 	void AddComponent(Nigozi::Entity& entity, bool selectedComponent) {
@@ -125,5 +129,7 @@ private:
 	entt::entity m_editValueSelectionContext = entt::null;
 
 	glm::vec2 m_mouseOldPosition;
+
+	bool m_isDragDropping = false;
 };
 

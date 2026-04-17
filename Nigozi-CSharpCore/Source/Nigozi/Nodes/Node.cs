@@ -183,11 +183,11 @@ namespace Nigozi
         {
             return (this as T)!;
         }
-        public void OnStart() { }
-        public void OnUpdate(float timestep) { }
-        public void OnRender() { }
-        public void OnImGuiRender() { }
-        public void OnDestroy() { }
+        protected void OnStart() { }
+        protected void OnUpdate(float timestep) { }
+        protected void OnRender() { }
+        protected void OnImGuiRender() { }
+        protected void OnDestroy() { }
         private void SetID(ulong id)
         {
             this.id = id;
