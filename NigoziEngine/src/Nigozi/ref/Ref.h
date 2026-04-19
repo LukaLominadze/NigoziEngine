@@ -71,7 +71,7 @@ public:
     bool operator==(Ref<T>& other) const noexcept { return m_id == other.m_id; }
 
     Ref<T>& operator=(Ref<T>&& other) noexcept {
-        NG_CORE_LOG_TRACE("[Ref::{}] Move assignment, this id: {}, other id: {}", typeid(T).name(), m_id, other.m_id);
+        // NG_CORE_LOG_TRACE("[Ref::{}] Move assignment, this id: {}, other id: {}", typeid(T).name(), m_id, other.m_id);
         if (*this) {
             RefManager<T>::Get().Decrement(m_id);
         }
@@ -80,7 +80,7 @@ public:
         return *this;
     }
     Ref<T>& operator=(const Ref<T>& other) {
-        NG_CORE_LOG_TRACE("[Ref::{}] Copy assignment, this id: {}, other id: {}", typeid(T).name(), m_id, other.m_id);
+        // NG_CORE_LOG_TRACE("[Ref::{}] Copy assignment, this id: {}, other id: {}", typeid(T).name(), m_id, other.m_id);
         if (*this) {
             RefManager<T>::Get().Decrement(m_id);
         }

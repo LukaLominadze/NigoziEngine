@@ -21,6 +21,8 @@ namespace Nigozi
         internal static delegate* unmanaged<ushort, ulong> SceneTree_CreateNode;
         internal static delegate* unmanaged<ulong, ulong> SceneTree_GetParent;
         internal static delegate* unmanaged<ulong, ulong, byte> SceneTree_SetParent;
+        internal static delegate* unmanaged<ulong, int, ulong> SceneTree_GetChildByIndex;
+        internal static delegate* unmanaged<ulong, ushort> SceneTree_GetNodeType;
         internal static delegate* unmanaged<ulong, void> SceneTree_DestroyNode;
         #endregion
 
@@ -70,6 +72,8 @@ namespace Nigozi
         internal static delegate* unmanaged<ulong, IVector2, void> SpriteRendererComponent_SetSlot;
         internal static delegate* unmanaged<ulong, IVector2> SpriteRendererComponent_GetSeperator;
         internal static delegate* unmanaged<ulong, IVector2, void> SpriteRendererComponent_SetSeperator;
+        internal static delegate* unmanaged<ulong, Vector4> SpriteRendererComponent_GetColor;
+        internal static delegate* unmanaged<ulong, Vector4, void> SpriteRendererComponent_SetColor;
         #endregion
 
         #region RigidbodyComponent

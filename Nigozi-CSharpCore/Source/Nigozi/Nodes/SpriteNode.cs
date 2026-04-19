@@ -32,6 +32,18 @@ namespace Nigozi
             }
         }
 
+        public Vector4 Color
+        {
+            get
+            {
+                unsafe { return InternalCalls.SpriteRendererComponent_GetColor(ID); }
+            }
+            set
+            {
+                unsafe { InternalCalls.SpriteRendererComponent_SetColor(ID, value); }
+            }
+        }
+
         public SpriteNode(ulong id) : base(id)
         {
         }

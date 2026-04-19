@@ -25,7 +25,7 @@ namespace Nigozi
 		std::vector<UUID>& GetChildrenUUIDs();
 		std::vector<Entity> GetChildren();
 
-		Entity GetChildByID(uint32_t id);
+		Entity GetChildByIndex(uint32_t id);
 		Entity GetChildByUUID(UUID uuid);
 		Entity GetChildByQuery(std::function<bool(Entity)> query);
 

@@ -126,6 +126,9 @@ void EditorLayer::OnAttach()
 
 void EditorLayer::OnDetach()
 {
+    if (m_editorState == EditorState::PLAY) {
+        EditorStop();
+    }
     m_sceneTreeContexts.clear();
     m_lastContext.reset();
     m_currentContext.reset();
@@ -1666,61 +1669,30 @@ void EditorLayer::ShowViewportPanel()
         ImGuiWindowFlags_NoScrollbar |
         ImGuiWindowFlags_NoScrollWithMouse;
     ImGui::Begin("##Viewport_Panel", nullptr, flags);
-    bool buttonHovered = false;
+
     if (ImGui::Button("Select Tool")) {
-        buttonHovered = true;
         m_tool = Tool::SELECT;
     }
-    if (ImGui::IsItemHovered()) buttonHovered = true;
     ImGui::SameLine();
     if (ImGui::Button("Move Tool")) {
-        buttonHovered = true;
         m_tool = Tool::MOVE;
     }
-    if (ImGui::IsItemHovered()) buttonHovered = true;
     ImGui::SameLine();
     if (ImGui::Button("Rotate Tool")) {
-        buttonHovered = true;
         m_tool = Tool::ROTATE;
     }
+
     if (ImGui::Button("Play") && m_currentContext->GetSceneRootUUID().GetUUID() != Nigozi::UUID::Null) {
-        if (SaveAllScenes()) {
-            m_lastContext = m_currentContext;
-
-            Nigozi::ScriptEngine::ReloadAssemblies();
-
-            m_currentContext = std::make_shared<Nigozi::SceneTree>();
-            m_currentContext->DeserializeScene(m_lastContext->GetFilePath());
-            Nigozi::ScriptEngine::SetCurrentSceneTree(m_currentContext);
-
-            m_currentContext->OnAttach();
-
-            m_selectionContext = entt::null;
-            m_movingSelectionContext = entt::null;
-
-
-            m_editorState = EditorState::PLAY;
-        }
+        EditorPlay();
     }
     ImGui::SameLine();
     if (ImGui::Button("Pause") && m_editorState != EditorState::EDIT) {
-        if (m_editorState == EditorState::PLAY)
-            m_editorState = EditorState::PAUSE;
-        else
-            m_editorState = EditorState::PLAY;
+        EditorPause();
     }
     ImGui::SameLine();
     if (ImGui::Button("Stop")) {
-        m_currentContext->OnDetach();
-
-        m_currentContext = m_lastContext;
-
-        m_selectionContext = entt::null;
-        m_movingSelectionContext = entt::null;
-
-        m_editorState = EditorState::EDIT;
+        EditorStop();
     }
-    if (ImGui::IsItemHovered()) buttonHovered = true;
     ImGui::End();
 }
 
@@ -1901,6 +1873,47 @@ void EditorLayer::ShowCreateOrOpenProjectModal()
         }
         ImGui::EndPopup();
     }
+}
+
+void EditorLayer::EditorPlay()
+{
+    if (SaveAllScenes()) {
+        m_lastContext = m_currentContext;
+
+        Nigozi::ScriptEngine::ReloadAssemblies();
+
+        m_currentContext = std::make_shared<Nigozi::SceneTree>();
+        m_currentContext->DeserializeScene(m_lastContext->GetFilePath());
+        Nigozi::ScriptEngine::SetCurrentSceneTree(m_currentContext);
+
+        m_currentContext->OnAttach();
+
+        m_selectionContext = entt::null;
+        m_movingSelectionContext = entt::null;
+
+
+        m_editorState = EditorState::PLAY;
+    }
+}
+
+void EditorLayer::EditorPause()
+{
+    if (m_editorState == EditorState::PLAY)
+        m_editorState = EditorState::PAUSE;
+    else if (m_editorState == EditorState::PAUSE)
+        m_editorState = EditorState::PLAY;
+}
+
+void EditorLayer::EditorStop()
+{
+    m_currentContext->OnDetach();
+
+    m_currentContext = m_lastContext;
+
+    m_selectionContext = entt::null;
+    m_movingSelectionContext = entt::null;
+
+    m_editorState = EditorState::EDIT;
 }
 
 void EditorLayer::CloseSceneTab(const std::shared_ptr<Nigozi::SceneTree> sceneContext)

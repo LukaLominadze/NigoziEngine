@@ -55,6 +55,10 @@ private:
 
 	void ShowCreateOrOpenProjectModal();
 
+	void EditorPlay();
+	void EditorPause();
+	void EditorStop();
+
 	enum EditValueInInspectorFlags 
 	{
 		NONE = 0,

@@ -52,6 +52,7 @@
     <Compile Include="Source\Nigozi\Test.cs" />
     <Compile Include="Source\Nigozi\Transform.cs" />
     <Compile Include="Source\Nigozi\Vector2.cs" />
+    <Compile Include="Source\Nigozi\Vector4.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\vendor\Coral\Coral.Managed\Coral.Managed.csproj">

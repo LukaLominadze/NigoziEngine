@@ -31,6 +31,8 @@ namespace Nigozi
 		NG_REGISTER_INTERNAL_CALL(SceneTree_CreateNode);
 		NG_REGISTER_INTERNAL_CALL(SceneTree_GetParent);
 		NG_REGISTER_INTERNAL_CALL(SceneTree_SetParent);
+		NG_REGISTER_INTERNAL_CALL(SceneTree_GetChildByIndex);
+		NG_REGISTER_INTERNAL_CALL(SceneTree_GetNodeType);
 		NG_REGISTER_INTERNAL_CALL(SceneTree_DestroyNode);
 
 		NG_REGISTER_INTERNAL_CALL(Input_IsKeyPressed);
@@ -66,6 +68,8 @@ namespace Nigozi
 		NG_REGISTER_INTERNAL_CALL(SpriteRendererComponent_SetSlot);
 		NG_REGISTER_INTERNAL_CALL(SpriteRendererComponent_GetSeperator);
 		NG_REGISTER_INTERNAL_CALL(SpriteRendererComponent_SetSeperator);
+		NG_REGISTER_INTERNAL_CALL(SpriteRendererComponent_GetColor);
+		NG_REGISTER_INTERNAL_CALL(SpriteRendererComponent_SetColor);
 
 		NG_REGISTER_INTERNAL_CALL(RigidbodyComponent_GetBodyType);
 		NG_REGISTER_INTERNAL_CALL(RigidbodyComponent_SetBodyType);
@@ -162,6 +166,28 @@ namespace Nigozi
 			}
 			entity.SetParentUUID(UUID(newParentId));
 			return true;
+		}
+
+		uint64_t SceneTree_GetChildByIndex(uint64_t id, int32_t index)
+		{
+			Entity entity = ScriptEngine::GetCurrentSceneTree()->TryGetEntityByUUID(UUID(id));
+			if (entity == Entity()) {
+				return 0;
+			}
+			Entity child = entity.GetChildByIndex(index);
+			if (child == Entity()) {
+				return 0;
+			}
+			return child.GetUUID();
+		}
+
+		uint16_t SceneTree_GetNodeType(uint64_t id)
+		{
+			Entity entity = ScriptEngine::GetCurrentSceneTree()->TryGetEntityByUUID(UUID(id));
+			if (entity == Entity()) {
+				return 0;
+			}
+			return (uint16_t)entity.GetComponent<NodeTypeComponent>().Type;
 		}
 
 		void SceneTree_DestroyNode(uint64_t id)
@@ -381,7 +407,7 @@ namespace Nigozi
 		float CameraComponent_GetZoom(uint64_t id)
 		{
 			Entity entity = ScriptEngine::GetCurrentSceneTree()->TryGetEntityByUUID(UUID(id));
-			if (entity == Entity() && !entity.HasComponent<CameraComponent>()) {
+			if (entity == Entity() || !entity.HasComponent<CameraComponent>()) {
 				return 0.0f;
 			}
 			return entity.GetComponent<CameraComponent>().Zoom;
@@ -390,7 +416,7 @@ namespace Nigozi
 		float CameraComponent_GetAspect(uint64_t id)
 		{
 			Entity entity = ScriptEngine::GetCurrentSceneTree()->TryGetEntityByUUID(UUID(id));
-			if (entity == Entity() && !entity.HasComponent<CameraComponent>()) {
+			if (entity == Entity() || !entity.HasComponent<CameraComponent>()) {
 				return 0.0f;
 			}
 			return entity.GetComponent<CameraComponent>().Aspect;
@@ -399,7 +425,7 @@ namespace Nigozi
 		bool CameraComponent_GetCurrent(uint64_t id)
 		{
 			Entity entity = ScriptEngine::GetCurrentSceneTree()->TryGetEntityByUUID(UUID(id));
-			if (entity == Entity() && !entity.HasComponent<CameraComponent>()) {
+			if (entity == Entity() || !entity.HasComponent<CameraComponent>()) {
 				return false;
 			}
 			return entity.GetComponent<CameraComponent>().Current;
@@ -408,7 +434,7 @@ namespace Nigozi
 		void CameraComponent_SetZoom(uint64_t id, float inZoom)
 		{
 			Entity entity = ScriptEngine::GetCurrentSceneTree()->TryGetEntityByUUID(UUID(id));
-			if (entity == Entity() && !entity.HasComponent<CameraComponent>()) {
+			if (entity == Entity() || !entity.HasComponent<CameraComponent>()) {
 				return;
 			}
 
@@ -418,7 +444,7 @@ namespace Nigozi
 		void CameraComponent_SetAspect(uint64_t id, float inAspect)
 		{
 			Entity entity = ScriptEngine::GetCurrentSceneTree()->TryGetEntityByUUID(UUID(id));
-			if (entity == Entity() && !entity.HasComponent<CameraComponent>()) {
+			if (entity == Entity() || !entity.HasComponent<CameraComponent>()) {
 				return;
 			}
 
@@ -428,7 +454,7 @@ namespace Nigozi
 		void CameraComponent_SetCurrent(uint64_t id, bool inCurrent)
 		{
 			Entity entity = ScriptEngine::GetCurrentSceneTree()->TryGetEntityByUUID(UUID(id));
-			if (entity == Entity() && !entity.HasComponent<CameraComponent>()) {
+			if (entity == Entity() || !entity.HasComponent<CameraComponent>()) {
 				return;
 			}
 
@@ -452,7 +478,7 @@ namespace Nigozi
 		glm::i32vec2 SpriteRendererComponent_GetSlot(uint64_t id)
 		{
 			Entity entity = ScriptEngine::GetCurrentSceneTree()->TryGetEntityByUUID(UUID(id));
-			if (entity == Entity() && !entity.HasComponent<SpriteRendererComponent>()) {
+			if (entity == Entity() || !entity.HasComponent<SpriteRendererComponent>()) {
 				return glm::i32vec2();
 			}
 
@@ -463,7 +489,7 @@ namespace Nigozi
 		void SpriteRendererComponent_SetSlot(uint64_t id, glm::i32vec2 inSlot)
 		{
 			Entity entity = ScriptEngine::GetCurrentSceneTree()->TryGetEntityByUUID(UUID(id));
-			if (entity == Entity() && !entity.HasComponent<SpriteRendererComponent>()) {
+			if (entity == Entity() || !entity.HasComponent<SpriteRendererComponent>()) {
 				return;
 			}
 
@@ -474,7 +500,7 @@ namespace Nigozi
 		glm::i32vec2 SpriteRendererComponent_GetSeperator(uint64_t id)
 		{
 			Entity entity = ScriptEngine::GetCurrentSceneTree()->TryGetEntityByUUID(UUID(id));
-			if (entity == Entity() && !entity.HasComponent<SpriteRendererComponent>()) {
+			if (entity == Entity() || !entity.HasComponent<SpriteRendererComponent>()) {
 				return glm::i32vec2();
 			}
 
@@ -486,7 +512,7 @@ namespace Nigozi
 		void SpriteRendererComponent_SetSeperator(uint64_t id, glm::i32vec2 inSeperator)
 		{
 			Entity entity = ScriptEngine::GetCurrentSceneTree()->TryGetEntityByUUID(UUID(id));
-			if (entity == Entity() && !entity.HasComponent<SpriteRendererComponent>()) {
+			if (entity == Entity() || !entity.HasComponent<SpriteRendererComponent>()) {
 				return;
 			}
 
@@ -496,10 +522,30 @@ namespace Nigozi
 			sprite.Sprite.SetSubTexture(size, sprite.Sprite.GetSlotX(), sprite.Sprite.GetSlotY());
 		}
 
+		glm::vec4 SpriteRendererComponent_GetColor(uint64_t id)
+		{
+			Entity entity = ScriptEngine::GetCurrentSceneTree()->TryGetEntityByUUID(UUID(id));
+			if (entity == Entity() || !entity.HasComponent<SpriteRendererComponent>()) {
+				return glm::vec4();
+			}
+			auto& sprite = entity.GetComponent<SpriteRendererComponent>();
+			return sprite.Color;
+		}
+
+		void SpriteRendererComponent_SetColor(uint64_t id, glm::vec4 inColor)
+		{
+			Entity entity = ScriptEngine::GetCurrentSceneTree()->TryGetEntityByUUID(UUID(id));
+			if (entity == Entity() || !entity.HasComponent<SpriteRendererComponent>()) {
+				return;
+			}
+			auto& sprite = entity.GetComponent<SpriteRendererComponent>();
+			sprite.Color = inColor;
+		}
+
 		uint16_t RigidbodyComponent_GetBodyType(uint64_t id)
 		{
 			Entity entity = ScriptEngine::GetCurrentSceneTree()->TryGetEntityByUUID(UUID(id));
-			if (entity == Entity() && !entity.HasComponent<RigidbodyComponent>()) {
+			if (entity == Entity() || !entity.HasComponent<RigidbodyComponent>()) {
 				return 0;
 			}
 
@@ -509,7 +555,7 @@ namespace Nigozi
 		void RigidbodyComponent_SetBodyType(uint64_t id, uint16_t inBodyType)
 		{
 			Entity entity = ScriptEngine::GetCurrentSceneTree()->TryGetEntityByUUID(UUID(id));
-			if (entity == Entity() && !entity.HasComponent<RigidbodyComponent>()) {
+			if (entity == Entity() || !entity.HasComponent<RigidbodyComponent>()) {
 				return;
 			}
 
@@ -523,7 +569,7 @@ namespace Nigozi
 		bool RigidbodyComponent_GetFreezeRotation(uint64_t id)
 		{
 			Entity entity = ScriptEngine::GetCurrentSceneTree()->TryGetEntityByUUID(UUID(id));
-			if (entity == Entity() && !entity.HasComponent<RigidbodyComponent>()) {
+			if (entity == Entity() || !entity.HasComponent<RigidbodyComponent>()) {
 				return false;
 			}
 
@@ -533,7 +579,7 @@ namespace Nigozi
 		void RigidbodyComponent_SetFreezeRotation(uint64_t id, bool inFreezeRotation)
 		{
 			Entity entity = ScriptEngine::GetCurrentSceneTree()->TryGetEntityByUUID(UUID(id));
-			if (entity == Entity() && !entity.HasComponent<RigidbodyComponent>()) {
+			if (entity == Entity() || !entity.HasComponent<RigidbodyComponent>()) {
 				return;
 			}
 
@@ -547,7 +593,7 @@ namespace Nigozi
 		void RigidbodyComponent_ApplyForce(uint64_t id, glm::vec2 inForce)
 		{
 			Entity entity = ScriptEngine::GetCurrentSceneTree()->TryGetEntityByUUID(UUID(id));
-			if (entity == Entity() && !entity.HasComponent<RigidbodyComponent>()) {
+			if (entity == Entity() || !entity.HasComponent<RigidbodyComponent>()) {
 				return;
 			}
 
@@ -559,7 +605,7 @@ namespace Nigozi
 		void RigidbodyComponent_ApplyImpulse(uint64_t id, glm::vec2 inImpulse)
 		{
 			Entity entity = ScriptEngine::GetCurrentSceneTree()->TryGetEntityByUUID(UUID(id));
-			if (entity == Entity() && !entity.HasComponent<RigidbodyComponent>()) {
+			if (entity == Entity() || !entity.HasComponent<RigidbodyComponent>()) {
 				return;
 			}
 
@@ -571,7 +617,7 @@ namespace Nigozi
 		glm::vec2 BoxColliderComponent_GetSize(uint64_t id)
 		{
 			Entity entity = ScriptEngine::GetCurrentSceneTree()->TryGetEntityByUUID(UUID(id));
-			if (entity == Entity() && !entity.HasComponent<BoxColliderComponent>()) {
+			if (entity == Entity() || !entity.HasComponent<BoxColliderComponent>()) {
 				return glm::vec2();
 			}
 
@@ -581,7 +627,7 @@ namespace Nigozi
 		void BoxColliderComponent_SetSize(uint64_t id, glm::vec2 inSize)
 		{
 			Entity entity = ScriptEngine::GetCurrentSceneTree()->TryGetEntityByUUID(UUID(id));
-			if (entity == Entity() && !entity.HasComponent<BoxColliderComponent>()) {
+			if (entity == Entity() || !entity.HasComponent<BoxColliderComponent>()) {
 				return;
 			}
 
@@ -592,7 +638,7 @@ namespace Nigozi
 		glm::vec2 BoxColliderComponent_GetOffset(uint64_t id)
 		{
 			Entity entity = ScriptEngine::GetCurrentSceneTree()->TryGetEntityByUUID(UUID(id));
-			if (entity == Entity() && !entity.HasComponent<BoxColliderComponent>()) {
+			if (entity == Entity() || !entity.HasComponent<BoxColliderComponent>()) {
 				return glm::vec2();
 			}
 
@@ -602,7 +648,7 @@ namespace Nigozi
 		void BoxColliderComponent_SetOffset(uint64_t id, glm::vec2 inOffset)
 		{
 			Entity entity = ScriptEngine::GetCurrentSceneTree()->TryGetEntityByUUID(UUID(id));
-			if (entity == Entity() && !entity.HasComponent<BoxColliderComponent>()) {
+			if (entity == Entity() || !entity.HasComponent<BoxColliderComponent>()) {
 				return;
 			}
 
@@ -614,7 +660,7 @@ namespace Nigozi
 		float AudioStreamPlayerComponent_GetVolume(uint64_t id)
 		{
 			Entity entity = ScriptEngine::GetCurrentSceneTree()->TryGetEntityByUUID(UUID(id));
-			if (entity == Entity() && !entity.HasComponent<AudioStreamPlayerComponent>()) {
+			if (entity == Entity() || !entity.HasComponent<AudioStreamPlayerComponent>()) {
 				return 0.0f;
 			}
 
@@ -624,7 +670,7 @@ namespace Nigozi
 		void AudioStreamPlayerComponent_SetVolume(uint64_t id, float inVolume)
 		{
 			Entity entity = ScriptEngine::GetCurrentSceneTree()->TryGetEntityByUUID(UUID(id));
-			if (entity == Entity() && !entity.HasComponent<AudioStreamPlayerComponent>()) {
+			if (entity == Entity() || !entity.HasComponent<AudioStreamPlayerComponent>()) {
 				return;
 			}
 			auto& audio = entity.GetComponent<AudioStreamPlayerComponent>();
@@ -635,7 +681,7 @@ namespace Nigozi
 		bool AudioStreamPlayerComponent_GetPlaying(uint64_t id)
 		{
 			Entity entity = ScriptEngine::GetCurrentSceneTree()->TryGetEntityByUUID(UUID(id));
-			if (entity == Entity() && !entity.HasComponent<AudioStreamPlayerComponent>()) {
+			if (entity == Entity() || !entity.HasComponent<AudioStreamPlayerComponent>()) {
 				return false;
 			}
 
@@ -645,7 +691,7 @@ namespace Nigozi
 		void AudioStreamPlayerComponent_SetPlaying(uint64_t id, bool inPlaying)
 		{
 			Entity entity = ScriptEngine::GetCurrentSceneTree()->TryGetEntityByUUID(UUID(id));
-			if (entity == Entity() && !entity.HasComponent<AudioStreamPlayerComponent>()) {
+			if (entity == Entity() || !entity.HasComponent<AudioStreamPlayerComponent>()) {
 				return;
 			}
 			auto& audio = entity.GetComponent<AudioStreamPlayerComponent>();
@@ -666,7 +712,7 @@ namespace Nigozi
 		bool AudioStreamPlayerComponent_GetIsPaused(uint64_t id)
 		{
 			Entity entity = ScriptEngine::GetCurrentSceneTree()->TryGetEntityByUUID(UUID(id));
-			if (entity == Entity() && !entity.HasComponent<AudioStreamPlayerComponent>()) {
+			if (entity == Entity() || !entity.HasComponent<AudioStreamPlayerComponent>()) {
 				return false;
 			}
 
@@ -676,7 +722,7 @@ namespace Nigozi
 		void AudioStreamPlayerComponent_SetIsPaused(uint64_t id, bool inPaused)
 		{
 			Entity entity = ScriptEngine::GetCurrentSceneTree()->TryGetEntityByUUID(UUID(id));
-			if (entity == Entity() && !entity.HasComponent<AudioStreamPlayerComponent>()) {
+			if (entity == Entity() || !entity.HasComponent<AudioStreamPlayerComponent>()) {
 				return;
 			}
 			auto& audio = entity.GetComponent<AudioStreamPlayerComponent>();
@@ -692,7 +738,7 @@ namespace Nigozi
 		void AudioStreamPlayerComponent_Stop(uint64_t id)
 		{
 			Entity entity = ScriptEngine::GetCurrentSceneTree()->TryGetEntityByUUID(UUID(id));
-			if (entity == Entity() && !entity.HasComponent<AudioStreamPlayerComponent>()) {
+			if (entity == Entity() || !entity.HasComponent<AudioStreamPlayerComponent>()) {
 				return;
 			}
 			auto& audio = entity.GetComponent<AudioStreamPlayerComponent>();

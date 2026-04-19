@@ -183,6 +183,35 @@ namespace Nigozi
         {
             return (this as T)!;
         }
+
+        public Node? GetChild(int index)
+        {
+            ulong childId = 0;
+            unsafe { childId = InternalCalls.SceneTree_GetChildByIndex(ID, index); }
+            if (childId == 0)
+            {
+                return null;
+            }
+
+            NodeTypes nodeType = NodeTypes.Node;
+            unsafe { nodeType = (NodeTypes)InternalCalls.SceneTree_GetNodeType(childId); }
+
+            return (Node?)Activator.CreateInstance(NodeTypeToType(nodeType), childId);
+        }
+        public T? GetChild<T>(int index) where T : Node
+        {
+            ulong childId = 0;
+            unsafe { childId = InternalCalls.SceneTree_GetChildByIndex(ID, index); }
+            if (childId == 0)
+            {
+                return null;
+            }
+
+            NodeTypes nodeType = NodeTypes.Node;
+            unsafe { nodeType = (NodeTypes)InternalCalls.SceneTree_GetNodeType(childId); }
+
+            return (T?)Activator.CreateInstance(NodeTypeToType(nodeType), childId);
+        }
         protected void OnStart() { }
         protected void OnUpdate(float timestep) { }
         protected void OnRender() { }

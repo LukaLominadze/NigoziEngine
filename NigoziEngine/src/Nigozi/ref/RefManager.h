@@ -33,18 +33,18 @@ public:
             return id;
         }
         m_refs.emplace_back(std::forward<Args>(args)...);
-        NG_CORE_LOG_TRACE("[RefManager::{}] Create {}, {}", typeid(T).name(), m_refs.size(), m_invalidatedRefs.size());
+        // NG_CORE_LOG_TRACE("[RefManager::{}] Create {}, {}", typeid(T).name(), m_refs.size(), m_invalidatedRefs.size());
         return m_refs.size() - 1;
     }
 
     void Increment(uint32_t id)
     {
         m_refs[id].RefCount++;
-        NG_CORE_LOG_TRACE("[RefManager::{}] Increment id: {}, refsSize: {}, invalidSize: {}, RefCount: {}", typeid(T).name(), id, m_refs.size(), m_invalidatedRefs.size(), m_refs[id].RefCount);
+        // NG_CORE_LOG_TRACE("[RefManager::{}] Increment id: {}, refsSize: {}, invalidSize: {}, RefCount: {}", typeid(T).name(), id, m_refs.size(), m_invalidatedRefs.size(), m_refs[id].RefCount);
     }
     void Decrement(uint32_t id)
     {
-        NG_CORE_LOG_TRACE("[RefManager::{}] Decrement id: {}, refsSize: {}, invalidSize: {}, RefCount: {} - 1", typeid(T).name(), id, m_refs.size(), m_invalidatedRefs.size(), m_refs[id].RefCount);
+        // NG_CORE_LOG_TRACE("[RefManager::{}] Decrement id: {}, refsSize: {}, invalidSize: {}, RefCount: {} - 1", typeid(T).name(), id, m_refs.size(), m_invalidatedRefs.size(), m_refs[id].RefCount);
         if (--m_refs[id].RefCount == 0) {
             m_invalidatedRefs.push_back(id);
             if (m_invalidatedRefs.size() == m_refs.size()) {

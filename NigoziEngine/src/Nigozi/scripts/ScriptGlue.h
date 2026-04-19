@@ -28,6 +28,8 @@ namespace Nigozi
 		uint64_t SceneTree_CreateNode(uint16_t nodeType);
 		uint64_t SceneTree_GetParent(uint64_t childId);
 		bool SceneTree_SetParent(uint64_t childId, uint64_t newParentId);
+		uint64_t SceneTree_GetChildByIndex(uint64_t id, int32_t index);
+		uint16_t SceneTree_GetNodeType(uint64_t id);
 		void SceneTree_DestroyNode(uint64_t id);
 #pragma endregion
 
@@ -84,6 +86,8 @@ namespace Nigozi
 		void SpriteRendererComponent_SetSlot(uint64_t id, glm::i32vec2 inSlot);
 		glm::i32vec2 SpriteRendererComponent_GetSeperator(uint64_t id);
 		void SpriteRendererComponent_SetSeperator(uint64_t id, glm::i32vec2 inSeperator);
+		glm::vec4 SpriteRendererComponent_GetColor(uint64_t id);
+		void SpriteRendererComponent_SetColor(uint64_t id, glm::vec4 inColor);
 #pragma endregion
 
 #pragma region RigidbodyComponent

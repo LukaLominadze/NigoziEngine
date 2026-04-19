@@ -83,12 +83,12 @@ namespace Nigozi
 		return children;
 	}
 
-	Entity Entity::GetChildByID(uint32_t id)
+	Entity Entity::GetChildByIndex(uint32_t id)
 	{
 		Entity child{};
 
 		const std::vector<UUID>& childrenUUIDs = GetComponent<RelationshipComponent>().ChildrenUUIDs;
-		if (childrenUUIDs.size() < id) {
+		if (id < childrenUUIDs.size()) {
 			child = p_scene->TryGetEntityByUUID(childrenUUIDs[id]);
 		}
 
