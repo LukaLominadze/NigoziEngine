@@ -585,6 +585,10 @@ void EditorLayer::DockViewportWithMenuBar()
                 LoadScene();
             }
             ImGui::Separator();
+            if (ImGui::MenuItem("Regenerate Scripts")) {
+                ProjectUtils::RecreateScriptsProject();
+            }
+            ImGui::Separator();
             if (ImGui::MenuItem("Undo", "Ctrl+Z")) {
                 m_commandQueue.RevertBack();
             }
