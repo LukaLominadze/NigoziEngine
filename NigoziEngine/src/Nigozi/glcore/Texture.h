@@ -21,6 +21,18 @@ namespace Nigozi
 		inline const std::string& GetPath() const { return m_filePath; }
 
 		inline const uint32_t GetRendererID() const { return m_rendererID; }
+	public:
+		Texture& operator=(Texture&& other) noexcept 
+		{
+			m_rendererID = other.m_rendererID;
+			m_filePath = std::move(other.m_filePath);
+			m_size = other.m_size;
+			m_BPP = other.m_BPP;
+
+			// Invalidate
+			other.m_rendererID = -1;
+			return *this;
+		}
 	private:
 		uint32_t m_rendererID;
 		std::string m_filePath;

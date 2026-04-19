@@ -8,6 +8,8 @@
 #include "Nigozi/core/Environment.h"
 #include "Nigozi/core/SubProcess.h"
 
+#include "Nigozi/ref/Ref.h"
+
 #include "Nigozi/Benchmarking/Timer.h"
 
 #include "Nigozi/layers/Layer.h"

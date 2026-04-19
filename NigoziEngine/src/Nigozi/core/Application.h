@@ -51,9 +51,9 @@ namespace Nigozi
 		bool StartRenderer();
 		bool StartAudioEngine();
 	protected:
-		Window m_window;
-		LayerStack m_layerStack;
 		ImGuiLayer m_imGuiLayer;
+		LayerStack m_layerStack;
+		Window m_window;
 	private:
 		std::mutex m_eventQueueMutex;
 		std::queue<std::function<void(Event*)>> m_eventQueue;

@@ -17,7 +17,7 @@ namespace Nigozi
 		static void Deinitialize();
 
 		static inline std::shared_ptr<SceneTree> GetCurrentSceneTree() { return s_currentScene; }
-		static inline void SetCurrentSceneTree(const std::shared_ptr<SceneTree>& sceneTree) { s_currentScene = sceneTree; }
+		static inline void SetCurrentSceneTree(std::shared_ptr<SceneTree> sceneTree) { s_currentScene = sceneTree; }
 
 		static void LoadProjectAssembly();
 		static void ReloadAssemblies();

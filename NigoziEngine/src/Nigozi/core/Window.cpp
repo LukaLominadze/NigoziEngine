@@ -39,9 +39,12 @@ namespace Nigozi
 
 	Window::~Window()
 	{
-		glfwDestroyWindow(p_window);
-		glfwTerminate();
-		NG_CORE_LOG_INFO("[Window] deinitialized");
+		if (p_window) {
+			glfwDestroyWindow(p_window);
+			glfwTerminate();
+			p_window = nullptr;
+			NG_CORE_LOG_INFO("[Window] deinitialized");
+		}
 	}
 
 	void Window::SetIcon(const char* path)

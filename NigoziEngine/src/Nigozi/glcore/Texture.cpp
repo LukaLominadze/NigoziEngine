@@ -2,6 +2,7 @@
 
 #include "Texture.h"
 #include "Nigozi/core/Assert.h"
+#include "core/Log.h"
 
 namespace Nigozi
 {
@@ -31,6 +32,7 @@ namespace Nigozi
 
 	Texture::~Texture()
 	{
+		NG_CORE_LOG_TRACE("[Texture] Destroyed, id: {}, pointer: {}", m_rendererID, (void*)this);
 		Delete();
 	}
 

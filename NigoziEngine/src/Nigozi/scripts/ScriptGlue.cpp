@@ -267,7 +267,7 @@ namespace Nigozi
 			tag.Tag = std::string(inTag);
 		}
 
-		static void UpdateRigidbodyTransform(Entity entity, const std::shared_ptr<SceneTree> m_currentContext) {
+		static void UpdateRigidbodyTransform(Entity entity, std::shared_ptr<SceneTree> m_currentContext) {
 			if (!entity.HasComponent<RigidbodyComponent>()) {
 				return;
 			}
@@ -282,7 +282,7 @@ namespace Nigozi
 			body->SetAwake(true);
 		}
 
-		static void UpdateBoxCollider(Entity entity, const std::shared_ptr<SceneTree> m_currentContext, glm::vec2 size)
+		static void UpdateBoxCollider(Entity entity, std::shared_ptr<SceneTree> m_currentContext, glm::vec2 size)
 		{
 			auto& boxCollider = entity.GetComponent<Nigozi::BoxColliderComponent>();
 			b2Fixture* oldFixture = (b2Fixture*)boxCollider.RuntimeFixture;

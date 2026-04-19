@@ -61,7 +61,7 @@ namespace Nigozi
             }
             Renderer2D::DrawRotatedQuad({ particle.Position.x, particle.Position.y },
                                         { particle.Size, particle.Size },
-                                        particle.Rotation, nullptr, particle.Color);
+                                        particle.Rotation, Ref<Texture>(), particle.Color);
         }
     }
 

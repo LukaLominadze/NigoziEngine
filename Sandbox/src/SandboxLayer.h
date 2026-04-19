@@ -19,7 +19,7 @@ private:
 
 	Nigozi::Audio* p_audio;
 
-	std::shared_ptr<Nigozi::Texture> m_luigiTexture;
+	Ref<Nigozi::Texture> m_luigiTexture;
 	Nigozi::SubTexture m_playerTexture;
 
 	std::string m_keystate;

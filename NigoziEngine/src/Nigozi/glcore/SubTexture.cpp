@@ -1,7 +1,7 @@
 #include "ngpch.h"
 #include "SubTexture.h"
 
-Nigozi::SubTexture::SubTexture(const std::shared_ptr<Texture>& texture, glm::vec2 size, uint32_t slotX, uint32_t slotY)
+Nigozi::SubTexture::SubTexture(const Ref<Texture>& texture, glm::vec2 size, uint32_t slotX, uint32_t slotY)
 	:m_size(size), m_slotX(slotX), m_slotY(slotY), m_texture(texture)
 {
 	if (m_size == glm::vec2{ 0, 0 }) {

@@ -146,7 +146,7 @@ namespace Nigozi
                     texturePath = ent["Sprite"]["Texture"]["FilePath"].as<std::string>();
                 }
                 if (std::filesystem::exists(std::filesystem::path(texturePath))) {
-                    sprite.SpriteTexture = std::make_shared<Texture>(texturePath);
+                    sprite.SpriteTexture = Ref<Texture>::Create(texturePath);
                 }
                 else {
                     sprite.SpriteTexture = Renderer2D::GetData()->Textures[0];

@@ -5,7 +5,10 @@ public:
     CommandQueue() = default;
     CommandQueue(const CommandQueue& other) = delete;
     CommandQueue(CommandQueue&& other) = delete;
-    ~CommandQueue() = default;
+    ~CommandQueue()
+    {
+        NG_CLIENT_LOG_INFO("[Command Queue] Deinitializing!");
+    }
 
     bool PushBack(Command&& command);
 

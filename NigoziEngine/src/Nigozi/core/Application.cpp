@@ -40,6 +40,7 @@ namespace Nigozi
 
     Application::~Application()
     {
+        m_layerStack.Cleanup();
         Renderer2D::Deinitialize();
         m_window.~Window();
         AudioEngine::Deinitialize();

@@ -12,6 +12,8 @@ namespace Nigozi
 		LayerStack();
 		~LayerStack();
 
+		void Cleanup();
+
 		void PushLayer(Layer* layer);
 		void PushOverlay(Layer* layer);
 		void PopLayer(Layer* layer);

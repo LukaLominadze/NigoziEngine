@@ -3,6 +3,7 @@
 #include "VertexBuffer.h"
 #include "VertexBufferLayout.h"
 #include "IndexBuffer.h"
+#include "ref/Ref.h"
 
 namespace Nigozi
 {
@@ -12,8 +13,8 @@ namespace Nigozi
 		VertexArray();
 		~VertexArray();
 
-		void AddVertexBuffer(const std::shared_ptr<VertexBuffer>& vbo, const VertexBufferLayout& vboLayout);
-		void AddIndexBuffer(const std::shared_ptr<IndexBuffer>& ibo);
+		void AddVertexBuffer(const Ref<VertexBuffer>& vbo, const VertexBufferLayout& vboLayout);
+		void AddIndexBuffer(const Ref<IndexBuffer>& ibo);
 
 		void Bind() const;
 		void Unbind() const;
@@ -22,11 +23,22 @@ namespace Nigozi
 		void SetIndexBufferData(const void* data, uint32_t count);
 
 		void Delete();
+	public:
+		VertexArray& operator=(VertexArray&& other) noexcept
+		{
+			m_rendererID = other.m_rendererID;
+			r_vbo = other.r_vbo;
+			r_ibo = other.r_ibo;
+
+			// Invalidate
+			other.m_rendererID = -1;
+			return *this;
+		}
 	private:
 		uint32_t m_rendererID;
 
-		std::shared_ptr<VertexBuffer> r_vbo;
-		std::shared_ptr<IndexBuffer> r_ibo;
+		Ref<VertexBuffer> r_vbo;
+		Ref<IndexBuffer> r_ibo;
 	};
 }
 

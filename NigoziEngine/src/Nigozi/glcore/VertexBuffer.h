@@ -15,6 +15,15 @@ namespace Nigozi
 		void SetData(const void* data, uint32_t size);
 
 		void Delete();
+	public:
+		VertexBuffer& operator=(VertexBuffer&& other) noexcept
+		{
+			m_rendererID = other.m_rendererID;
+
+			// Invalidate
+			other.m_rendererID = -1;
+			return *this;
+		}
 	private:
 		uint32_t m_rendererID;
 	};

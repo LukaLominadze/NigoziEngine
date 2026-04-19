@@ -5,6 +5,7 @@
 #include "Shader.h"
 #include "Texture.h"
 #include "SubTexture.h"
+#include "ref/Ref.h"
 
 namespace Nigozi
 {
@@ -25,9 +26,9 @@ namespace Nigozi
 		uint32_t QuadCount = 0;
 
 		VertexArray* QuadVertexArray;
-		std::shared_ptr<Shader> DefaultShader;
+		Ref<Shader> DefaultShader;
 
-		std::shared_ptr<Texture> Textures[16];
+		Ref<Texture> Textures[16];
 		uint32_t TextureSlot = 0;
 		int TextureUnits[16];
 	};
@@ -51,13 +52,13 @@ namespace Nigozi
 			Maybe it would be good to create my own Ref wrapper
 		*/
 		static void DrawQuad(const glm::vec2& position, const glm::vec2& scale,
-							 const std::shared_ptr<Texture>& texture, const glm::vec4& color,
+							 const Ref<Texture>& texture, const glm::vec4& color,
 							 const glm::vec2& coordMin = glm::vec2(0),
 							 const glm::vec2& coordMax = glm::vec2(1));
 		static void DrawQuad(const glm::vec2& position, const glm::vec2& scale,
 							 SubTexture& texture, const glm::vec4& color);
 		static void DrawRotatedQuad(const glm::vec2& position, const glm::vec2& scale,
-									float rotation, const std::shared_ptr<Texture>& texture,
+									float rotation, const Ref<Texture>& texture,
 									const glm::vec4& color,
 									const glm::vec2& coordMin = glm::vec2(0),
 									const glm::vec2 & coordMax = glm::vec2(1));
@@ -72,7 +73,7 @@ namespace Nigozi
 
 		static Renderer2DData* GetData() { return s_data; }
 	private:
-		static uint32_t SetTextureAndGetSlot(const std::shared_ptr<Texture>& texture);
+		static uint32_t SetTextureAndGetSlot(const Ref<Texture>& texture);
 		static void FlushIfExceededMaxVertexCount();
 	private:
 		static Renderer2DData* s_data;

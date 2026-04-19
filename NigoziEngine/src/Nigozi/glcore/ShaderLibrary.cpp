@@ -11,9 +11,9 @@ namespace Nigozi
 	{
 	}
 
-	const std::shared_ptr<Shader>& ShaderLibrary::AddShader(const std::string& filePath)
+	const Ref<Shader> ShaderLibrary::AddShader(const std::string& filePath)
 	{
-		std::shared_ptr<Shader> shader = std::make_shared<Shader>(filePath);
+		Ref<Shader> shader = Ref<Shader>::Create(filePath);
 
 		size_t slash_pos = filePath.find_last_of("/\\");
 		std::string filename = (slash_pos == std::string::npos) ? filePath : filePath.substr(slash_pos + 1);

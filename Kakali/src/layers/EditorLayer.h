@@ -27,6 +27,7 @@ public:
 	EditorLayer(const EditorParams& params, Nigozi::FrameBuffer* viewportBuffer);
 
 	void OnAttach() override;
+	void OnDetach() override;
 	void OnEvent(Nigozi::Event& event) override;
 	void OnUpdate(float timestep) override;
 	void OnRender() override;
@@ -84,10 +85,10 @@ private:
 		}
 	}
 
-	void CloseSceneTab(const std::shared_ptr<Nigozi::SceneTree>& sceneContext);
+	void CloseSceneTab(const std::shared_ptr<Nigozi::SceneTree> sceneContext);
 
 	bool SaveAllScenes();
-	bool SaveScene(const std::shared_ptr<Nigozi::SceneTree>& context);
+	bool SaveScene(std::shared_ptr<Nigozi::SceneTree> context);
 	bool SaveCurrentScene();
 	bool SaveCurrentSceneAs();
 	void LoadScene();

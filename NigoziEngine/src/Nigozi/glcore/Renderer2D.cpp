@@ -33,7 +33,7 @@ namespace Nigozi
 
 		// Create VAO
 		s_data->QuadVertexArray = new VertexArray();
-		std::shared_ptr<VertexBuffer> vbo = std::make_shared<VertexBuffer>(
+		Ref<VertexBuffer> vbo = Ref<VertexBuffer>::Create(
 			s_data->Vertices,
 			s_data->MaxVerticesElements * sizeof(float)
 		);
@@ -57,7 +57,7 @@ namespace Nigozi
 			offset += 4;
 		}
 
-		std::shared_ptr<IndexBuffer> ibo = std::make_shared<IndexBuffer>(
+		Ref<IndexBuffer> ibo = Ref<IndexBuffer>::Create(
 			s_data->Indicies,
 			s_data->MaxIndicies
 		);
@@ -65,7 +65,7 @@ namespace Nigozi
 		s_data->QuadVertexArray->AddVertexBuffer(vbo, layout);
 		s_data->QuadVertexArray->AddIndexBuffer(ibo);
 		// Create shader and set up texture units
-		s_data->DefaultShader = std::make_shared<Shader>("src/Nigozi/res/shaders/Default.glsl");
+		s_data->DefaultShader = Ref<Shader>::Create("src/Nigozi/res/shaders/Default.glsl");
 		
 		for (int i = 0; i < 16; i++)
 		{
@@ -74,7 +74,7 @@ namespace Nigozi
 
 		s_data->DefaultShader->SetUniform1iv("u_Textures", 16, s_data->TextureUnits);
 
-		s_data->Textures[0] = std::make_shared<Texture>("src/Nigozi/res/textures/flatQuad.png");
+		s_data->Textures[0] = Ref<Texture>::Create("src/Nigozi/res/textures/flatQuad.png");
 		s_data->Textures[s_data->TextureSlot++]->Bind(0);
 
 		NG_CORE_LOG_INFO("[Renderer] initialized");
@@ -111,7 +111,7 @@ namespace Nigozi
 		DrawQuad(position, scale, texture.GetTexture(), color, texture.GetCoordMin(), texture.GetCoordMax());
 	}
 
-	void Renderer2D::DrawQuad(const glm::vec2& position, const glm::vec2& scale, const std::shared_ptr<Texture>& texture, const glm::vec4& color, const glm::vec2& coordMin, const glm::vec2& coordMax)
+	void Renderer2D::DrawQuad(const glm::vec2& position, const glm::vec2& scale, const Ref<Texture>& texture, const glm::vec4& color, const glm::vec2& coordMin, const glm::vec2& coordMax)
 	{
 		FlushIfExceededMaxVertexCount();
 
@@ -139,7 +139,7 @@ namespace Nigozi
 		DrawRotatedQuad(position, scale, rotation, texture.GetTexture(), color, texture.GetCoordMin(), texture.GetCoordMax());
 	}
 
-	void Renderer2D::DrawRotatedQuad(const glm::vec2& position, const glm::vec2& scale, float rotation, const std::shared_ptr<Texture>& texture, const glm::vec4& color, const glm::vec2& coordMin, const glm::vec2& coordMax)
+	void Renderer2D::DrawRotatedQuad(const glm::vec2& position, const glm::vec2& scale, float rotation, const Ref<Texture>& texture, const glm::vec4& color, const glm::vec2& coordMin, const glm::vec2& coordMax)
 	{
 		FlushIfExceededMaxVertexCount();
 
@@ -205,7 +205,7 @@ namespace Nigozi
 		s_data->DefaultShader->SetUniformMat4f("modelViewProjection", mvp);
 	}
 
-	uint32_t Renderer2D::SetTextureAndGetSlot(const std::shared_ptr<Texture>& texture)
+	uint32_t Renderer2D::SetTextureAndGetSlot(const Ref<Texture>& texture)
 	{
 		if (texture) {
 			if (s_data->TextureSlot > 15) {

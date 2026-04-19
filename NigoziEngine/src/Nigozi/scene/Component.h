@@ -7,6 +7,7 @@
 #include "Nigozi/audio/AudioEngine.h"
 #include "Nigozi/glcore/OrthographicCamera.h"
 #include "UUID.h"
+#include "ref/Ref.h"
 #include <Coral/HostInstance.hpp>
 #include <Coral/GC.hpp>
 #include <Coral/Array.hpp>
@@ -130,7 +131,7 @@ namespace Nigozi {
 		of entt. Figure out a way to have these stack allocated
 	*/ 
 	struct SpriteRendererComponent {
-		std::shared_ptr<Texture> SpriteTexture;
+		Ref<Texture> SpriteTexture;
 		SubTexture Sprite;
 		glm::vec4 Color{ 1.0f };
 		int16_t ZOrder = 0;
@@ -139,13 +140,13 @@ namespace Nigozi {
 			:SpriteTexture(Renderer2D::GetData()->Textures[0]),
 			 Sprite(SpriteTexture, SpriteTexture->GetSize()) { }
 		SpriteRendererComponent(const SpriteRendererComponent& other) = default;
-		SpriteRendererComponent(const std::shared_ptr<Texture>& texture, const SubTexture& sprite, int8_t zOrder = 0) {
+		SpriteRendererComponent(const Ref<Texture> texture, const SubTexture& sprite, int8_t zOrder = 0) {
 			SpriteTexture = texture;
 			Sprite = sprite;
 			ZOrder = zOrder;
 		}
 		SpriteRendererComponent(const std::string& filePath, glm::vec2 size, int8_t zOrder = 0, uint32_t slotX = 0, uint32_t slotY = 0)
-			:SpriteTexture(std::make_shared<Texture>(filePath)),
+			:SpriteTexture(Ref<Texture>::Create(filePath)),
 			 Sprite(SpriteTexture, size, slotX, slotY),
 			 ZOrder(zOrder) { }
 	};

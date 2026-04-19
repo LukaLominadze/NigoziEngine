@@ -10,9 +10,17 @@ namespace Nigozi
 
 	LayerStack::~LayerStack()
 	{
+		if (m_layerStack.size() > 0) {
+			Cleanup();
+		}
+	}
+
+	void LayerStack::Cleanup()
+	{
 		for (Layer* layer : m_layerStack) {
 			layer->OnDetach();
 		}
+		m_layerStack.clear();
 	}
 
 	void LayerStack::PushLayer(Layer* layer)

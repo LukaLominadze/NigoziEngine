@@ -21,7 +21,7 @@ namespace Nigozi
 	};
 }
 
-#ifndef DISTRIBUTION
+#ifdef _DEBUG
 #define NG_CORE_LOG_TRACE(...) Nigozi::Log::GetCoreLogger()->trace(__VA_ARGS__)
 #define NG_CORE_LOG_INFO(...) Nigozi::Log::GetCoreLogger()->info(__VA_ARGS__)
 #define NG_CORE_LOG_WARN(...) Nigozi::Log::GetCoreLogger()->warn(__VA_ARGS__)
@@ -39,7 +39,25 @@ namespace Nigozi
 #define NG_CUSTOM_LOG_WARN(name, ...) Nigozi::Log::GetLogger(name)->warn(__VA_ARGS__)
 #define NG_CUSTOM_LOG_ERROR(name, ...) Nigozi::Log::GetLogger(name)->error(__VA_ARGS__)
 #define NG_CUSTOM_LOG_CRITICAL(name, ...) Nigozi::Log::GetLogger(name)->critical(__VA_ARGS__)
-#else
+#elif defined(NDEBUG)
+#define NG_CORE_LOG_TRACE(...)
+#define NG_CORE_LOG_INFO(...) Nigozi::Log::GetCoreLogger()->info(__VA_ARGS__)
+#define NG_CORE_LOG_WARN(...) Nigozi::Log::GetCoreLogger()->warn(__VA_ARGS__)
+#define NG_CORE_LOG_ERROR(...) Nigozi::Log::GetCoreLogger()->error(__VA_ARGS__)
+#define NG_CORE_LOG_CRITICAL(...) Nigozi::Log::GetCoreLogger()->critical(__VA_ARGS__)
+
+#define NG_CLIENT_LOG_TRACE(...)
+#define NG_CLIENT_LOG_INFO(...) Nigozi::Log::GetClientLogger()->info(__VA_ARGS__)
+#define NG_CLIENT_LOG_WARN(...) Nigozi::Log::GetClientLogger()->warn(__VA_ARGS__)
+#define NG_CLIENT_LOG_ERROR(...) Nigozi::Log::GetClientLogger()->error(__VA_ARGS__)
+#define NG_CLIENT_LOG_CRITICAL(...) Nigozi::Log::GetClientLogger()->critical(__VA_ARGS__)
+
+#define NG_CUSTOM_LOG_TRACE(name, ...)
+#define NG_CUSTOM_LOG_INFO(name, ...) Nigozi::Log::GetLogger(name)->info(__VA_ARGS__)
+#define NG_CUSTOM_LOG_WARN(name, ...) Nigozi::Log::GetLogger(name)->warn(__VA_ARGS__)
+#define NG_CUSTOM_LOG_ERROR(name, ...) Nigozi::Log::GetLogger(name)->error(__VA_ARGS__)
+#define NG_CUSTOM_LOG_CRITICAL(name, ...) Nigozi::Log::GetLogger(name)->critical(__VA_ARGS__)
+#elif defined(DISTRIBUTION)
 #define NG_CORE_LOG_TRACE(...)
 #define NG_CORE_LOG_INFO(...)
 #define NG_CORE_LOG_WARN(...)

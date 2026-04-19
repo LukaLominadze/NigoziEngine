@@ -10,8 +10,8 @@ SandboxLayer::SandboxLayer(Nigozi::OrthographicCameraController* cameraLayer)
 void SandboxLayer::OnAttach() {
 	NG_CLIENT_LOG_INFO("Hey! it's wooorking!");
 	Nigozi::Renderer2D::SetClearColor(0.1f, 0.1f, 0.1f, 1.0f);
-	m_luigiTexture = std::make_shared<Nigozi::Texture>("src/Nigozi/res/textures/luigi.png");
-	std::shared_ptr<Nigozi::Texture> ref = std::make_shared<Nigozi::Texture>("src/res/Player.png");
+	m_luigiTexture = Ref<Nigozi::Texture>::Create("src/Nigozi/res/textures/luigi.png");
+	Ref<Nigozi::Texture> ref = Ref<Nigozi::Texture>::Create("src/res/Player.png");
 	m_playerTexture = Nigozi::SubTexture(ref, glm::vec2{ 16, 16 }, 0, 0);
 }
 
@@ -111,7 +111,7 @@ void SandboxLayer::OnRender()
 
 	for (float i = 1 / 200.0f; i < 1; i += increment) {
 		for (float j = 1 / 200.0f; j < 1; j += increment) {
-			Nigozi::Renderer2D::DrawQuad({ i, j }, { increment, increment }, nullptr, color);
+			Nigozi::Renderer2D::DrawQuad({ i, j }, { increment, increment }, Ref<Nigozi::Texture>(), color);
 			color.z -= (increment * increment);
 			color.y = i * j;
 		}

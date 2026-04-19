@@ -61,6 +61,8 @@ namespace Nigozi
 		CameraComponent* GetMainCamera();
 
 		inline UUID GetSceneRootUUID() const { return m_sceneRootUUID; }
+	public:
+		SceneTree& operator=(SceneTree&&) noexcept = default;
 	private:
 		void SerializeNode(Entity node, YAML::Node& doc);
 	public:

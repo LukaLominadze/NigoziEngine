@@ -124,6 +124,13 @@ void EditorLayer::OnAttach()
     col[ImGuiCol_ModalWindowDimBg] = color(0, 0, 0, 140);
 }
 
+void EditorLayer::OnDetach()
+{
+    m_sceneTreeContexts.clear();
+    m_lastContext.reset();
+    m_currentContext.reset();
+}
+
 void EditorLayer::OnEvent(Nigozi::Event& event)
 {
     Nigozi::EventDispatcher dispatcher(event);
@@ -959,8 +966,7 @@ void EditorLayer::ShowInspector()
                 if (!result.empty()) {
                     std::string path = result.string();
 
-                    component.SpriteTexture.reset();
-                    component.SpriteTexture = std::make_shared<Nigozi::Texture>(path);
+                    component.SpriteTexture = Ref<Nigozi::Texture>::Create(path);
                     component.Sprite = Nigozi::SubTexture(component.SpriteTexture, component.SpriteTexture->GetSize());
                 }
             }
@@ -1707,7 +1713,6 @@ void EditorLayer::ShowViewportPanel()
     if (ImGui::Button("Stop")) {
         m_currentContext->OnDetach();
 
-        m_currentContext.reset();
         m_currentContext = m_lastContext;
 
         m_selectionContext = entt::null;
@@ -1753,7 +1758,7 @@ void EditorLayer::ShowViewport()
         }
         ImGui::EndTabBar();
     }
-    if (m_editorState == EditorState::EDIT && closeContext.get()) {
+    if (m_editorState == EditorState::EDIT && closeContext) {
         CloseSceneTab(closeContext);
     }
 
@@ -1898,7 +1903,7 @@ void EditorLayer::ShowCreateOrOpenProjectModal()
     }
 }
 
-void EditorLayer::CloseSceneTab(const std::shared_ptr<Nigozi::SceneTree>& sceneContext)
+void EditorLayer::CloseSceneTab(const std::shared_ptr<Nigozi::SceneTree> sceneContext)
 {
     auto it = std::find(m_sceneTreeContexts.begin(), m_sceneTreeContexts.end(), sceneContext);
     if (it == m_sceneTreeContexts.end()) {
@@ -1947,7 +1952,7 @@ bool EditorLayer::SaveAllScenes()
     return true;
 }
 
-bool EditorLayer::SaveScene(const std::shared_ptr<Nigozi::SceneTree>& context)
+bool EditorLayer::SaveScene(std::shared_ptr<Nigozi::SceneTree> context)
 {
     if (context->HasFilePath()) {
         return context->SerializeScene();

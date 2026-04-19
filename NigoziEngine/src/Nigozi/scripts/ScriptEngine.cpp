@@ -85,6 +85,8 @@ namespace Nigozi
 			auto& scriptComponent = entity.GetComponent<ScriptComponent>();
 			scriptComponent.ManagedScriptObject.Destroy();
 		}
+
+		s_currentScene.reset();
 	}
 
 	void ScriptEngine::LoadHostInstance()

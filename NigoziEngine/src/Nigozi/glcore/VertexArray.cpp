@@ -15,7 +15,7 @@ namespace Nigozi
 		Delete();
 	}
 
-	void VertexArray::AddVertexBuffer(const std::shared_ptr<VertexBuffer>& vbo, const VertexBufferLayout& vboLayout)
+	void VertexArray::AddVertexBuffer(const Ref<VertexBuffer>& vbo, const VertexBufferLayout& vboLayout)
 	{
 		r_vbo = vbo;
 		r_vbo->Bind();
@@ -30,7 +30,7 @@ namespace Nigozi
 		}
 	}
 
-	void VertexArray::AddIndexBuffer(const std::shared_ptr<IndexBuffer>& ibo)
+	void VertexArray::AddIndexBuffer(const Ref<IndexBuffer>& ibo)
 	{
 		r_ibo = ibo;
 	}
@@ -49,14 +49,14 @@ namespace Nigozi
 
 	void VertexArray::SetVertexBufferData(const void* data, uint32_t size)
 	{
-		r_vbo.get()->Bind();
-		r_vbo.get()->SetData(data, size);
+		r_vbo.Get()->Bind();
+		r_vbo.Get()->SetData(data, size);
 	}
 
 	void VertexArray::SetIndexBufferData(const void* data, uint32_t count)
 	{
-		r_ibo.get()->Bind();
-		r_ibo.get()->SetData(data, count);
+		r_ibo.Get()->Bind();
+		r_ibo.Get()->SetData(data, count);
 	}
 
 	void VertexArray::Delete()
