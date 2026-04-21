@@ -30,6 +30,17 @@ namespace Nigozi
 		}
 	}
 
+	Texture::Texture(Texture&& other) noexcept
+	{
+		m_rendererID = other.m_rendererID;
+		m_filePath = std::move(other.m_filePath);
+		m_size = other.m_size;
+		m_BPP = other.m_BPP;
+
+		// Invalidate
+		other.m_rendererID = -1;
+	}
+
 	Texture::~Texture()
 	{
 		NG_CORE_LOG_TRACE("[Texture] Destroyed, id: {}, pointer: {}", m_rendererID, (void*)this);

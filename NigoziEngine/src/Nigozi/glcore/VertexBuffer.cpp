@@ -12,6 +12,14 @@ namespace Nigozi
         GLCall(glBufferData(GL_ARRAY_BUFFER, size, data, GL_DYNAMIC_DRAW));
     }
 
+    VertexBuffer::VertexBuffer(VertexBuffer&& other) noexcept
+    {
+        m_rendererID = other.m_rendererID;
+
+        // Invalidate
+        other.m_rendererID = -1;
+    }
+
     VertexBuffer::~VertexBuffer()
     {
         Delete();

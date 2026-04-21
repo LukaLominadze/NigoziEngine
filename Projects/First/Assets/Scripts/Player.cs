@@ -10,7 +10,8 @@ namespace First
     internal class Player : RigidbodyNode
     {
         private Vector4 startColor = Vector4.Zero;
-        private SpriteNode sprite;
+        private SpriteNode? sprite;
+        private SpriteNode? hatSprite;
         private float direction = -1.0f;
 
         public void OnStart()
@@ -24,6 +25,11 @@ namespace First
                 startColor = child.Color;
                 child.Color = new Vector4(0.2f, 0.2f, 0.9f, 1.0f);
             }
+            child = GetChild<SpriteNode>(1);
+            if (child != null)
+            {
+                hatSprite = child;
+            }
         }
 
         public void OnUpdate(float timestep)
@@ -36,15 +42,17 @@ namespace First
                 ApplyImpulse(Vector2.Up * 8.0f);
             }
 
-            if (sprite.Color.X < 0.2f)
+            if (sprite!.Color.X < 0.2f)
             {
                 direction = 1;
             }
-            else if (sprite.Color.X > 0.9f)
+            else if (sprite!.Color.X > 0.9f)
             {
                 direction = -1;
             }
-            sprite.Color += new Vector4(1.0f, 1.0f, 1.0f) * direction * 2.0f * timestep;
+            sprite!.Color += new Vector4(1.0f, 1.0f, 1.0f) * direction * 2.0f * timestep;
+
+            hatSprite!.Rotation += 720.0f * timestep;
         }
 
         public void OnDestroy()

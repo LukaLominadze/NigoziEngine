@@ -14,7 +14,7 @@
 
 namespace Nigozi
 {
-	std::shared_ptr<SceneTree> ScriptEngine::s_currentScene;
+	std::weak_ptr<SceneTree> ScriptEngine::s_currentScene;
 
 	Coral::HostInstance ScriptEngine::s_hostInstance;
 	Coral::AssemblyLoadContext ScriptEngine::s_loadContext;
@@ -59,10 +59,10 @@ namespace Nigozi
 
 	void ScriptEngine::StartRuntime()
 	{
-		auto view = s_currentScene->m_Registry.view<ScriptComponent>();
+		auto view = s_currentScene.lock()->m_Registry.view<ScriptComponent>();
 
 		for (auto entityHandle : view) {
-			auto entity = Entity(entityHandle, s_currentScene.get());
+			auto entity = Entity(entityHandle, s_currentScene.lock().get());
 			auto& scriptComponent = entity.GetComponent<ScriptComponent>();
 
 			std::string scriptName = StringUtils::SplitString(scriptComponent.ScriptPath.filename().string(), ".")[0];
@@ -78,10 +78,10 @@ namespace Nigozi
 
 	void ScriptEngine::EndRuntime()
 	{
-		auto view = s_currentScene->m_Registry.view<ScriptComponent>();
+		auto view = s_currentScene.lock()->m_Registry.view<ScriptComponent>();
 
 		for (auto entityHandle : view) {
-			auto entity = Entity(entityHandle, s_currentScene.get());
+			auto entity = Entity(entityHandle, s_currentScene.lock().get());
 			auto& scriptComponent = entity.GetComponent<ScriptComponent>();
 			scriptComponent.ManagedScriptObject.Destroy();
 		}

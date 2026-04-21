@@ -7,10 +7,13 @@
 #include <utility>
 #include <cstdint>
 #include <new>
-#include <deque>
 #include "core/Log.h"
 
 // This is what manages ref counted objects
+/*
+    Note(Luka):
+    This ref manager's purpose is to put all referenced objects inside a single, contigious, container.
+*/
 template<typename T>
 class RefManager
 {
@@ -28,8 +31,8 @@ public:
             uint32_t id = *--m_invalidatedRefs.end();
             m_invalidatedRefs.pop_back();
 
-            // new (&m_refs[id]) RefCounted<T>(std::forward<Args>(args)...);
-            m_refs[id] = RefCounted<T>(std::forward<Args>(args)...);
+            new (&m_refs[id]) RefCounted<T>(std::forward<Args>(args)...);
+            // m_refs[id] = RefCounted<T>(std::forward<Args>(args)...);
             return id;
         }
         m_refs.emplace_back(std::forward<Args>(args)...);
@@ -61,6 +64,6 @@ public:
         return &m_refs[id].Obj;
     }
 private:
-    std::deque<RefCounted<T>> m_refs;
+    std::vector<RefCounted<T>> m_refs;
     std::vector<uint32_t> m_invalidatedRefs;
 };

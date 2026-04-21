@@ -3,7 +3,27 @@
 #include "RefCounted.h"
 #include "RefManager.h"
 
-// This is what the API for ref counted objects
+// This is the API for ref counted objects
+/*
+    Note(Luka):
+    Any usage of this ref class will require the contained class
+    to have a move constructor, that will "invalidate" the input instance
+    to disable the destructor behaviour
+
+    For Ex.
+    Test(Test&& other)
+    {
+        m_id = other.m_id
+        other.m_id = -1; // Invalidate!
+    }
+    ~Test()
+    {
+        if (m_id != -1)
+        {
+            // Destruct!
+        }
+    }
+*/
 template<typename T>
 class Ref
 {
@@ -31,8 +51,8 @@ public:
     template<typename... Args>
     static Ref<T> Create(Args&&... args) 
     {
-        static_assert(std::is_move_assignable<T>::value, "Move assignment not found!");
-        static_assert(std::is_nothrow_move_assignable<T>::value, "Move assignment with noexcept needed");
+        static_assert(std::is_move_constructible<T>::value, "Move constructor not found!");
+        static_assert(std::is_nothrow_move_constructible<T>::value, "Move constructor with noexcept needed");
         uint32_t id = RefManager<T>::Get().Create(std::forward<Args>(args)...);
         return Ref<T>(id);
     }

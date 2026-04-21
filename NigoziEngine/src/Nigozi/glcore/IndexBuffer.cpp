@@ -16,6 +16,15 @@ namespace Nigozi
         GLCall(glBufferData(GL_ELEMENT_ARRAY_BUFFER, m_count * sizeof(uint32_t), data, GL_DYNAMIC_DRAW));
     }
 
+    IndexBuffer::IndexBuffer(IndexBuffer&& other) noexcept
+    {
+        m_rendererID = other.m_rendererID;
+        m_count = other.m_count;
+
+        // Invalidate
+        other.m_rendererID = -1;
+    }
+
     IndexBuffer::~IndexBuffer()
     {
         Delete();

@@ -161,6 +161,10 @@ namespace Nigozi
                     color.w = ent["Sprite"]["Color"]["A"].as<float>();
                 }
 
+                if (ent["Sprite"]["ZOrder"]) {
+                    sprite.ZOrder = ent["Sprite"]["ZOrder"].as<int8_t>();
+                }
+
                 glm::u32vec2 seperator(1);
                 if (ent["Sprite"]["Seperator"]) {
                     seperator = glm::u32vec2(
@@ -312,6 +316,8 @@ namespace Nigozi
             ent["Sprite"]["Color"]["G"] = sprite.Color.y;
             ent["Sprite"]["Color"]["B"] = sprite.Color.z;
             ent["Sprite"]["Color"]["A"] = sprite.Color.w;
+
+            ent["Sprite"]["ZOrder"] = sprite.ZOrder;
 
             ent["Sprite"]["Slot"]["X"] = sprite.Sprite.GetSlotX();
             ent["Sprite"]["Slot"]["Y"] = sprite.Sprite.GetSlotY();

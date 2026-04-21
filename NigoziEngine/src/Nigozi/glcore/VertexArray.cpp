@@ -10,6 +10,16 @@ namespace Nigozi
 		GLCall(glBindVertexArray(m_rendererID));
 	}
 
+	VertexArray::VertexArray(VertexArray&& other) noexcept
+	{
+		m_rendererID = other.m_rendererID;
+		r_vbo = other.r_vbo;
+		r_ibo = other.r_ibo;
+
+		// Invalidate
+		other.m_rendererID = -1;
+	}
+
 	VertexArray::~VertexArray()
 	{
 		Delete();

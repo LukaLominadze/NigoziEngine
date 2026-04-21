@@ -26,14 +26,14 @@ namespace Nigozi
 		// Start the child process. 
 		if (!CreateProcess(NULL,   // No module name (use command line)
 			wsysCommand.data(),    // Command line
-			NULL,           // Process handle not inheritable
-			NULL,           // Thread handle not inheritable
-			TRUE,          // Set handle inheritance to TRUE
-			flags, // No creation flags
-			NULL,           // Use parent's environment block
-			NULL,           // Use parent's starting directory 
-			&si,            // Pointer to STARTUPINFO structure
-			&pi)           // Pointer to PROCESS_INFORMATION structure
+			NULL,                  // Process handle not inheritable
+			NULL,                  // Thread handle not inheritable
+			TRUE,                  // Set handle inheritance to TRUE
+			flags,                 // No creation flags
+			NULL,                  // Use parent's environment block
+			NULL,                  // Use parent's starting directory 
+			&si,                   // Pointer to STARTUPINFO structure
+			&pi)                   // Pointer to PROCESS_INFORMATION structure
 			)
 		{
 			printf("CreateProcess failed (%d).\n", GetLastError());

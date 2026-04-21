@@ -7,6 +7,7 @@ namespace Nigozi
 	public:
 		VertexBuffer() = default;
 		VertexBuffer(const void* data, uint32_t size);
+		VertexBuffer(VertexBuffer&& other) noexcept;
 		~VertexBuffer();
 
 		void Bind() const;
@@ -15,15 +16,6 @@ namespace Nigozi
 		void SetData(const void* data, uint32_t size);
 
 		void Delete();
-	public:
-		VertexBuffer& operator=(VertexBuffer&& other) noexcept
-		{
-			m_rendererID = other.m_rendererID;
-
-			// Invalidate
-			other.m_rendererID = -1;
-			return *this;
-		}
 	private:
 		uint32_t m_rendererID;
 	};

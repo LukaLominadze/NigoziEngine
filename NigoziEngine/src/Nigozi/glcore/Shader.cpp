@@ -29,6 +29,15 @@ namespace Nigozi
         GLCall(glUseProgram(m_shader));
     }
 
+    Shader::Shader(Shader&& other) noexcept
+    {
+        m_filePath = std::move(other.m_filePath);
+        m_shader = other.m_shader;
+
+        // Invalidate
+        other.m_shader = -1;
+    }
+
     Shader::~Shader()
     {
         Delete();

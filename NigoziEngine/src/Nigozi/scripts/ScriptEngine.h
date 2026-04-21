@@ -16,8 +16,8 @@ namespace Nigozi
 		static void Initialize(const std::filesystem::path& coralDir);
 		static void Deinitialize();
 
-		static inline std::shared_ptr<SceneTree> GetCurrentSceneTree() { return s_currentScene; }
-		static inline void SetCurrentSceneTree(std::shared_ptr<SceneTree> sceneTree) { s_currentScene = sceneTree; }
+		static inline std::shared_ptr<SceneTree> GetCurrentSceneTree() { return s_currentScene.lock(); }
+		static inline void SetCurrentSceneTree(const std::shared_ptr<SceneTree>& sceneTree) { s_currentScene = sceneTree; }
 
 		static void LoadProjectAssembly();
 		static void ReloadAssemblies();
@@ -29,7 +29,8 @@ namespace Nigozi
 		static void LoadCoreAssembly();
 		static void UnloadCoreAssembly();
 	private:
-		static std::shared_ptr<SceneTree> s_currentScene;
+		// Script engine will only be using current scene during the scene tree lifetime
+		static std::weak_ptr<SceneTree> s_currentScene;
 
 		static Coral::HostInstance s_hostInstance;
 		static Coral::AssemblyLoadContext s_loadContext;

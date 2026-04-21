@@ -11,6 +11,7 @@ namespace Nigozi
 	{
 	public:
 		VertexArray();
+		VertexArray(VertexArray&& other) noexcept;
 		~VertexArray();
 
 		void AddVertexBuffer(const Ref<VertexBuffer>& vbo, const VertexBufferLayout& vboLayout);
@@ -23,17 +24,6 @@ namespace Nigozi
 		void SetIndexBufferData(const void* data, uint32_t count);
 
 		void Delete();
-	public:
-		VertexArray& operator=(VertexArray&& other) noexcept
-		{
-			m_rendererID = other.m_rendererID;
-			r_vbo = other.r_vbo;
-			r_ibo = other.r_ibo;
-
-			// Invalidate
-			other.m_rendererID = -1;
-			return *this;
-		}
 	private:
 		uint32_t m_rendererID;
 

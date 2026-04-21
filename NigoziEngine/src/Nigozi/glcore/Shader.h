@@ -17,6 +17,7 @@ namespace Nigozi
 	public:
 		Shader() = default;
 		Shader(const std::string& filePath);
+		Shader(Shader&& other) noexcept;
 		~Shader();
 
 		void SetUniform1i(const std::string& name, int value);
@@ -33,16 +34,6 @@ namespace Nigozi
 		int GetUniformLocation(const std::string& uniform);
 
 		void Delete();
-	public:
-		Shader& operator=(Shader&& other) noexcept
-		{
-			m_filePath = std::move(other.m_filePath);
-			m_shader = other.m_shader;
-
-			// Invalidate
-			other.m_shader = -1;
-			return *this;
-		}
 	private:
 		ShaderProgramSource ParseShader();
 		uint32_t CreateShader(const std::string& vertexShader, const std::string& fragmentShader);

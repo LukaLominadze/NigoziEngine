@@ -637,9 +637,9 @@ void EditorLayer::ShowSceneHierarchy()
     ImGui::Begin("Scene Hierarchy");
     m_windowPosition = glm::vec2(ImGui::GetWindowPos().x, ImGui::GetWindowPos().y);
 
-    auto view = m_currentContext->m_Registry.view<Nigozi::UUIDComponent>();
+    Nigozi::Entity rootNode = m_currentContext->TryGetEntityByUUID(m_currentContext->GetSceneRootUUID());
     
-    if (view.empty()) {
+    if (rootNode == Nigozi::Entity()) {
         ImGui::Text("Add your first node");
     }
     ShowAddNodeModal();
@@ -671,13 +671,8 @@ void EditorLayer::ShowSceneHierarchy()
         ImGui::EndPopup();
     }
 
-    for (const auto entityHandle : view) {
-        Nigozi::Entity entity(entityHandle, m_currentContext.get());
-        auto& relationshipComponent = entity.GetComponent<Nigozi::RelationshipComponent>();
-
-        if (relationshipComponent.ParentUUID.GetUUID() == Nigozi::UUID::Null) {
-            DrawSceneHierarchyNode(entity);
-        }
+    if (rootNode != Nigozi::Entity()) {
+        DrawSceneHierarchyNode(rootNode);
     }
     if (ImGui::IsMouseDown(ImGuiMouseButton_Left) && ImGui::IsWindowHovered()) {
         m_selectionContext = entt::null;
@@ -1910,6 +1905,9 @@ void EditorLayer::EditorPause()
 
 void EditorLayer::EditorStop()
 {
+    if (m_editorState == EditorState::EDIT) {
+        return;
+    }
     m_currentContext->OnDetach();
 
     m_currentContext = m_lastContext;
