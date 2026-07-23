@@ -8,7 +8,7 @@
     Note(Luka):
     Any usage of this ref class will require the contained class
     to have a move constructor, that will "invalidate" the input instance
-    to disable the destructor behaviour
+    to disable it's destructor behaviour
 
     For Ex.
     Test(Test&& other)

@@ -12,11 +12,6 @@ namespace Nigozi
 	class TransformComponent;
 	class CameraComponent;
 
-	/*
-		TODO: There probably should be different versions of a scene,
-		for runtime and for the editor, since components behave differently
-		in each
-	*/
 	class SceneTree : public Layer
 	{
 	public:
@@ -29,12 +24,6 @@ namespace Nigozi
 
 		void ClearSceneTree();
 
-		/*
-			TODO: It would be good to have scene metadeta saved in a file
-			and just have a LoadScene function, which would all the associated
-			data to that scene. This way we also wouldn't have to create
-			inherited scene classes to have different scenes
-		*/
 		void OnAttach() override;
 		void OnDetach() override;
 		void OnEvent(Event& event) override;

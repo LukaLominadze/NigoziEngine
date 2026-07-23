@@ -1,11 +1,19 @@
 #include "ngpch.h"
 #include "Material.h"
 
-Nigozi::Material::Material(std::shared_ptr<Shader>& shader)
+namespace Nigozi
 {
-	p_shader = shader;
-}
+	Material::Material(Ref<Shader>& shader)
+	{
+		p_shader = shader;
+	}
 
-Nigozi::Material::~Material()
-{
+	Material::Material(Material&& other)
+	{
+		p_shader = other.p_shader;
+	}
+
+	Material::~Material()
+	{
+	}
 }
